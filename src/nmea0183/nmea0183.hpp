@@ -28,7 +28,13 @@ public:
     // Produce wire-format representation
     std::string serialize() const override;
 
-    // Validate message contents (checksum, length, etc.)
+    /**
+     * @brief Validates the message by checking it begins with '$' or '!',
+     * and the checksum is correct.
+     * 
+     * @return true 
+     * @return false 
+     */
     bool validate() const override;
 
     // Access the payload (without leading '$'/'!' and without trailing checksum or CRLF)

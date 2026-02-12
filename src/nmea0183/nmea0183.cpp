@@ -42,9 +42,8 @@ bool Message0183::validate() const {
     const auto star = rawData_.find('*');
     if (star == std::string::npos) return false;
 
-    // need at least two hex digits after '*'
-    if (star + 2 >= rawData_.size()) return false;
-    const std::string csStr = rawData_.substr(star + 1, 2);
+    const std::string csStr = getChecksumStr();
+    if (csStr.size() != 2) return false;
     if (!isHexByte(csStr)) return false;
 
     const std::string payload = rawData_.substr(1, star - 1);

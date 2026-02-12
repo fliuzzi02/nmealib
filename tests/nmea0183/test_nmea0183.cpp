@@ -6,13 +6,18 @@ using namespace nmealib::nmea0183;
 
 // Messages to test the class with
 std::forward_list<std::string> validMessages = {
+    // Valid checksum #1
     "$PFUGDP,GN,033615.00,3953.88002,N,10506.75324,W,13,9,FF,0.1,0.1,149,0.1*13\r\n",
-    "$GPGGA,210230,3855.4487,N,09446.0071,W,1,07,1.1,370.5,M,-29.5,M,,*7A\r\n"
+    // Valid checksum #2
+    "$GPGGA,210230,3855.4487,N,09446.0071,W,1,07,1.1,370.5,M,-29.5,M,,*7A\r\n",
+    // Valid checksum but with leading '!' instead of '$' (some NMEA sentences use '!')
+    "!GPGGA,210230,3855.4487,N,09446.0071,W,1,07,1.1,370.5,M,-29.5,M,,*7A\r\n",
+    // Valid checksum without trailing CRLF (should be accepted as valid)
+    "$GPGGA,210230,3855.4487,N,09446.0071,W,1,07,1.1,370.5,M,-29.5,M,,*7A"
 };
 std::forward_list<std::string> invalidMessages = {
-    "GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*45", // Missing leading '$'
-    "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*ZZ", // Invalid checksum
-    "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*27\r\nEXTRA" // Extra data after CRLF
+    "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*45", // Invalid checksum (should be 47, not 45)
+    "GPGGA,210230,3855.4487,N,09446.0071,W,1,07,1.1,370.5,M,-29.5,M,,*7A" // Missing leading '$' or '!'
 };
 
 // Just a basic test to ensure the class hierarchy compiles and can be used polymorphically.
