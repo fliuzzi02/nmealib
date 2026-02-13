@@ -73,7 +73,10 @@ public:
 
     // Polymorphic copy
     std::unique_ptr<nmealib::Message> clone() const override;
-
+    
+    char getStartChar() const noexcept;
+    std::string getTalker() const noexcept;
+    std::string getSentenceType() const noexcept;
     std::string getPayload() const noexcept;
     /**
      * @brief Get the Checksum Str object
@@ -88,14 +91,12 @@ public:
      * @return std::string The checksum string calculated from the payload of the NMEA 0183 sentence, represented as a two-digit hexadecimal string.
      */
     std::string getCalculatedChecksumStr() const noexcept;
-    std::string getTalker() const noexcept;
-    std::string getSentenceType() const noexcept;
 
 protected:
     char startChar_; // '$' or '!'
     std::string talker_; // e.g. "GP", "II", etc. (first two chars of payload)
     std::string sentenceType_; // e.g. "GGA", "RMC", etc. (chars 3-5 of payload)
-    std::string payload_; // the part between header and checksum
+    std::string payload_; // the part between startChar and * (or between startChar and CRLF if no checksum)
     std::string checksumStr_; // the two hex digits after '*', if present
     std::string calculatedChecksumStr_; // the checksum computed from the payload, as a two-digit hex string
 
