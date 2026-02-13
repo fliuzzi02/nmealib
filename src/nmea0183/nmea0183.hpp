@@ -92,6 +92,44 @@ public:
      */
     std::string getCalculatedChecksumStr() const noexcept;
 
+    // Produce wire-format representation
+    std::string serialize() const override;
+
+    // Override of the == operator to compare Message0183 objects based on their content rather than their memory addresses.
+    bool operator==(const Message0183& other) const noexcept {
+        return startChar_ == other.startChar_ &&
+               talker_ == other.talker_ &&
+               sentenceType_ == other.sentenceType_ &&
+               payload_ == other.payload_ &&
+               checksumStr_ == other.checksumStr_ &&
+               calculatedChecksumStr_ == other.calculatedChecksumStr_ &&
+               Message::operator==(other);
+    }
+
+    /**
+     * @brief Compares the content of the message only, ignoring the timestamp
+     * 
+     * @param other The other Message0183 object to compare with
+     * @return true if the content of both messages is equal (start char, talker, sentence type, payload, checksum string, and calculated checksum string), regardless of their timestamps;
+     * @return false otherwise
+     */
+    bool hasEqualContent(const Message0183& other) const noexcept {
+        return startChar_ == other.startChar_ &&
+               talker_ == other.talker_ &&
+               sentenceType_ == other.sentenceType_ &&
+               payload_ == other.payload_ &&
+               checksumStr_ == other.checksumStr_ &&
+               calculatedChecksumStr_ == other.calculatedChecksumStr_;
+    }
+
+    /**
+     * @brief Returns wheter the message is valid or not
+     * 
+     * @return true If there is no checksum or if the checksum matches the calculated checksum for the payload
+     * @return false if there is a checksum and it does not match the calculated checksum for the payload
+     */
+    bool validate() const override { return getChecksumStr().empty() || (getChecksumStr() == getCalculatedChecksumStr()); }
+
 protected:
     char startChar_; // '$' or '!'
     std::string talker_; // e.g. "GP", "II", etc. (first two chars of payload)

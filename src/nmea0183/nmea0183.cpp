@@ -70,20 +70,32 @@ std::unique_ptr<Message0183> Message0183::create(const std::string& raw, TimePoi
         if(!isHexByte(checksumStr)) {
             throw NoChecksumException(context, "Invalid checksum format: " + checksumStr);
         }
-        return std::make_unique<Message0183>(raw, ts, startChar, talker, sentenceType, payload, checksumStr);
+        return std::unique_ptr<Message0183>(new Message0183(raw, ts, startChar, talker, sentenceType, payload, checksumStr));
     } else {
 
         payload = raw.substr(1, raw.size() - 3); // Exclude start char and CRLF
-        return std::make_unique<Message0183>(raw, ts, startChar, talker, sentenceType, payload);
+        return std::unique_ptr<Message0183>(new Message0183(raw, ts, startChar, talker, sentenceType, payload));
     }
 }
 
 std::unique_ptr<nmealib::Message> Message0183::clone() const {
-    return std::make_unique<Message0183>(*this);
+    return std::unique_ptr<Message0183>(new Message0183(*this));
 }
 
 std::string Message0183::getPayload() const noexcept {
     return payload_;
+}
+
+char Message0183::getStartChar() const noexcept {
+    return startChar_;
+}
+
+std::string Message0183::getTalker() const noexcept {
+    return talker_;
+}
+
+std::string Message0183::getSentenceType() const noexcept {
+    return sentenceType_;
 }
 
 std::string Message0183::getChecksumStr() const {
@@ -95,6 +107,18 @@ std::string Message0183::getChecksumStr() const {
 
 std::string Message0183::getCalculatedChecksumStr() const noexcept {
     return calculatedChecksumStr_;
+}
+
+std::string Message0183::serialize() const {
+    std::string out;
+    out.push_back(startChar_);
+    out += payload_;
+    if (!checksumStr_.empty()) {
+        out.push_back('*');
+        out += checksumStr_;
+    }
+    out += "\r\n";
+    return out;
 }
 
 std::string Message0183::computeChecksum(const std::string& payload) noexcept {
