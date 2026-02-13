@@ -48,6 +48,13 @@ public:
     // Validate message contents (checksum, length, etc.)
     virtual bool validate() const = 0;
 
+    // Override == operator to compare Message objects based on their content rather than their memory addresses.
+    bool operator==(const Message& other) const noexcept {
+        return type_ == other.type_ &&
+               rawData_ == other.rawData_ &&
+               timestamp_ == other.timestamp_;
+    }
+
 protected:
     std::string rawData_;
     Type type_{Type::Unknown};
