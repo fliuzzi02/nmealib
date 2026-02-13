@@ -121,6 +121,13 @@ std::string Message0183::serialize() const {
     return out;
 }
 
+bool Message0183::validate() const {
+    if (checksumStr_.empty()) {
+        return true; // No checksum means we consider it valid by default
+    }
+    return getChecksumStr() == getCalculatedChecksumStr();
+}
+
 std::string Message0183::computeChecksum(const std::string& payload) noexcept {
     uint8_t checksum = 0;
     for (char c : payload) {

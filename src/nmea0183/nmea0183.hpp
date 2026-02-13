@@ -128,7 +128,7 @@ public:
      * @return true If there is no checksum or if the checksum matches the calculated checksum for the payload
      * @return false if there is a checksum and it does not match the calculated checksum for the payload
      */
-    bool validate() const override { return getChecksumStr().empty() || (getChecksumStr() == getCalculatedChecksumStr()); }
+    bool validate() const override;
 
 protected:
     char startChar_; // '$' or '!'
