@@ -18,6 +18,14 @@ public:
      * 
      */
     enum class Type { Unknown, NMEA0183, NMEA2000 };
+    static std::string typeToString(Type t) {
+        switch (t) {
+            case Type::Unknown: return "Unknown";
+            case Type::NMEA0183: return "NMEA0183";
+            case Type::NMEA2000: return "NMEA2000";
+            default: return "InvalidType";
+        }
+    }
 
     using TimePoint = std::chrono::system_clock::time_point;
 

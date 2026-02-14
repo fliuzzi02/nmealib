@@ -110,16 +110,29 @@ std::string Message0183::getCalculatedChecksumStr() const noexcept {
     return calculatedChecksumStr_;
 }
 
-std::string Message0183::serialize() const {
-    std::string out;
-    out.push_back(startChar_);
-    out += payload_;
-    if (!checksumStr_.empty()) {
-        out.push_back('*');
-        out += checksumStr_;
+std::string Message0183::getStringContent(bool verbose) const noexcept {
+    std::stringstream ss;
+    std::string validity = "KO";
+    if(validate()) {
+        validity = "OK";
     }
-    out += "\r\n";
-    return out;
+
+    if (!verbose) {
+        ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": " << "Unimplemented sentence type";
+    } else {
+        ss << "Protocol: " << typeToString(type_) << "\n";
+        ss << "Talker: " << getTalker() << "\n";
+        ss << "Sentence Type: " << getSentenceType() << "\n";
+        ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
+        ss << "Fields: \n";
+        ss << "\tUnimplemented sentence type";
+    }
+
+    return ss.str();
+}
+
+std::string Message0183::serialize() const {
+    return rawData_;
 }
 
 bool Message0183::validate() const {

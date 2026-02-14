@@ -91,8 +91,21 @@ public:
      * @return std::string The checksum string calculated from the payload of the NMEA 0183 sentence, represented as a two-digit hexadecimal string.
      */
     std::string getCalculatedChecksumStr() const noexcept;
+    
+    /**
+     * @brief Returns a human-readable string representation of the message content.
+     * 
+     * @param verbose Selects wheter to print an one-liner or a more detailed multi-line string with field names and values.
+     * @return std::string The string representation of the message content 
+     */
+    virtual std::string getStringContent(bool verbose) const noexcept;
 
-    // Produce wire-format representation
+    /**
+     * @brief Returns the wire-format representation of the NMEA 0183 sentence, 
+     * that is, the raw information that was passed when the message was created.
+     * 
+     * @return std::string A string with thw wire-format
+     */
     std::string serialize() const override;
 
     // Override of the == operator to compare Message0183 objects based on their content rather than their memory addresses.
