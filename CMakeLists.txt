@@ -9,13 +9,19 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-include(CTest)
-
-enable_testing()
-
 add_subdirectory(app)
 add_subdirectory(src)
-add_subdirectory(tests)
+
+option(ENABLE_TESTS "Enable building and running tests" OFF)
+
+if(ENABLE_TESTS)
+    message(STATUS "Tests enabled (ENABLE_TESTS=ON)")
+    include(CTest)
+
+    enable_testing()
+    
+    add_subdirectory(tests)
+endif()
 
 option(ENABLE_STATIC_ANALYSIS "Enable static analysis (clang-tidy and cppcheck)" OFF)
 

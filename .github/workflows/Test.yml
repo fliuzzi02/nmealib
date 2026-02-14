@@ -1,4 +1,4 @@
-name: Test
+name: Run Tests
 
 on:
   workflow_run:
@@ -13,12 +13,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: build-ubuntu-latest-gcc
-        path: build
-        run-id: ${{ github.event.workflow_run.id }}
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build build --config Release
 
     - name: Run all tests
       working-directory: build

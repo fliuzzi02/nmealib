@@ -2,15 +2,17 @@
     "version": 8,
     "configurePresets": [
         {
-            "name": "Linux GCC",
-            "displayName": "GCC 15.2.0 x86_64-unknown-linux-gnu",
+            "name": "gcc-full",
+            "displayName": "GCC Full Build",
             "description": "Using compilers: C = /usr/bin/gcc, CXX = /usr/bin/g++",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
                 "CMAKE_C_COMPILER": "/usr/bin/gcc",
                 "CMAKE_CXX_COMPILER": "/usr/bin/g++",
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_BUILD_TYPE": "Debug",
+                "ENABLE_TESTS": "ON",
+                "ENABLE_STATIC_ANALYSIS": "OFF"
             }
         }
     ],
@@ -19,7 +21,7 @@
       "name": "test-nmea0183",
       "displayName": "Nmea0183",
       "description": "Run only nmea0183 tests",
-      "configurePreset": "Linux GCC",
+      "configurePreset": "gcc-full",
       "filter": {
         "include": {
           "label": "nmea0183"
@@ -30,7 +32,7 @@
       "name": "test-nmea2000",
       "displayName": "Nmea2000",
       "description": "Run only nmea2000 tests",
-      "configurePreset": "Linux GCC",
+      "configurePreset": "gcc-full",
       "filter": {
         "include": {
           "label": "nmea2000"
@@ -41,7 +43,7 @@
       "name": "test-all",
       "displayName": "All",
       "description": "Run all tests (aggregate target)",
-      "configurePreset": "Linux GCC"
+      "configurePreset": "gcc-full"
     }
   ]
 }
