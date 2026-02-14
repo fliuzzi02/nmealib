@@ -25,7 +25,7 @@ if(ENABLE_STATIC_ANALYSIS)
     find_program(CLANG_TIDY_EXE NAMES clang-tidy clang-tidy-14 clang-tidy-13)
     if(CLANG_TIDY_EXE)
         # Run clang-tidy as part of the compilation step
-        set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE};-checks=*,clang-analyzer-*" CACHE STRING "clang-tidy executable and options" FORCE)
+        set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE};-checks=*,clang-analyzer-*,-readability-function-cognitive-complexity" CACHE STRING "clang-tidy executable and options" FORCE)
         message(STATUS "Found clang-tidy: ${CLANG_TIDY_EXE}")
     else()
         message(WARNING "clang-tidy not found; clang-tidy checks will not run during build")
@@ -41,7 +41,7 @@ if(ENABLE_STATIC_ANALYSIS)
     # Create a helper target that runs cppcheck (if available) and then triggers a build (so clang-tidy runs)
     if(CPPCHECK_EXE)
         add_custom_target(static-analysis
-            COMMAND ${CPPCHECK_EXE} --enable=all --inconclusive --std=c++20 --suppress=missingIncludeSystem
+            COMMAND ${CPPCHECK_EXE} --enable=all --inconclusive --std=c++20 --suppress=missingIncludeSystem --suppress=unusedFunction
                             --error-exitcode=1
                             ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/app
             COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}

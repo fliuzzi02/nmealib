@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
+#include <numeric>
 
 namespace nmealib {
 namespace nmea0183 {
@@ -129,10 +130,8 @@ bool Message0183::validate() const {
 }
 
 std::string Message0183::computeChecksum(const std::string& payload) noexcept {
-    uint8_t checksum = 0;
-    for (char c : payload) {
-        checksum ^= static_cast<uint8_t>(c);
-    }
+    uint8_t checksum = std::accumulate(payload.begin(), payload.end(), static_cast<uint8_t>(0),
+        [](uint8_t acc, char c) { return acc ^ static_cast<uint8_t>(c); });
     std::stringstream ss;
     ss << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(checksum);
     return ss.str();

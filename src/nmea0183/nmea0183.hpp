@@ -10,25 +10,25 @@ namespace nmea0183 {
 
 class TooLongSentenceException : public NmeaException {
 public:
-    TooLongSentenceException(const std::string& context, const std::string& details = "") : 
+    explicit TooLongSentenceException(const std::string& context, const std::string& details = "") : 
     NmeaException(context, "NMEA 0183 sentence exceeds maximum length of 82 characters", details) {}
 };
 
 class InvalidStartCharacterException : public NmeaException {
 public:
-    InvalidStartCharacterException(const std::string& context, const std::string& details = "") : 
+    explicit InvalidStartCharacterException(const std::string& context, const std::string& details = "") : 
     NmeaException(context, "NMEA 0183 sentence must start with '$' or '!'", details) {}
 };
 
 class NoChecksumException : public NmeaException {
 public:
-    NoChecksumException(const std::string& context, const std::string& details = "") : 
+    explicit NoChecksumException(const std::string& context, const std::string& details = "") : 
     NmeaException(context, "This sentence does not contain a checksum", details) {}
 };
 
 class NoEndlineException : public NmeaException {
 public:
-    NoEndlineException(const std::string& context, const std::string& details = "") : 
+    explicit NoEndlineException(const std::string& context, const std::string& details = "") : 
     NmeaException(context, "NMEA 0183 sentence must end with <CR><LF>", details) {}
 };
 
