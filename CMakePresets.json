@@ -2,8 +2,8 @@
     "version": 8,
     "configurePresets": [
         {
-            "name": "Codespace GCC",
-            "displayName": "GCC 13.3.0 x86_64-linux-gnu",
+            "name": "Linux GCC",
+            "displayName": "GCC 15.2.0 x86_64-unknown-linux-gnu",
             "description": "Using compilers: C = /usr/bin/gcc, CXX = /usr/bin/g++",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "cacheVariables": {
@@ -12,18 +12,36 @@
                 "CMAKE_CXX_COMPILER": "/usr/bin/g++",
                 "CMAKE_BUILD_TYPE": "Debug"
             }
-        },
-        {
-            "name": "Codespace Clang",
-            "displayName": "Clang 18.1.3 x86_64-pc-linux-gnu",
-            "description": "Using compilers: C = /usr/bin/clang, CXX = /usr/bin/clang++",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "cacheVariables": {
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-                "CMAKE_C_COMPILER": "/usr/bin/clang",
-                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
         }
-    ]
+    ],
+    "testPresets": [
+    {
+      "name": "test-nmea0183",
+      "displayName": "Nmea0183",
+      "description": "Run only nmea0183 tests",
+      "configurePreset": "Linux GCC",
+      "filter": {
+        "include": {
+          "label": "nmea0183"
+        }
+      }
+    },
+    {
+      "name": "test-nmea2000",
+      "displayName": "Nmea2000",
+      "description": "Run only nmea2000 tests",
+      "configurePreset": "Linux GCC",
+      "filter": {
+        "include": {
+          "label": "nmea2000"
+        }
+      }
+    },
+    {
+      "name": "test-all",
+      "displayName": "All",
+      "description": "Run all tests (aggregate target)",
+      "configurePreset": "Linux GCC"
+    }
+  ]
 }

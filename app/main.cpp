@@ -41,19 +41,29 @@ int main(int argc, char** argv) {
     }
 
     auto now = std::chrono::system_clock::now();
-    nmealib::nmea0183::Message0183 msg(sentence, now);
+    std::unique_ptr<nmealib::nmea0183::Message0183> msg;
+    try {
+        msg = nmealib::nmea0183::Message0183::create(sentence, now);
+    } catch (const std::exception& ex) {
+        std::cerr << "Failed to parse NMEA sentence: " << ex.what() << '\n';
+        return 2;
+    }
 
-    std::cout << "Raw:      " << msg.getRawData() << '\n';
-    std::cout << "Payload:  " << msg.getPayload() << '\n';
-    std::cout << "Checksum: " << msg.getChecksumStr() << '\n';
-    std::cout << "Valid:    " << std::boolalpha << msg.validate() << '\n';
+    std::cout << "Raw:      " << msg->getRawData() << '\n';
+    std::cout << "Payload:  " << msg->getPayload() << '\n';
+    try {
+        std::cout << "Checksum: " << msg->getChecksumStr() << '\n';
+    } catch (const nmealib::nmea0183::NoChecksumException&) {
+        std::cout << "Checksum: (none)" << '\n';
+    }
+    std::cout << "Valid:    " << std::boolalpha << msg->validate() << '\n';
 
-    auto ts = msg.getTimestamp();
+    auto ts = msg->getTimestamp();
     std::time_t tt = std::chrono::system_clock::to_time_t(ts);
     std::tm tm = *std::localtime(&tt);
     std::cout << "Timestamp:" << std::put_time(&tm, " %Y-%m-%d %H:%M:%S") << '\n';
 
-    std::cout << "Serialized: " << msg.serialize() << '\n';
+    std::cout << "Serialized: " << msg->serialize() << '\n';
 
     return 0;
 }

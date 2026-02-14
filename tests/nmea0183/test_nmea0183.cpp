@@ -1,43 +1,127 @@
 #include <gtest/gtest.h>
-#include <forward_list>
+#include <chrono>
+#include <memory>
+#include <string>
 #include "nmea0183.hpp"
 
 using namespace nmealib::nmea0183;
 
-// Messages to test the class with
-std::forward_list<std::string> validMessages = {
-    // Valid checksum #1
-    "$PFUGDP,GN,033615.00,3953.88002,N,10506.75324,W,13,9,FF,0.1,0.1,149,0.1*13\r\n",
-    // Valid checksum #2
-    "$GPGGA,210230,3855.4487,N,09446.0071,W,1,07,1.1,370.5,M,-29.5,M,,*7A\r\n",
-    // Valid checksum but with leading '!' instead of '$' (some NMEA sentences use '!')
-    "!GPGGA,210230,3855.4487,N,09446.0071,W,1,07,1.1,370.5,M,-29.5,M,,*7A\r\n",
-    // Valid checksum without trailing CRLF (should be accepted as valid)
-    "$GPGGA,210230,3855.4487,N,09446.0071,W,1,07,1.1,370.5,M,-29.5,M,,*7A"
-};
-std::forward_list<std::string> invalidMessages = {
-    "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*45", // Invalid checksum (should be 47, not 45)
-    "GPGGA,210230,3855.4487,N,09446.0071,W,1,07,1.1,370.5,M,-29.5,M,,*7A" // Missing leading '$' or '!'
-};
+static const std::string SAMPLE_WITH_CHECKSUM =
+    "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47\r\n";
 
-// Just a basic test to ensure the class hierarchy compiles and can be used polymorphically.
-TEST(Message0183, PolymorphicClone)
+static const std::string SAMPLE_NO_CHECKSUM =
+    "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,\r\n";
+
+TEST(Message0183, CreateSucceedsAndAccessors)
 {
-    Message0183 msg("!AIVDM,1,1,,A,15MuqP0000G?tO`K@E>4?wN0<00,0*5C");
-    std::unique_ptr<nmealib::Message> basePtr = std::make_unique<Message0183>(msg);
-    auto clonedPtr = basePtr->clone();
-    EXPECT_TRUE(clonedPtr != nullptr);
-    EXPECT_EQ(clonedPtr->serialize(), msg.serialize());
+    auto msg = Message0183::create(SAMPLE_WITH_CHECKSUM);
+    ASSERT_NE(msg, nullptr);
+    EXPECT_EQ(msg->getStartChar(), '$');
+    EXPECT_EQ(msg->getTalker(), "GP");
+    EXPECT_EQ(msg->getSentenceType(), "GGA");
+    EXPECT_EQ(msg->getPayload().substr(0,5), "GPGGA");
+
+    // Checksum string should match the provided two hex digits
+    EXPECT_NO_THROW({
+        auto cs = msg->getChecksumStr();
+        EXPECT_EQ(cs, "47");
+    });
+
+    // Calculated checksum should match the provided checksum for a valid sentence
+    EXPECT_EQ(msg->getChecksumStr(), msg->getCalculatedChecksumStr());
 }
 
-// Test checksum validation
-TEST(Message0183, Validate) {
-    for (const auto& raw : validMessages) {
-        Message0183 msg(raw);
-        EXPECT_TRUE(msg.validate()) << "Valid message failed validation: " << raw;
-    }
-    for (const auto& raw : invalidMessages) {
-        Message0183 msg(raw);
-        EXPECT_FALSE(msg.validate()) << "Invalid message passed validation: " << raw;
-    }
+TEST(Message0183, CreateWithoutChecksumAndGetChecksumThrows)
+{
+    auto msg = Message0183::create(SAMPLE_NO_CHECKSUM);
+    ASSERT_NE(msg, nullptr);
+    EXPECT_THROW(msg->getChecksumStr(), NoChecksumException);
+    // But calculated checksum is still available and noexcept
+    EXPECT_NO_THROW({
+        auto calc = msg->getCalculatedChecksumStr();
+        EXPECT_EQ(calc.size(), 2u);
+    });
 }
+
+TEST(Message0183, CreateThrowsOnTooLongSentence)
+{
+    // Construct a string longer than 82 characters
+    std::string longRaw(90, 'A');
+    longRaw[0] = '$';
+    EXPECT_THROW(Message0183::create(longRaw), TooLongSentenceException);
+}
+
+TEST(Message0183, CreateThrowsOnInvalidStartCharacter)
+{
+    std::string s = SAMPLE_WITH_CHECKSUM;
+    s.erase(0,1); // remove leading '$'
+    EXPECT_THROW(Message0183::create(s), InvalidStartCharacterException);
+}
+
+TEST(Message0183, CreateThrowsOnMissingEndline)
+{
+    // Remove CRLF from a valid sample
+    std::string s = SAMPLE_WITH_CHECKSUM;
+    if (s.size() >= 2) s.erase(s.size()-2);
+    EXPECT_THROW(Message0183::create(s), NoEndlineException);
+}
+
+TEST(Message0183, CloneProducesEqualObject)
+{
+    auto msg = Message0183::create(SAMPLE_WITH_CHECKSUM);
+    ASSERT_NE(msg, nullptr);
+
+    std::unique_ptr<nmealib::Message> baseClone = msg->clone();
+    ASSERT_NE(baseClone, nullptr);
+
+    // Attempt to downcast and compare content
+    auto derivedClone = dynamic_cast<Message0183*>(baseClone.get());
+    ASSERT_NE(derivedClone, nullptr);
+    EXPECT_TRUE(msg->hasEqualContent(*derivedClone));
+}
+
+TEST(Message0183, EqualityAndHasEqualContent)
+{
+    using Clock = std::chrono::system_clock;
+    auto ts = Clock::now();
+
+    auto m1 = Message0183::create(SAMPLE_WITH_CHECKSUM, ts);
+    auto m2 = Message0183::create(SAMPLE_WITH_CHECKSUM, ts);
+    ASSERT_NE(m1, nullptr);
+    ASSERT_NE(m2, nullptr);
+
+    // When timestamps are identical, operator== should consider them equal
+    EXPECT_TRUE(*m1 == *m2);
+
+    // Different timestamps -> operator== may be false, but hasEqualContent ignores timestamp
+    auto m3 = Message0183::create(SAMPLE_WITH_CHECKSUM);
+    ASSERT_NE(m3, nullptr);
+    EXPECT_TRUE(m1->hasEqualContent(*m3));
+}
+
+TEST(Message0183, ValidateBehavior)
+{
+    // Valid checksum -> validate() == true
+    auto good = Message0183::create(SAMPLE_WITH_CHECKSUM);
+    ASSERT_NE(good, nullptr);
+    EXPECT_TRUE(good->validate());
+
+    // Invalid checksum -> validate() == false
+    std::string bad = SAMPLE_WITH_CHECKSUM;
+    auto star = bad.find('*');
+    if (star != std::string::npos && star + 3 < bad.size()) {
+        bad[star+1] = '0';
+        bad[star+2] = '0';
+    }
+    auto invalid = Message0183::create(bad);
+    ASSERT_NE(invalid, nullptr);
+    EXPECT_FALSE(invalid->validate());
+
+    // No checksum -> validate() == true
+    auto no = Message0183::create(SAMPLE_NO_CHECKSUM);
+    ASSERT_NE(no, nullptr);
+    EXPECT_TRUE(no->validate());
+}
+
+
+

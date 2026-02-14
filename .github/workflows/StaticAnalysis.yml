@@ -1,0 +1,39 @@
+name: Static Analysis
+
+on:
+  workflow_dispatch:
+
+jobs:
+  static-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+    - name: Install analysis tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cppcheck clang-tools
+
+    - name: Configure CMake
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=g++
+        -DCMAKE_C_COMPILER=gcc
+        -DCMAKE_BUILD_TYPE=Debug
+        -S ${{ github.workspace }}
+
+    - name: Run cppcheck
+      run: cppcheck --enable=all --error-exitcode=1 src/
+
+    - name: Run clang-tidy
+      run: |
+        cd ${{ steps.strings.outputs.build-output-dir }}
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+        run-clang-tidy -p . ../src/

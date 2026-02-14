@@ -1,0 +1,28 @@
+name: Run Tests
+
+on:
+  workflow_run:
+    workflows: ["Build on multiple platforms"]
+    types: [completed]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-ubuntu-latest-gcc
+        path: build
+
+    - name: Run all tests
+      working-directory: build
+      run: ctest --build-config Release --output-on-failure
+
+    - name: Run nmea0183 tests only
+      working-directory: build
+      run: ctest --build-config Release --output-on-failure -L nmea0183
