@@ -51,10 +51,10 @@ std::unique_ptr<Message0183> Message0183::create(const std::string& raw, TimePoi
 
     char startChar = raw[0];
 
-    // TODO: Decide whether to allow sentences that end with just LF, or just CR, or neither. For now we require CRLF.
+    // TODO: Decide whether to allow sentences that end with just LF, or just CR, or neither. For now we require do not require it.
     bool hasCRLF = raw.size() >= 2 && raw.substr(raw.size() - 2) == "\r\n";
     if(!hasCRLF) {
-        throw NoEndlineException(context, "Input string: " + raw);
+        // throw NoEndlineException(context, "Input string: " + raw);
     }
 
     // Extract talker and sentence type from the raw sentence.
