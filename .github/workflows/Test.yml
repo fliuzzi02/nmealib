@@ -1,8 +1,8 @@
-name: Run Tests
+name: Test
 
 on:
   workflow_run:
-    workflows: ["Build on multiple platforms"]
+    workflows: ["Build"]
     types: [completed]
 
 jobs:
@@ -13,6 +13,17 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: List available artifacts
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: context.payload.workflow_run.id,
+          });
+          console.log('Available artifacts:', artifacts.data.artifacts.map(a => a.name));
+
     - name: Download build artifacts
       uses: actions/download-artifact@v4
       with:
@@ -22,7 +33,3 @@ jobs:
     - name: Run all tests
       working-directory: build
       run: ctest --build-config Release --output-on-failure
-
-    - name: Run nmea0183 tests only
-      working-directory: build
-      run: ctest --build-config Release --output-on-failure -L nmea0183
