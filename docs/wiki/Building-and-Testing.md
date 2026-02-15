@@ -231,7 +231,7 @@ The CLI tool is built automatically with the main library.
 ls out/build/gcc-full/app/nmealib-cli
 
 # Run it
-./out/build/gcc-full/app/nmealib-cli --nmea0183 $'$GPGGA,123519,...*47\r\n'
+./out/build/gcc-full/app/nmealib-cli -m $'$GPGGA,123519,...*47\r\n'
 ```
 
 ### Installing the CLI
