@@ -1,69 +1,59 @@
-// ...existing code...
 #include <iostream>
-#include <chrono>
-#include <string>
-#include <iomanip>
-#include <ctime>
 
 #include "nmea0183.hpp"
 
-static void print_usage(const char* prog) {
-    std::cerr << "Usage: " << prog << " --nmea0183 \"<NMEA_SENTENCE>\"\n";
+void print_usage() {
+    std::cout << "Usage: nmealib-cli [options] \"<nmea_sentence>\"\n";
+    std::cout << "Options:\n";
+    std::cout << "  -h, --help        Show this help message and exit\n";
+    std::cout << "  -v, --version     Show version information and exit\n";
+    std::cout << "  -V, --verbose     Enable verbose output\n";
+    std::cout << "Example:\n";
+    std::cout << "  nmealib-cli -V \"$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47\"\n";
 }
 
 int main(int argc, char** argv) {
-    if (argc < 2) {
-        print_usage(argv[0]);
-        return 1;
+    // If no arguments are provided, print usage and exit
+    if (argc == 1) {
+        print_usage();
+        return 0;
     }
 
-    std::string sentence;
+    // Check if verbosity is enabled
+    bool verbose = false;
+    std::string nmea_sentence;
+
     for (int i = 1; i < argc; ++i) {
-        std::string a = argv[i];
-        const std::string prefix = "--nmea0183=";
-        if (a == "--nmea0183") {
-            if (i + 1 < argc) {
-                sentence = argv[i + 1];
-                break;
-            } else {
-                print_usage(argv[0]);
-                return 1;
-            }
-        } else if (a.rfind(prefix, 0) == 0) {
-            sentence = a.substr(prefix.size());
-            break;
+        std::string arg = argv[i];
+        if (arg == "-h" || arg == "--help") {
+            print_usage();
+            return 0;
+        } else if (arg == "-v" || arg == "--version") {
+            std::cout << "nmealib version 1.0.0\n";
+            return 0;
+        } else if (arg == "-V" || arg == "--verbose") {
+            verbose = true;
+        } else if (arg[0] == '-') {
+            std::cerr << "Unknown option: " << arg << "\n";
+            print_usage();
+            return 1;
+        } else {
+            // Assign nmea sentence without leading/trailing " if present
+            if(arg[0] == '"' && arg[arg.size() - 1] == '"')
+                nmea_sentence = arg.substr(1, arg.size() - 2);
+            else
+                nmea_sentence = arg;
         }
     }
 
-    if (sentence.empty()) {
-        print_usage(argv[0]);
+    // Create a Message0183 object from the input sentence
+    try {
+        auto message = nmealib::nmea0183::Message0183::create(nmea_sentence);
+        std::cout << message->getStringContent(verbose) << "\n";
+    } catch (const nmealib::NmeaException& e) {
+        std::cerr << e.what() << "\n";
         return 1;
     }
-
-    auto now = std::chrono::system_clock::now();
-    std::unique_ptr<nmealib::nmea0183::Message0183> msg;
-    try {
-        msg = nmealib::nmea0183::Message0183::create(sentence, now);
-    } catch (const std::exception& ex) {
-        std::cerr << "Failed to parse NMEA sentence: " << ex.what() << '\n';
-        return 2;
-    }
-
-    std::cout << "Raw:      " << msg->getRawData() << '\n';
-    std::cout << "Payload:  " << msg->getPayload() << '\n';
-    try {
-        std::cout << "Checksum: " << msg->getChecksumStr() << '\n';
-    } catch (const nmealib::nmea0183::NoChecksumException&) {
-        std::cout << "Checksum: (none)" << '\n';
-    }
-    std::cout << "Valid:    " << std::boolalpha << msg->validate() << '\n';
-
-    auto ts = msg->getTimestamp();
-    std::time_t tt = std::chrono::system_clock::to_time_t(ts);
-    std::tm tm = *std::localtime(&tt);
-    std::cout << "Timestamp:" << std::put_time(&tm, " %Y-%m-%d %H:%M:%S") << '\n';
-
-    std::cout << "Serialized: " << msg->serialize() << '\n';
 
     return 0;
 }
