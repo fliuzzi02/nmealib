@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "nmea0183.hpp"
+#include <nmea0183Factory.hpp>
 
 void print_usage() {
     std::cout << "Usage: nmealib-cli [options] \"<nmea_sentence>\"\n";
@@ -48,7 +49,7 @@ int main(int argc, char** argv) {
 
     // Create a Message0183 object from the input sentence
     try {
-        auto message = nmealib::nmea0183::Message0183::create(nmea_sentence);
+        auto message = nmealib::nmea0183::Nmea0183Factory::create(nmea_sentence);
         std::cout << message->getStringContent(verbose) << "\n";
     } catch (const nmealib::NmeaException& e) {
         std::cerr << e.what() << "\n";

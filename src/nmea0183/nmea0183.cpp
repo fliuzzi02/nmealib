@@ -40,8 +40,38 @@ Message0183::Message0183(std::string raw,
     calculatedChecksumStr_ = computeChecksum(payload_);
 }
 
-std::unique_ptr<Message0183> Message0183::create(const std::string& raw, TimePoint ts) {
+std::unique_ptr<Message0183> Message0183::create(std::string raw, TimePoint ts) {
     std::string context = "Message0183::create";
+    validateFormat(context, raw);
+
+    char startChar = raw[0];
+
+    bool hasCRLF = raw.size() >= 2 && raw.substr(raw.size() - 2) == "\r\n";
+
+    // Extract talker and sentence type from the raw sentence.
+    std::string talker = raw.substr(1, 2);
+    std::string sentenceType = raw.substr(3, 3);
+    bool hasChecksum = raw.find('*') != std::string::npos;
+    if(hasChecksum) {
+        size_t asteriskPos = raw.find('*');
+        std::string payload = raw.substr(1, asteriskPos - 1); // Exclude start char and checksum part
+        std::string checksumStr = raw.substr(asteriskPos + 1, 2);
+        return std::unique_ptr<Message0183>(new Message0183(raw, ts, startChar, talker, sentenceType, payload, checksumStr));
+    } else {
+        if (hasCRLF) {
+            std::string payload = raw.substr(1, raw.size() - 3); // Exclude start char and CRLF
+            return std::unique_ptr<Message0183>(new Message0183(raw, ts, startChar, talker, sentenceType, payload));
+        } else {
+            std::string payload = raw.substr(1); // Exclude start char only
+            return std::unique_ptr<Message0183>(new Message0183(raw, ts, startChar, talker, sentenceType, payload));
+        }
+    }
+}
+
+void Message0183::validateFormat(const std::string& context, const std::string& raw) {
+    // TODO: I have to check that it correspons to the minimum sentence: $XXXXX*ZZ<CR><LF>
+    // and also without checksum: $XXXXX<CR><LF>
+    // and also without CRLF: $XXXXX*ZZ and $XXXXX
     if(raw.size() > 82) {
         throw TooLongSentenceException(context, "Input string length: " + std::to_string(raw.size()));
     }
@@ -49,33 +79,14 @@ std::unique_ptr<Message0183> Message0183::create(const std::string& raw, TimePoi
         throw InvalidStartCharacterException("NMEA 0183 sentence must start with '$' or '!'");
     }
 
-    char startChar = raw[0];
-
-    // TODO: Decide whether to allow sentences that end with just LF, or just CR, or neither. For now we require do not require it.
-    bool hasCRLF = raw.size() >= 2 && raw.substr(raw.size() - 2) == "\r\n";
-    if(!hasCRLF) {
-        // throw NoEndlineException(context, "Input string: " + raw);
-    }
-
-    // Extract talker and sentence type from the raw sentence.
-    std::string talker = raw.substr(1, 2);
-    std::string sentenceType = raw.substr(3, 3);
-    std::string payload;
     bool hasChecksum = raw.find('*') != std::string::npos;
-
     if (hasChecksum) {
         // If it has a checksum, find the position of '*' and extract payload and checksum accordingly.
         size_t asteriskPos = raw.find('*');
-        payload = raw.substr(1, asteriskPos - 1); // Exclude start char and checksum part
         std::string checksumStr = raw.substr(asteriskPos + 1, 2);
         if(!isHexByte(checksumStr)) {
             throw NoChecksumException(context, "Invalid checksum format: " + checksumStr);
         }
-        return std::unique_ptr<Message0183>(new Message0183(raw, ts, startChar, talker, sentenceType, payload, checksumStr));
-    } else {
-
-        payload = raw.substr(1, raw.size() - 3); // Exclude start char and CRLF
-        return std::unique_ptr<Message0183>(new Message0183(raw, ts, startChar, talker, sentenceType, payload));
     }
 }
 

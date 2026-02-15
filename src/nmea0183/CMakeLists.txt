@@ -1,5 +1,7 @@
 add_library(nmealib_nmea0183 STATIC
     nmea0183.cpp
+    nmea0183Factory.cpp
+    rmc.cpp
 )
 
 # headers live in src/ and src/nmea0183/
