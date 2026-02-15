@@ -291,7 +291,7 @@ Contributions are welcome! Please:
 
 ## License
 
-This project is open source. Please see the LICENSE file for details.
+This project is open source; licensing details are provided in this repository's documentation and metadata.
 
 ## Acknowledgments
 
