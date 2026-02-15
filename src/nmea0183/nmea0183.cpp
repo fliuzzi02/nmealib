@@ -51,10 +51,10 @@ std::unique_ptr<Message0183> Message0183::create(const std::string& raw, TimePoi
 
     char startChar = raw[0];
 
-    // TODO: Decide whether to allow sentences that end with just LF, or just CR, or neither. For now we require CRLF.
+    // TODO: Decide whether to allow sentences that end with just LF, or just CR, or neither. For now we require do not require it.
     bool hasCRLF = raw.size() >= 2 && raw.substr(raw.size() - 2) == "\r\n";
     if(!hasCRLF) {
-        throw NoEndlineException(context, "Input string: " + raw);
+        // throw NoEndlineException(context, "Input string: " + raw);
     }
 
     // Extract talker and sentence type from the raw sentence.
@@ -110,16 +110,29 @@ std::string Message0183::getCalculatedChecksumStr() const noexcept {
     return calculatedChecksumStr_;
 }
 
-std::string Message0183::serialize() const {
-    std::string out;
-    out.push_back(startChar_);
-    out += payload_;
-    if (!checksumStr_.empty()) {
-        out.push_back('*');
-        out += checksumStr_;
+std::string Message0183::getStringContent(bool verbose) const noexcept {
+    std::stringstream ss;
+    std::string validity = "KO";
+    if(validate()) {
+        validity = "OK";
     }
-    out += "\r\n";
-    return out;
+
+    if (!verbose) {
+        ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": " << "Unimplemented sentence type";
+    } else {
+        ss << "Protocol: " << typeToString(type_) << "\n";
+        ss << "Talker: " << getTalker() << "\n";
+        ss << "Sentence Type: " << getSentenceType() << "\n";
+        ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
+        ss << "Fields: \n";
+        ss << "\tUnimplemented sentence type";
+    }
+
+    return ss.str();
+}
+
+std::string Message0183::serialize() const {
+    return rawData_;
 }
 
 bool Message0183::validate() const {
