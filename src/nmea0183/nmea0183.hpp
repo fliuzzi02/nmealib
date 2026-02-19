@@ -141,6 +141,9 @@ protected:
     std::string checksumStr_; // the two hex digits after '*', if present
     std::string calculatedChecksumStr_; // the checksum computed from the payload, as a two-digit hex string
 
+    // Protected internal factory
+    static std::unique_ptr<Message0183> create(std::string raw, TimePoint ts = std::chrono::system_clock::now());
+
 private:
     explicit Message0183(std::string raw,
                         TimePoint ts,
@@ -159,9 +162,6 @@ private:
     static std::string computeChecksum(const std::string& payload) noexcept;
     static bool isHexByte(const std::string& s) noexcept;
     static void validateFormat(const std::string& context, const std::string& raw);
-
-    // Private internal factory
-    static std::unique_ptr<Message0183> create(std::string raw, TimePoint ts);
 
     friend class Nmea0183Factory;
 };

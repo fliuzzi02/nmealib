@@ -1,6 +1,8 @@
 #include "rmc.hpp"
 #include <cmath>
 
+#include "nmea0183Factory.hpp"
+
 namespace nmealib {
 namespace nmea0183 {
 
@@ -81,6 +83,37 @@ RMC::RMC(Message0183 baseMessage,
       modeIndicator_(modeIndicator),
       navigationStatus_(navigationStatus) {}
 
+RMC::RMC(std::string talkerId, unsigned int utcFix, 
+        char status, 
+        double latitude,
+        char latitudeDirection, 
+        double longitude,
+        char longitudeDirection,
+        double speedOverGround, 
+        double courseOverGround, 
+        unsigned int date, 
+        double magneticVariation,
+        char magneticVariationDirection,
+        char modeIndicator,
+        char navigationStatus) : 
+        Message0183(*Message0183::create(composeRaw(talkerId, utcFix, status, latitude, 
+                                latitudeDirection, longitude, longitudeDirection, 
+                                speedOverGround, courseOverGround, date, magneticVariation, 
+                                magneticVariationDirection, modeIndicator, navigationStatus))),
+        utcFix_(utcFix),
+        status_(status),
+        latitude_(latitude),
+        latitudeDirection_(latitudeDirection),
+        longitude_(longitude),
+        longitudeDirection_(longitudeDirection),
+        speedOverGround_(speedOverGround),
+        courseOverGround_(courseOverGround),
+        date_(date),
+        magneticVariation_(magneticVariation),
+        magneticVariationDirection_(magneticVariationDirection),
+        modeIndicator_(modeIndicator),
+        navigationStatus_(navigationStatus) {}
+
 std::unique_ptr<nmealib::Message> RMC::clone() const {
     return std::unique_ptr<RMC>(new RMC(*this));
 }
@@ -92,23 +125,71 @@ std::string RMC::getStringContent(bool verbose) const noexcept {
            << "  UTC Fix: " << utcFix_ << "\n"
            << "  Status: " << status_ << "\n"
            << "  Latitude: " << latitude_ << "\n"
+           << "  Latitude Direction: " << latitudeDirection_ << "\n"
            << "  Longitude: " << longitude_ << "\n"
+           << "  Longitude Direction: " << longitudeDirection_ << "\n"
            << "  Speed Over Ground: " << speedOverGround_ << "\n"
            << "  Course Over Ground: " << courseOverGround_ << "\n"
            << "  Date: " << date_ << "\n"
-           << "  Magnetic Variation: " << magneticVariation_;
+           << "  Magnetic Variation: " << magneticVariation_ << "\n"
+           << "  Magnetic Variation Direction: " << magneticVariationDirection_ << "\n"
+           << "  Mode Indicator: " << modeIndicator_ << "\n"
+           << "  Navigation Status: " << navigationStatus_;
+
     } else {
         ss << "RMC(UTC Fix=" << utcFix_
            << ", Status=" << status_
-           << ", Lat=" << latitude_
-           << ", Lon=" << longitude_
+           << ", Lat=" << latitude_ << latitudeDirection_
+           << ", Lon=" << longitude_ << longitudeDirection_
            << ", SOG=" << speedOverGround_
            << ", COG=" << courseOverGround_
            << ", Date=" << date_
-           << ", MagVar=" << magneticVariation_ 
+           << ", MagVar=" << magneticVariation_ << magneticVariationDirection_
+           << ", Mode=" << modeIndicator_
+           << ", NavStatus=" << navigationStatus_
+
            << ")";
     }
     return ss.str();
+}
+
+std::string RMC::composeRaw(std::string talkerId, unsigned int utcFix, 
+                            char status, 
+                            double latitude,
+                            char latitudeDirection, 
+                            double longitude,
+                            char longitudeDirection,
+                            double speedOverGround, 
+                            double courseOverGround, 
+                            unsigned int date, 
+                            double magneticVariation,
+                            char magneticVariationDirection,
+                            char modeIndicator,
+                            char navigationStatus) {
+    std::ostringstream payloadStream;
+    payloadStream << talkerId << "RMC,";
+    payloadStream << std::setw(6) << std::setfill('0') << utcFix << ",";
+    payloadStream << status << ",";
+    double latitudeDegrees = std::floor(latitude);
+    double latitudeMinutes = (latitude - latitudeDegrees) * 60.0;
+    latitude = latitudeDegrees * 100.0 + latitudeMinutes; // Convert from decimal degrees to ddmm.mmmm
+    double longitudeDegrees = std::floor(longitude);
+    double longitudeMinutes = (longitude - longitudeDegrees) * 60.0;
+    longitude = longitudeDegrees * 100.0 + longitudeMinutes; // Convert from decimal degrees to dddmm.mmmm
+    payloadStream << std::fixed << std::setprecision(4) << latitude << ",";
+    payloadStream << latitudeDirection << ",";
+    payloadStream << std::fixed << std::setprecision(4) << longitude << ",";
+    payloadStream << longitudeDirection << ",";
+    payloadStream << std::fixed << std::setprecision(1) << speedOverGround << ",";
+    payloadStream << std::fixed << std::setprecision(1) << courseOverGround << ",";
+    payloadStream << std::setw(6) << std::setfill('0') << date << ",";
+    payloadStream << std::fixed << std::setprecision(1) << magneticVariation << ",";
+    payloadStream << magneticVariationDirection << ",";
+    payloadStream << modeIndicator << ",";
+    payloadStream << navigationStatus;
+
+    std::string payload = payloadStream.str();
+    return "$" + payload + "\r\n";
 }
 
 } // namespace nmea0183

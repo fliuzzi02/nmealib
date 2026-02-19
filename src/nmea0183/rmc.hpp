@@ -13,7 +13,26 @@ public:
 
 class RMC : public Message0183 {
 public:
-    RMC(Message0183 baseMessage, 
+    // Public constructor from parameters
+    /**
+     * @brief Construct a new RMC object from data
+     * 
+     * @param talkerId The talker ID to use in the payload, e.g. "GP", "II", etc.
+     * @param utcFix hhmmss.ss format, e.g. 123519 for 12:35:19 UTC
+     * @param status A or V
+     * @param latitude Expected in the format ddmm.mmmm, positive
+     * @param latitudeDirection N or S
+     * @param longitude Expected in the format dddmm.mmmm, positive
+     * @param longitudeDirection W or E
+     * @param speedOverGround In knots
+     * @param courseOverGround In degrees
+     * @param date ddmmyy format, e.g. 230394 for 23 March 1994
+     * @param magneticVariation In degrees
+     * @param magneticVariationDirection E or W 
+     * @param modeIndicator D, A, E or N
+     * @param navigationStatus S, C, U or V
+     */
+    RMC(std::string talkerId,
         unsigned int utcFix, 
         char status, 
         double latitude,
@@ -27,7 +46,7 @@ public:
         char magneticVariationDirection,
         char modeIndicator,
         char navigationStatus
-    ) noexcept;
+    );
 
     // Accessory constructors
     RMC(const RMC&) = default;
@@ -81,8 +100,40 @@ private:
     char modeIndicator_;
     char navigationStatus_;
 
+    RMC() = default;
+
+    // Private constructor used by the factory method
+    RMC(Message0183 baseMessage, 
+        unsigned int utcFix, 
+        char status, 
+        double latitude,
+        char latitudeDirection, 
+        double longitude,
+        char longitudeDirection,
+        double speedOverGround, 
+        double courseOverGround, 
+        unsigned int date, 
+        double magneticVariation,
+        char magneticVariationDirection,
+        char modeIndicator,
+        char navigationStatus
+    ) noexcept;
+
     // Private internal factory
     static std::unique_ptr<RMC> create(std::unique_ptr<Message0183> baseMessage);
+    static std::string composeRaw(std::string talkerId, unsigned int utcFix, 
+                            char status, 
+                            double latitude,
+                            char latitudeDirection, 
+                            double longitude,
+                            char longitudeDirection,
+                            double speedOverGround, 
+                            double courseOverGround, 
+                            unsigned int date, 
+                            double magneticVariation,
+                            char magneticVariationDirection,
+                            char modeIndicator,
+                            char navigationStatus);
     
     friend class Nmea0183Factory;
 };
