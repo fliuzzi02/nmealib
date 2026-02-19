@@ -1,6 +1,8 @@
 #pragma once
 
 #include "nmea0183.hpp"
+#include "gga.hpp"
+#include "gll.hpp"
 #include "rmc.hpp"
 
 namespace nmealib {

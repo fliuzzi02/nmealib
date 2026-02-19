@@ -1,6 +1,8 @@
 add_library(nmealib_nmea0183 STATIC
     nmea0183.cpp
     nmea0183Factory.cpp
+    gga.cpp
+    gll.cpp
     rmc.cpp
 )
 

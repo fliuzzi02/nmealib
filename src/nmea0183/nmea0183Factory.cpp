@@ -9,6 +9,10 @@ std::unique_ptr<Message0183> Nmea0183Factory::create(const std::string& raw, Mes
 
     if (sentenceType == "RMC") {
         return RMC::create(std::move(baseMessage));
+    } else if (sentenceType == "GGA") {
+        return GGA::create(std::move(baseMessage));
+    } else if (sentenceType == "GLL") {
+        return GLL::create(std::move(baseMessage));
     } else {
         return std::move(baseMessage);
     }

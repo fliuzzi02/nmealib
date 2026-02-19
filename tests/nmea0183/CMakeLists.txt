@@ -1,6 +1,8 @@
 add_executable(nmea0183_tests
     test_nmea0183.cpp
     test_RMC.cpp
+    test_GGA.cpp
+    test_GLL.cpp
 )
 
 target_link_libraries(nmea0183_tests
