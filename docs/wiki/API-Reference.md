@@ -1,6 +1,6 @@
 # API Reference
 
-Complete API reference for nmealib classes and functions.
+Complete API reference for `nmealib` classes and functions.
 
 ## Namespaces
 
@@ -11,9 +11,9 @@ Complete API reference for nmealib classes and functions.
 
 ### nmealib::Message
 
-**File:** `message.hpp`
+**File:** `src/message.hpp`
 
-Base class for all NMEA message types. Provides common functionality for message handling.
+Base abstract class for all message types.
 
 #### Public Types
 
@@ -22,346 +22,307 @@ enum class Type { Unknown, NMEA0183, NMEA2000 };
 using TimePoint = std::chrono::system_clock::time_point;
 ```
 
-#### Constructors
+#### Constructors / Assignment
 
 ```cpp
-Message()  // Default constructor
-explicit Message(std::string raw, Type type = Type::Unknown, 
-                TimePoint ts = std::chrono::system_clock::now()) noexcept
+Message() = default;
+explicit Message(std::string raw,
+                 Type type = Type::Unknown,
+                 TimePoint ts = std::chrono::system_clock::now()) noexcept;
+
+Message(const Message&) = default;
+Message& operator=(const Message&) = default;
+Message(Message&&) noexcept = default;
+Message& operator=(Message&&) noexcept = default;
+virtual ~Message() = default;
 ```
 
 #### Public Methods
 
-| Method | Description | Return Type |
-|--------|-------------|-------------|
-| `getType()` | Get the message type | `Type` |
-| `getRawData()` | Get the original raw message string | `const std::string&` |
-| `getTimestamp()` | Get the message timestamp | `TimePoint` |
-| `clone()` | Create a polymorphic copy of the message | `std::unique_ptr<Message>` |
-| `serialize()` | Convert message to wire format | `std::string` |
-| `validate()` | Validate message integrity | `bool` |
-| `operator==` | Compare messages for equality | `bool` |
-
-**Note:** `clone()`, `serialize()`, and `validate()` are pure virtual and must be implemented by derived classes.
+| Method | Return Type | Notes |
+|--------|-------------|-------|
+| `static std::string typeToString(Type t)` | `std::string` | String representation of message type |
+| `getType() const noexcept` | `Type` | Stored message type |
+| `getRawData() const noexcept` | `const std::string&` | Raw wire text |
+| `getTimestamp() const noexcept` | `TimePoint` | Message timestamp |
+| `clone() const` | `std::unique_ptr<Message>` | Pure virtual |
+| `serialize() const` | `std::string` | Pure virtual |
+| `validate() const` | `bool` | Pure virtual |
+| `operator==(const Message&) const noexcept` | `bool` | Compares type, raw data, and timestamp |
 
 ---
 
 ### nmealib::nmea0183::Message0183
 
-**File:** `nmea0183/nmea0183.hpp`
+**File:** `src/nmea0183/nmea0183.hpp`
 
-Represents an NMEA 0183 sentence with full parsing and validation capabilities.
+Represents a parsed NMEA 0183 sentence.
 
-#### Factory Method
+#### Creation
 
-```cpp
-static std::unique_ptr<Message0183> create(
-    const std::string& raw,
-    TimePoint ts = std::chrono::system_clock::now()
-);
-```
+`Message0183::create(...)` is an internal/protected factory. Use `Nmea0183Factory::create(...)` for construction.
 
-Creates a Message0183 instance from a raw NMEA 0183 sentence string.
-
-**Parameters:**
-- `raw` - The raw NMEA 0183 sentence (must include `\r\n` ending)
-- `ts` - Optional timestamp (defaults to current time)
-
-**Returns:** `std::unique_ptr<Message0183>` to the parsed message
-
-**Throws:**
-- `TooLongSentenceException` - If sentence exceeds 82 characters
-- `InvalidStartCharacterException` - If sentence doesn't start with `$` or `!`
-- `NoEndlineException` - If sentence doesn't end with `\r\n`
-
-**Example:**
-```cpp
-auto msg = Message0183::create("$GPGGA,123519,...*47\r\n");
-```
-
-#### Constructors
+#### Constructors / Assignment
 
 ```cpp
-Message0183(const Message0183&) = default;           // Copy constructor
-Message0183& operator=(const Message0183&) = default; // Copy assignment
-Message0183(Message0183&&) noexcept = default;       // Move constructor
-Message0183& operator=(Message0183&&) noexcept = default; // Move assignment
-~Message0183() override = default;                   // Destructor
+Message0183(const Message0183&) = default;
+Message0183& operator=(const Message0183&) = default;
+Message0183(Message0183&&) noexcept = default;
+Message0183& operator=(Message0183&&) noexcept = default;
+~Message0183() override = default;
 ```
 
 #### Public Methods
 
-##### getStartChar()
-```cpp
-char getStartChar() const noexcept;
-```
-Returns the start character of the sentence (`$` or `!`).
+| Method | Return Type | Notes |
+|--------|-------------|-------|
+| `clone() const override` | `std::unique_ptr<nmealib::Message>` | Polymorphic copy |
+| `getStartChar() const noexcept` | `char` | `$` or `!` |
+| `getTalker() const noexcept` | `std::string` | 2-char talker ID |
+| `getSentenceType() const noexcept` | `std::string` | 3-char sentence type |
+| `getPayload() const noexcept` | `std::string` | Full payload between start and checksum/end |
+| `getChecksumStr() const` | `std::string` | Throws `NoChecksumException` if missing |
+| `getCalculatedChecksumStr() const noexcept` | `std::string` | Computed checksum |
+| `getStringContent(bool verbose) const noexcept` | `std::string` | Human-readable summary |
+| `serialize() const override` | `std::string` | Returns stored raw wire string |
+| `validate() const override` | `bool` | True when checksum absent or matching |
+| `operator==(const Message0183&) const noexcept` | `bool` | Full equality, includes timestamp via base |
+| `hasEqualContent(const Message0183&) const noexcept` | `bool` | Content equality, ignores timestamp |
 
-##### getTalker()
-```cpp
-std::string getTalker() const noexcept;
-```
-Returns the two-character talker identifier (e.g., "GP", "II", "GL").
+#### Notes
 
-**Common Talker IDs:**
-- `GP` - GPS
-- `GL` - GLONASS
-- `GA` - Galileo
-- `GN` - Combined GNSS
-- `II` - Integrated Instrumentation
-- `AI` - AIS
-
-##### getSentenceType()
-```cpp
-std::string getSentenceType() const noexcept;
-```
-Returns the three-character sentence type identifier (e.g., "GGA", "RMC", "GSA").
-
-**Common Sentence Types:**
-- `GGA` - Global Positioning System Fix Data
-- `RMC` - Recommended Minimum Navigation Information
-- `GSA` - GPS DOP and Active Satellites
-- `GSV` - GPS Satellites in View
-- `VTG` - Track Made Good and Ground Speed
-- `GLL` - Geographic Position
-
-##### getPayload()
-```cpp
-std::string getPayload() const noexcept;
-```
-Returns the full payload string (everything between start character and checksum/endline).
-
-**Example:** For `$GPGGA,123519,...*47\r\n`, returns `"GPGGA,123519,..."`
-
-##### getChecksumStr()
-```cpp
-std::string getChecksumStr() const;
-```
-Returns the checksum string from the message (two hex digits).
-
-**Throws:** `NoChecksumException` if the message doesn't contain a checksum.
-
-**Example:**
-```cpp
-try {
-    std::string checksum = msg->getChecksumStr();
-    std::cout << "Checksum: " << checksum << std::endl;
-} catch (const NoChecksumException&) {
-    std::cout << "No checksum present" << std::endl;
-}
-```
-
-##### getCalculatedChecksumStr()
-```cpp
-std::string getCalculatedChecksumStr() const noexcept;
-```
-Returns the calculated checksum for the payload as a two-digit hex string.
-
-Always available, regardless of whether the original message had a checksum.
-
-##### serialize()
-```cpp
-std::string serialize() const override;
-```
-Converts the message back to wire format (NMEA 0183 sentence string).
-
-**Returns:** String without `\r\n` terminator
-
-##### validate()
-```cpp
-bool validate() const override;
-```
-Validates the message by comparing the provided checksum (if any) with the calculated checksum.
-
-**Returns:**
-- `true` - If no checksum present OR checksum matches calculated value
-- `false` - If checksum present but doesn't match calculated value
-
-##### clone()
-```cpp
-std::unique_ptr<nmealib::Message> clone() const override;
-```
-Creates a polymorphic copy of the message.
-
-**Returns:** Unique pointer to base Message class containing a copy
-
-**Example:**
-```cpp
-auto original = Message0183::create(sentence);
-auto copy = original->clone();
-auto* derived = dynamic_cast<Message0183*>(copy.get());
-```
-
-##### operator==
-```cpp
-bool operator==(const Message0183& other) const noexcept;
-```
-Compares two messages for complete equality including timestamps.
-
-**Returns:** `true` if all fields match (including timestamp)
-
-##### hasEqualContent()
-```cpp
-bool hasEqualContent(const Message0183& other) const noexcept;
-```
-Compares message content only, ignoring timestamps.
-
-**Returns:** `true` if message content is identical (start char, talker, type, payload, checksums)
-
-**Example:**
-```cpp
-auto msg1 = Message0183::create(sentence, time1);
-auto msg2 = Message0183::create(sentence, time2);
-msg1 == msg2;  // false (different timestamps)
-msg1.hasEqualContent(msg2);  // true (same content)
-```
-
-#### Protected Members
-
-```cpp
-char startChar_;                    // '$' or '!'
-std::string talker_;                // e.g. "GP", "II"
-std::string sentenceType_;          // e.g. "GGA", "RMC"
-std::string payload_;               // Full payload string
-std::string checksumStr_;           // Provided checksum (if any)
-std::string calculatedChecksumStr_; // Calculated checksum
-```
+- Maximum sentence length enforced: 82 chars.
+- Start char must be `$` or `!`.
+- Checksum is optional; if present, it must be two hex digits.
 
 ---
 
-## Exception Classes
+### nmealib::nmea0183::Nmea0183Factory
 
-All exception classes inherit from `nmealib::NmeaException`.
+**File:** `src/nmea0183/nmea0183Factory.hpp`
+
+Public entry point for parsing NMEA 0183 sentences and creating typed sentence objects.
+
+```cpp
+class Nmea0183Factory {
+public:
+    static std::unique_ptr<Message0183> create(
+        const std::string& raw,
+        Message::TimePoint ts = std::chrono::system_clock::now());
+};
+```
+
+#### Runtime dispatch
+
+Depending on sentence type, `create(...)` returns:
+
+- `RMC` for `*RMC`
+- `GGA` for `*GGA`
+- `GLL` for `*GLL`
+- base `Message0183` for other types
+
+---
+
+## Sentence Classes
+
+### nmealib::nmea0183::RMC
+
+**File:** `src/nmea0183/rmc.hpp`
+
+Recommended Minimum Navigation Information.
+
+#### Public Constructor
+
+```cpp
+RMC(std::string talkerId,
+    unsigned int utcFix,
+    char status,
+    double latitude,
+    char latitudeDirection,
+    double longitude,
+    char longitudeDirection,
+    double speedOverGround,
+    double courseOverGround,
+    unsigned int date,
+    double magneticVariation,
+    char magneticVariationDirection,
+    char modeIndicator,
+    char navigationStatus);
+```
+
+#### Public Methods
+
+| Method | Return Type |
+|--------|-------------|
+| `clone() const override` | `std::unique_ptr<nmealib::Message>` |
+| `getUtcFix() const noexcept` | `unsigned int` |
+| `getStatus() const noexcept` | `char` |
+| `getLatitude() const noexcept` | `double` |
+| `getLatitudeDirection() const noexcept` | `char` |
+| `getLongitude() const noexcept` | `double` |
+| `getLongitudeDirection() const noexcept` | `char` |
+| `getSpeedOverGround() const noexcept` | `double` |
+| `getCourseOverGround() const noexcept` | `double` |
+| `getDate() const noexcept` | `unsigned int` |
+| `getMagneticVariation() const noexcept` | `double` |
+| `getMagneticVariationDirection() const noexcept` | `char` |
+| `getModeIndicator() const noexcept` | `char` |
+| `getNavigationStatus() const noexcept` | `char` |
+| `getStringContent(bool verbose) const noexcept override` | `std::string` |
+| `operator==(const RMC&) const noexcept` | `bool` |
+| `hasEqualContent(const RMC&) const noexcept` | `bool` |
+
+---
+
+### nmealib::nmea0183::GGA
+
+**File:** `src/nmea0183/gga.hpp`
+
+Global Positioning System Fix Data.
+
+#### Public Constructor
+
+```cpp
+GGA(std::string talkerId,
+    double timestamp,
+    double latitude,
+    char latitudeDirection,
+    double longitude,
+    char longitudeDirection,
+    unsigned int gpsQuality,
+    unsigned int satellites,
+    double hdop,
+    double altitude,
+    char altitudeUnits,
+    double geoidalSeparation,
+    char geoidalSeparationUnits,
+    double dgpsAge,
+    std::string dgpsReferenceStationId);
+```
+
+#### Public Methods
+
+| Method | Return Type |
+|--------|-------------|
+| `clone() const override` | `std::unique_ptr<nmealib::Message>` |
+| `getTimestamp() const noexcept` | `double` |
+| `getLatitude() const noexcept` | `double` |
+| `getLatitudeDirection() const noexcept` | `char` |
+| `getLongitude() const noexcept` | `double` |
+| `getLongitudeDirection() const noexcept` | `char` |
+| `getGpsQuality() const noexcept` | `unsigned int` |
+| `getSatellites() const noexcept` | `unsigned int` |
+| `getHdop() const noexcept` | `double` |
+| `getAltitude() const noexcept` | `double` |
+| `getAltitudeUnits() const noexcept` | `char` |
+| `getGeoidalSeparation() const noexcept` | `double` |
+| `getGeoidalSeparationUnits() const noexcept` | `char` |
+| `getDgpsAge() const noexcept` | `double` |
+| `getDgpsReferenceStationId() const noexcept` | `std::string` |
+| `getStringContent(bool verbose) const noexcept override` | `std::string` |
+| `operator==(const GGA&) const noexcept` | `bool` |
+| `hasEqualContent(const GGA&) const noexcept` | `bool` |
+
+---
+
+### nmealib::nmea0183::GLL
+
+**File:** `src/nmea0183/gll.hpp`
+
+Geographic position (latitude/longitude), timestamp, status, and mode.
+
+#### Public Constructor
+
+```cpp
+GLL(std::string talkerId,
+    double latitude,
+    char latitudeDirection,
+    double longitude,
+    char longitudeDirection,
+    double timestamp,
+    char status,
+    char modeIndicator);
+```
+
+#### Public Methods
+
+| Method | Return Type |
+|--------|-------------|
+| `clone() const override` | `std::unique_ptr<nmealib::Message>` |
+| `getLatitude() const noexcept` | `double` |
+| `getLatitudeDirection() const noexcept` | `char` |
+| `getLongitude() const noexcept` | `double` |
+| `getLongitudeDirection() const noexcept` | `char` |
+| `getTimestamp() const noexcept` | `double` |
+| `getStatus() const noexcept` | `char` |
+| `getModeIndicator() const noexcept` | `char` |
+| `getStringContent(bool verbose) const noexcept override` | `std::string` |
+| `operator==(const GLL&) const noexcept` | `bool` |
+| `hasEqualContent(const GLL&) const noexcept` | `bool` |
+
+---
+
+## Exceptions
 
 ### nmealib::NmeaException
 
-**File:** `nmeaException.hpp`
-
-Base exception class for all nmealib exceptions.
+**File:** `src/nmeaException.hpp`
 
 ```cpp
 class NmeaException : public std::runtime_error {
 public:
-    NmeaException(const std::string& context,
-                  const std::string& message,
-                  const std::string& details = "");
-                  
-    const std::string& getContext() const noexcept;
-    const std::string& getDetails() const noexcept;
+    explicit NmeaException(const std::string& context,
+                           const std::string& message,
+                           const std::string& details = "");
 };
 ```
 
-### NMEA 0183 Exceptions
+### NMEA 0183 generic exceptions
 
-#### TooLongSentenceException
-```cpp
-class TooLongSentenceException : public NmeaException;
-```
-Thrown when a sentence exceeds the maximum length of 82 characters.
+- `TooLongSentenceException`
+- `InvalidStartCharacterException`
+- `NoChecksumException`
+- `NoEndlineException`
+- `NotEnoughFieldsException`
 
-#### InvalidStartCharacterException
-```cpp
-class InvalidStartCharacterException : public NmeaException;
-```
-Thrown when a sentence doesn't start with `$` or `!`.
+### Sentence-specific exceptions
 
-#### NoEndlineException
-```cpp
-class NoEndlineException : public NmeaException;
-```
-Thrown when a sentence doesn't end with `\r\n`.
+- `NotRMCException`
+- `NotGGAException`
+- `NotGLLException`
 
-#### NoChecksumException
-```cpp
-class NoChecksumException : public NmeaException;
-```
-Thrown when attempting to retrieve a checksum from a message that doesn't have one.
+All inherit from `NmeaException`.
 
 ---
 
-## Usage Examples
+## Minimal usage examples
 
-### Basic Parsing
+### Parse a sentence
 
 ```cpp
-#include "nmea0183/nmea0183.hpp"
+#include "nmea0183Factory.hpp"
 
-std::string sentence = "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47\r\n";
-auto msg = nmealib::nmea0183::Message0183::create(sentence);
-
-std::cout << "Talker: " << msg->getTalker() << std::endl;
-std::cout << "Type: " << msg->getSentenceType() << std::endl;
-std::cout << "Valid: " << msg->validate() << std::endl;
+auto msg = nmealib::nmea0183::Nmea0183Factory::create(
+    "$GNGLL,3150.788156,N,11711.922383,E,062735.00,A,A*76\r\n");
 ```
 
-### Error Handling
+### Type-dispatch after parse
 
 ```cpp
-try {
-    auto msg = Message0183::create(input);
-    if (msg->validate()) {
-        // Process valid message
-    }
-} catch (const TooLongSentenceException& e) {
-    // Handle length error
-} catch (const InvalidStartCharacterException& e) {
-    // Handle start character error
-} catch (const NoEndlineException& e) {
-    // Handle endline error
-}
-```
-
-### Checksum Operations
-
-```cpp
-auto msg = Message0183::create(sentence);
-
-// Check if checksum exists
-try {
-    std::string provided = msg->getChecksumStr();
-    std::string calculated = msg->getCalculatedChecksumStr();
-    
-    if (provided == calculated) {
-        std::cout << "Checksum valid!" << std::endl;
-    }
-} catch (const NoChecksumException&) {
-    // Message has no checksum, use validate() instead
-    bool isValid = msg->validate();  // Returns true for no checksum
-}
-```
-
-### Message Cloning
-
-```cpp
-auto original = Message0183::create(sentence);
-auto clone = original->clone();
-
-// Downcast for NMEA0183-specific operations
-if (auto* msg0183 = dynamic_cast<Message0183*>(clone.get())) {
-    std::cout << "Talker: " << msg0183->getTalker() << std::endl;
-}
-```
-
-### Polymorphic Usage
-
-```cpp
-std::vector<std::unique_ptr<nmealib::Message>> messages;
-
-messages.push_back(Message0183::create(sentence1));
-messages.push_back(Message0183::create(sentence2));
-
-for (const auto& msg : messages) {
-    std::cout << "Type: " << static_cast<int>(msg->getType()) << std::endl;
-    std::cout << "Valid: " << msg->validate() << std::endl;
-    std::cout << "Serialized: " << msg->serialize() << std::endl;
+if (auto* rmc = dynamic_cast<nmealib::nmea0183::RMC*>(msg.get())) {
+    // use rmc-specific getters
+} else if (auto* gga = dynamic_cast<nmealib::nmea0183::GGA*>(msg.get())) {
+    // use gga-specific getters
+} else if (auto* gll = dynamic_cast<nmealib::nmea0183::GLL*>(msg.get())) {
+    // use gll-specific getters
 }
 ```
 
 ---
 
-## See Also
+## See also
 
-- [Getting Started Guide](Getting-Started.md)
-- [NMEA 0183 Format Guide](NMEA-0183-Guide.md)
+- [Getting Started](Getting-Started.md)
+- [NMEA 0183 Guide](NMEA-0183-Guide.md)
 - [Examples](Examples.md)
 - [Building and Testing](Building-and-Testing.md)
