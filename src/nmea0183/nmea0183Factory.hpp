@@ -2,6 +2,7 @@
 
 #include "nmea0183.hpp"
 #include "gga.hpp"
+#include "gsa.hpp"
 #include "gll.hpp"
 #include "rmc.hpp"
 

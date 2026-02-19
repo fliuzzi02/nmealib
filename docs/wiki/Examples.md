@@ -19,13 +19,14 @@ int main() {
 }
 ```
 
-## Typed dispatch (`RMC`, `GGA`, `GLL`)
+## Typed dispatch (`RMC`, `GGA`, `GLL`, `GSA`)
 
 ```cpp
 #include "nmea0183Factory.hpp"
 #include "rmc.hpp"
 #include "gga.hpp"
 #include "gll.hpp"
+#include "gsa.hpp"
 
 void handle(const std::string& sentence) {
     auto msg = nmealib::nmea0183::Nmea0183Factory::create(sentence);
@@ -42,6 +43,10 @@ void handle(const std::string& sentence) {
         // GLL fields
         (void)gll->getStatus();
         (void)gll->getModeIndicator();
+    } else if (auto* gsa = dynamic_cast<nmealib::nmea0183::GSA*>(msg.get())) {
+        // GSA fields
+        (void)gsa->getMode();
+        (void)gsa->getPdop();
     }
 }
 ```
@@ -98,6 +103,25 @@ nmealib::nmea0183::GLL gll(
 );
 
 std::string raw = gll.serialize();
+```
+
+### GSA
+
+```cpp
+#include "gsa.hpp"
+
+nmealib::nmea0183::GSA gsa(
+    "GN",
+    'A',
+    3,
+    std::array<unsigned int, 12>{80, 71, 73, 79, 69, 0, 0, 0, 0, 0, 0, 0},
+    1.83,
+    1.09,
+    1.47,
+    1
+);
+
+std::string raw = gsa.serialize();
 ```
 
 ## Clone and content comparison

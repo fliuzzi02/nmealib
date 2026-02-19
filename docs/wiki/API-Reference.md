@@ -119,6 +119,7 @@ Depending on sentence type, `create(...)` returns:
 - `RMC` for `*RMC`
 - `GGA` for `*GGA`
 - `GLL` for `*GLL`
+- `GSA` for `*GSA`
 - base `Message0183` for other types
 
 ---
@@ -262,6 +263,47 @@ GLL(std::string talkerId,
 
 ---
 
+### nmealib::nmea0183::GSA
+
+**File:** `src/nmea0183/gsa.hpp`
+
+GPS DOP and active satellites.
+
+Supports both classic GSA payloads and NMEA 4.1+ payloads with optional trailing `System ID`.
+
+#### Public Constructor
+
+```cpp
+GSA(std::string talkerId,
+    char selectionMode,
+    unsigned int mode,
+    std::array<unsigned int, 12> satelliteIds,
+    double pdop,
+    double hdop,
+    double vdop,
+    std::optional<unsigned int> systemId = std::nullopt);
+```
+
+#### Public Methods
+
+| Method | Return Type |
+|--------|-------------|
+| `clone() const override` | `std::unique_ptr<nmealib::Message>` |
+| `getSelectionMode() const noexcept` | `char` |
+| `getMode() const noexcept` | `unsigned int` |
+| `getSatelliteIds() const noexcept` | `std::array<unsigned int, 12>` |
+| `getSatelliteId(size_t index) const noexcept` | `unsigned int` |
+| `getPdop() const noexcept` | `double` |
+| `getHdop() const noexcept` | `double` |
+| `getVdop() const noexcept` | `double` |
+| `hasSystemId() const noexcept` | `bool` |
+| `getSystemId() const noexcept` | `std::optional<unsigned int>` |
+| `getStringContent(bool verbose) const noexcept override` | `std::string` |
+| `operator==(const GSA&) const noexcept` | `bool` |
+| `hasEqualContent(const GSA&) const noexcept` | `bool` |
+
+---
+
 ## Exceptions
 
 ### nmealib::NmeaException
@@ -290,6 +332,7 @@ public:
 - `NotRMCException`
 - `NotGGAException`
 - `NotGLLException`
+- `NotGSAException`
 
 All inherit from `NmeaException`.
 
@@ -315,6 +358,8 @@ if (auto* rmc = dynamic_cast<nmealib::nmea0183::RMC*>(msg.get())) {
     // use gga-specific getters
 } else if (auto* gll = dynamic_cast<nmealib::nmea0183::GLL*>(msg.get())) {
     // use gll-specific getters
+} else if (auto* gsa = dynamic_cast<nmealib::nmea0183::GSA*>(msg.get())) {
+    // use gsa-specific getters
 }
 ```
 

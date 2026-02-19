@@ -34,8 +34,9 @@ Welcome to the `nmealib` wiki. This documentation covers parsing, validation, ty
 - `RMC` (Recommended Minimum Navigation Information)
 - `GGA` (Fix data)
 - `GLL` (Geographic position)
+- `GSA` (DOP and active satellites)
 
-`Nmea0183Factory::create(...)` automatically returns typed objects (`RMC`, `GGA`, `GLL`) when recognized.
+`Nmea0183Factory::create(...)` automatically returns typed objects (`RMC`, `GGA`, `GLL`, `GSA`) when recognized.
 
 ## Suggested reading order
 
