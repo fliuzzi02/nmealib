@@ -19,7 +19,7 @@ int main() {
 }
 ```
 
-## Typed dispatch (`RMC`, `GGA`, `GLL`, `GSA`, `VTG`)
+## Typed dispatch (`RMC`, `GGA`, `GLL`, `GSA`, `VTG`, `ZDA`)
 
 ```cpp
 #include "nmea0183Factory.hpp"
@@ -28,6 +28,7 @@ int main() {
 #include "gll.hpp"
 #include "gsa.hpp"
 #include "vtg.hpp"
+#include "zda.hpp"
 
 void handle(const std::string& sentence) {
     auto msg = nmealib::nmea0183::Nmea0183Factory::create(sentence);
@@ -52,6 +53,10 @@ void handle(const std::string& sentence) {
         // VTG fields
         (void)vtg->getCourseOverGroundTrue();
         (void)vtg->getSpeedOverGroundKnots();
+    } else if (auto* zda = dynamic_cast<nmealib::nmea0183::ZDA*>(msg.get())) {
+        // ZDA fields
+        (void)zda->getUtcTime();
+        (void)zda->getYear();
     }
 }
 ```
@@ -144,6 +149,24 @@ nmealib::nmea0183::VTG vtg(
 );
 
 std::string raw = vtg.serialize();
+```
+
+### ZDA
+
+```cpp
+#include "zda.hpp"
+
+nmealib::nmea0183::ZDA zda(
+    "GP",
+    160012.71,
+    11,
+    3,
+    2004,
+    -1,
+    0
+);
+
+std::string raw = zda.serialize();
 ```
 
 ## Clone and content comparison

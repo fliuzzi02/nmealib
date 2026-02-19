@@ -6,6 +6,7 @@ add_library(nmealib_nmea0183 STATIC
     gll.cpp
     rmc.cpp
     vtg.cpp
+    zda.cpp
 )
 
 # headers live in src/ and src/nmea0183/

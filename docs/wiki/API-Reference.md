@@ -121,6 +121,7 @@ Depending on sentence type, `create(...)` returns:
 - `GLL` for `*GLL`
 - `GSA` for `*GSA`
 - `VTG` for `*VTG`
+- `ZDA` for `*ZDA`
 - base `Message0183` for other types
 
 ---
@@ -347,6 +348,41 @@ VTG(std::string talkerId,
 
 ---
 
+### nmealib::nmea0183::ZDA
+
+**File:** `src/nmea0183/zda.hpp`
+
+Time and date in UTC with local time zone offset.
+
+#### Public Constructor
+
+```cpp
+ZDA(std::string talkerId,
+    double utcTime,
+    unsigned int day,
+    unsigned int month,
+    unsigned int year,
+    int localZoneHours,
+    int localZoneMinutes);
+```
+
+#### Public Methods
+
+| Method | Return Type |
+|--------|-------------|
+| `clone() const override` | `std::unique_ptr<nmealib::Message>` |
+| `getUtcTime() const noexcept` | `double` |
+| `getDay() const noexcept` | `unsigned int` |
+| `getMonth() const noexcept` | `unsigned int` |
+| `getYear() const noexcept` | `unsigned int` |
+| `getLocalZoneHours() const noexcept` | `int` |
+| `getLocalZoneMinutes() const noexcept` | `int` |
+| `getStringContent(bool verbose) const noexcept override` | `std::string` |
+| `operator==(const ZDA&) const noexcept` | `bool` |
+| `hasEqualContent(const ZDA&) const noexcept` | `bool` |
+
+---
+
 ## Exceptions
 
 ### nmealib::NmeaException
@@ -377,6 +413,7 @@ public:
 - `NotGLLException`
 - `NotGSAException`
 - `NotVTGException`
+- `NotZDAException`
 
 All inherit from `NmeaException`.
 
@@ -406,6 +443,8 @@ if (auto* rmc = dynamic_cast<nmealib::nmea0183::RMC*>(msg.get())) {
     // use gsa-specific getters
 } else if (auto* vtg = dynamic_cast<nmealib::nmea0183::VTG*>(msg.get())) {
     // use vtg-specific getters
+} else if (auto* zda = dynamic_cast<nmealib::nmea0183::ZDA*>(msg.get())) {
+    // use zda-specific getters
 }
 ```
 

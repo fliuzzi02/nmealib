@@ -5,6 +5,7 @@ add_executable(nmea0183_tests
     test_GSA.cpp
     test_GLL.cpp
     test_VTG.cpp
+    test_ZDA.cpp
 )
 
 target_link_libraries(nmea0183_tests
