@@ -35,8 +35,9 @@ Welcome to the `nmealib` wiki. This documentation covers parsing, validation, ty
 - `GGA` (Fix data)
 - `GLL` (Geographic position)
 - `GSA` (DOP and active satellites)
+- `VTG` (Track made good and ground speed)
 
-`Nmea0183Factory::create(...)` automatically returns typed objects (`RMC`, `GGA`, `GLL`, `GSA`) when recognized.
+`Nmea0183Factory::create(...)` automatically returns typed objects (`RMC`, `GGA`, `GLL`, `GSA`, `VTG`) when recognized.
 
 ## Suggested reading order
 

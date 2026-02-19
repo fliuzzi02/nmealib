@@ -19,7 +19,7 @@ int main() {
 }
 ```
 
-## Typed dispatch (`RMC`, `GGA`, `GLL`, `GSA`)
+## Typed dispatch (`RMC`, `GGA`, `GLL`, `GSA`, `VTG`)
 
 ```cpp
 #include "nmea0183Factory.hpp"
@@ -27,6 +27,7 @@ int main() {
 #include "gga.hpp"
 #include "gll.hpp"
 #include "gsa.hpp"
+#include "vtg.hpp"
 
 void handle(const std::string& sentence) {
     auto msg = nmealib::nmea0183::Nmea0183Factory::create(sentence);
@@ -47,6 +48,10 @@ void handle(const std::string& sentence) {
         // GSA fields
         (void)gsa->getMode();
         (void)gsa->getPdop();
+    } else if (auto* vtg = dynamic_cast<nmealib::nmea0183::VTG*>(msg.get())) {
+        // VTG fields
+        (void)vtg->getCourseOverGroundTrue();
+        (void)vtg->getSpeedOverGroundKnots();
     }
 }
 ```
@@ -122,6 +127,23 @@ nmealib::nmea0183::GSA gsa(
 );
 
 std::string raw = gsa.serialize();
+```
+
+### VTG
+
+```cpp
+#include "vtg.hpp"
+
+nmealib::nmea0183::VTG vtg(
+    "GP",
+    220.86,
+    0.0,
+    2.550,
+    4.724,
+    'A'
+);
+
+std::string raw = vtg.serialize();
 ```
 
 ## Clone and content comparison

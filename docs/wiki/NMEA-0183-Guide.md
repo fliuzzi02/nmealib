@@ -32,8 +32,10 @@ Where:
 - `GGA` — fix data
 - `GLL` — latitude/longitude + time/status
 - `GSA` — DOP values and active satellites
+- `VTG` — track made good and ground speed
 
 `GSA` parsing supports both classic format and NMEA 4.1+ format with optional trailing `System ID`.
+`VTG` parsing supports both modern format and the older compact 5-field format.
 
 Other sentence types are parsed as generic `Message0183` objects.
 
@@ -76,6 +78,7 @@ Runtime dispatch:
 - sentence type `GGA` → `GGA`
 - sentence type `GLL` → `GLL`
 - sentence type `GSA` → `GSA`
+- sentence type `VTG` → `VTG`
 - otherwise → `Message0183`
 
 ## Example sentences
@@ -85,6 +88,7 @@ $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W,A,V*6A\r\n
 $GNGGA,062735.00,3150.788156,N,11711.922383,E,1,12,2.0,90.0,M,,M,,*55\r\n
 $GNGLL,3150.788156,N,11711.922383,E,062735.00,A,A*76\r\n
 $GNGSA,A,3,80,71,73,79,69,,,,,,,,1.83,1.09,1.47,1*37\r\n
+$GPVTG,220.86,T,,M,2.550,N,4.724,K,A*34\r\n
 ```
 
 ## Exceptions you may encounter
@@ -92,7 +96,7 @@ $GNGSA,A,3,80,71,73,79,69,,,,,,,,1.83,1.09,1.47,1*37\r\n
 - `TooLongSentenceException`
 - `InvalidStartCharacterException`
 - `NoChecksumException`
-- sentence-specific parse exceptions: `NotRMCException`, `NotGGAException`, `NotGLLException`, `NotGSAException`
+- sentence-specific parse exceptions: `NotRMCException`, `NotGGAException`, `NotGLLException`, `NotGSAException`, `NotVTGException`
 
 ## See also
 

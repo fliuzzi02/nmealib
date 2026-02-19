@@ -8,7 +8,7 @@ A modern C++20 library for parsing and validating NMEA messages.
 
 - Generic sentence parsing (`Message0183`)
 - Typed sentence dispatch via `Nmea0183Factory`
-- Sentence-specific classes for `RMC`, `GGA`, `GLL`, and `GSA`
+- Sentence-specific classes for `RMC`, `GGA`, `GLL`, `GSA`, and `VTG`
 - Checksum validation and serialization
 - Exception-based error handling
 - CLI utility and test suite
@@ -81,12 +81,18 @@ std::string wire = gll.serialize();
 - `GGA` for `*GGA`
 - `GLL` for `*GLL`
 - `GSA` for `*GSA`
+- `VTG` for `*VTG`
 - `Message0183` for other sentence types
 
 `GSA` supports both standard and NMEA 4.1+ forms:
 
 - Standard: selection mode, fix mode, up to 12 satellite IDs, PDOP/HDOP/VDOP
 - NMEA 4.1+: optional trailing `System ID` field before checksum
+
+`VTG` supports both newer and older forms:
+
+- Newer form: includes `T/M/N/K` unit markers and optional FAA mode indicator (NMEA 2.3+)
+- Older form: compact 5-field payload without explicit unit markers
 
 ## CLI
 
@@ -107,6 +113,7 @@ Common exceptions:
 - `NotGGAException`
 - `NotGLLException`
 - `NotGSAException`
+- `NotVTGException`
 
 All derive from `nmealib::NmeaException`.
 
@@ -125,7 +132,8 @@ nmealib/
 │       ├── rmc.hpp
 │       ├── gga.hpp
 │       ├── gll.hpp
-│       └── gsa.hpp
+│       ├── gsa.hpp
+│       └── vtg.hpp
 ├── tests/
 └── CMakeLists.txt
 ```
@@ -141,7 +149,7 @@ nmealib/
 ## Roadmap
 
 - [x] NMEA 0183 parsing/validation
-- [x] Typed sentence support (`RMC`, `GGA`, `GLL`, `GSA`)
+- [x] Typed sentence support (`RMC`, `GGA`, `GLL`, `GSA`, `VTG`)
 - [x] CLI support
 - [ ] Additional NMEA 0183 sentence types
 - [ ] NMEA 2000 support

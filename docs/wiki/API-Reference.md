@@ -120,6 +120,7 @@ Depending on sentence type, `create(...)` returns:
 - `GGA` for `*GGA`
 - `GLL` for `*GLL`
 - `GSA` for `*GSA`
+- `VTG` for `*VTG`
 - base `Message0183` for other types
 
 ---
@@ -304,6 +305,48 @@ GSA(std::string talkerId,
 
 ---
 
+### nmealib::nmea0183::VTG
+
+**File:** `src/nmea0183/vtg.hpp`
+
+Track made good and ground speed.
+
+Supports both modern VTG payloads (with `T/M/N/K` fields and optional FAA mode) and legacy 5-field VTG payloads.
+
+#### Public Constructor
+
+```cpp
+VTG(std::string talkerId,
+    double courseOverGroundTrue,
+    double courseOverGroundMagnetic,
+    double speedOverGroundKnots,
+    double speedOverGroundKph,
+    std::optional<char> faaModeIndicator = std::nullopt,
+    bool legacyFormat = false);
+```
+
+#### Public Methods
+
+| Method | Return Type |
+|--------|-------------|
+| `clone() const override` | `std::unique_ptr<nmealib::Message>` |
+| `getCourseOverGroundTrue() const noexcept` | `double` |
+| `getCourseOverGroundTrueType() const noexcept` | `char` |
+| `getCourseOverGroundMagnetic() const noexcept` | `double` |
+| `getCourseOverGroundMagneticType() const noexcept` | `char` |
+| `getSpeedOverGroundKnots() const noexcept` | `double` |
+| `getSpeedOverGroundKnotsType() const noexcept` | `char` |
+| `getSpeedOverGroundKph() const noexcept` | `double` |
+| `getSpeedOverGroundKphType() const noexcept` | `char` |
+| `hasFaaModeIndicator() const noexcept` | `bool` |
+| `getFaaModeIndicator() const noexcept` | `std::optional<char>` |
+| `isLegacyFormat() const noexcept` | `bool` |
+| `getStringContent(bool verbose) const noexcept override` | `std::string` |
+| `operator==(const VTG&) const noexcept` | `bool` |
+| `hasEqualContent(const VTG&) const noexcept` | `bool` |
+
+---
+
 ## Exceptions
 
 ### nmealib::NmeaException
@@ -333,6 +376,7 @@ public:
 - `NotGGAException`
 - `NotGLLException`
 - `NotGSAException`
+- `NotVTGException`
 
 All inherit from `NmeaException`.
 
@@ -360,6 +404,8 @@ if (auto* rmc = dynamic_cast<nmealib::nmea0183::RMC*>(msg.get())) {
     // use gll-specific getters
 } else if (auto* gsa = dynamic_cast<nmealib::nmea0183::GSA*>(msg.get())) {
     // use gsa-specific getters
+} else if (auto* vtg = dynamic_cast<nmealib::nmea0183::VTG*>(msg.get())) {
+    // use vtg-specific getters
 }
 ```
 

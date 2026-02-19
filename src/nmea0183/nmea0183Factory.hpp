@@ -5,6 +5,7 @@
 #include "gsa.hpp"
 #include "gll.hpp"
 #include "rmc.hpp"
+#include "vtg.hpp"
 
 namespace nmealib {
 namespace nmea0183 {

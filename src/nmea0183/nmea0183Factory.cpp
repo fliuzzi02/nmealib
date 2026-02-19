@@ -15,6 +15,8 @@ std::unique_ptr<Message0183> Nmea0183Factory::create(const std::string& raw, Mes
         return GSA::create(std::move(baseMessage));
     } else if (sentenceType == "GLL") {
         return GLL::create(std::move(baseMessage));
+    } else if (sentenceType == "VTG") {
+        return VTG::create(std::move(baseMessage));
     } else {
         return std::move(baseMessage);
     }
