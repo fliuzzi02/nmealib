@@ -1,62 +1,58 @@
 # nmealib Wiki
 
-Welcome to the nmealib wiki! This documentation provides comprehensive guides, examples, and reference material for using the nmealib library.
+Welcome to the `nmealib` wiki. This documentation covers parsing, validation, typed sentence handling, and development workflows.
 
 ## Quick Links
 
-- **[Getting Started](Getting-Started.md)** - Installation and first steps
-- **[API Reference](API-Reference.md)** - Detailed API documentation
-- **[NMEA 0183 Guide](NMEA-0183-Guide.md)** - Understanding NMEA 0183 format
-- **[Examples](Examples.md)** - Code examples and use cases
-- **[Building and Testing](Building-and-Testing.md)** - Build instructions and testing guide
-- **[Contributing](Contributing.md)** - How to contribute to the project
+- [Getting Started](Getting-Started.md)
+- [API Reference](API-Reference.md)
+- [NMEA 0183 Guide](NMEA-0183-Guide.md)
+- [Examples](Examples.md)
+- [Building and Testing](Building-and-Testing.md)
+- [Contributing](Contributing.md)
 
 ## What is nmealib?
 
-nmealib is a modern C++20 library for parsing, validating, and manipulating NMEA messages. It provides:
+`nmealib` is a modern C++20 library for NMEA processing with:
 
-- **Type-safe parsing** of NMEA 0183 sentences
-- **Automatic validation** with checksum verification
-- **Exception-based error handling** for robust applications
-- **Modern C++ design** utilizing C++20 features
-- **Comprehensive testing** ensuring reliability
+- Type-safe parsing via `Nmea0183Factory`
+- Checksum-aware validation
+- Sentence-specific classes for common sentence types
+- Exception-based error handling
+- Unit-tested behavior
 
-## Supported Standards
+## Current NMEA 0183 Support
 
-### NMEA 0183 ✅
-Full support for parsing and validating NMEA 0183 sentences, including:
-- Message parsing and validation
+### Core parser
+
+- Generic `Message0183` parsing and validation
+- Talker/sentence extraction
 - Checksum calculation and verification
-- Talker ID and sentence type extraction
-- Timestamp management
-- Message serialization
 
-### NMEA 2000 🚧
-Planned for future releases.
+### Typed sentence support
 
-## Use Cases
+- `RMC` (Recommended Minimum Navigation Information)
+- `GGA` (Fix data)
+- `GLL` (Geographic position)
+- `GSA` (DOP and active satellites)
+- `MWV` (Wind speed and angle)
+- `VTG` (Track made good and ground speed)
+- `ZDA` (UTC time, date, and local zone)
 
-nmealib is ideal for:
+`Nmea0183Factory::create(...)` automatically returns typed objects (`RMC`, `GGA`, `GLL`, `GSA`, `MWV`, `VTG`, `ZDA`) when recognized.
 
-- **Marine navigation applications** - Parse GPS and AIS data
-- **Data logging systems** - Record and validate marine sensor data
-- **Testing and debugging** - Validate NMEA message streams
-- **Protocol bridges** - Convert between different protocols
-- **Educational projects** - Learn about marine communication standards
+## Suggested reading order
 
-## Getting Help
+1. [Getting Started](Getting-Started.md)
+2. [Examples](Examples.md)
+3. [API Reference](API-Reference.md)
+4. [NMEA 0183 Guide](NMEA-0183-Guide.md)
 
-- Check the [FAQ](FAQ.md) for common questions
-- Browse the [Examples](Examples.md) for code samples
-- Report issues on [GitHub](https://github.com/fliuzzi02/nmealib/issues)
-- Review the API documentation for detailed class and method information
+## Version
 
-## Version Information
+Current project version: `0.1.0`.
 
-**Current Version:** 0.1.0
+## Repository
 
-See the [CHANGELOG](CHANGELOG.md) for version history and updates.
-
-## License
-
-This project is open source. See the [main repository](https://github.com/fliuzzi02/nmealib) for license details.
+- Main repository: https://github.com/fliuzzi02/nmealib
+- Issues: https://github.com/fliuzzi02/nmealib/issues

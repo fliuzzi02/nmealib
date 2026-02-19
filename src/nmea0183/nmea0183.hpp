@@ -32,6 +32,12 @@ public:
     NmeaException(context, "NMEA 0183 sentence must end with <CR><LF>", details) {}
 };
 
+class NotEnoughFieldsException : public NmeaException {
+public:
+    explicit NotEnoughFieldsException(const std::string& context, const std::string& details = "") : 
+    NmeaException(context, "NMEA 0183 sentence does not contain enough fields", details) {}
+};
+
 /**
  * @brief Represents an NMEA 0183 sentence
  * @attention NMEA 0183 sentences are ASCII text strings that follow a specific format:
@@ -46,22 +52,6 @@ public:
  */
 class Message0183 : public nmealib::Message {
 public:
-    // Factory method
-    /**
-     * @brief Creates a Message0183 instance from a raw NMEA 0183 sentence string. 
-     * This method performs validation on the input string, ensuring it adheres to the NMEA 0183 format and constraints. 
-     * If the input is valid, it returns a unique pointer to a Message0183 object; otherwise, 
-     * it throws an appropriate exception indicating the reason for failure.
-     * 
-     * @param raw The raw NMEA 0183 sentence string to parse and validate.
-     * @return std::unique_ptr<Message0183> A unique pointer to the created Message0183 instance if the input is valid.
-     * @throws TooLongSentenceException If the input string exceeds the maximum allowed length of 82 characters.
-     * @throws InvalidStartCharacterException If the input string does not start with either '$' or '!'.
-     * @throws NoEndlineException If the input string does not end with the required <CR><LF> sequence.
-     */
-    static std::unique_ptr<Message0183> create(const std::string& raw, 
-                                               TimePoint ts = std::chrono::system_clock::now());
-
     // Accessory constructors
     Message0183(const Message0183&) = default;
     Message0183& operator=(const Message0183&) = default;
@@ -126,7 +116,7 @@ public:
      * @return true if the content of both messages is equal (start char, talker, sentence type, payload, checksum string, and calculated checksum string), regardless of their timestamps;
      * @return false otherwise
      */
-    bool hasEqualContent(const Message0183& other) const noexcept {
+    virtual bool hasEqualContent(const Message0183& other) const noexcept {
         return startChar_ == other.startChar_ &&
                talker_ == other.talker_ &&
                sentenceType_ == other.sentenceType_ &&
@@ -151,6 +141,9 @@ protected:
     std::string checksumStr_; // the two hex digits after '*', if present
     std::string calculatedChecksumStr_; // the checksum computed from the payload, as a two-digit hex string
 
+    // Protected internal factory
+    static std::unique_ptr<Message0183> create(std::string raw, TimePoint ts = std::chrono::system_clock::now());
+
 private:
     explicit Message0183(std::string raw,
                         TimePoint ts,
@@ -168,6 +161,9 @@ private:
     
     static std::string computeChecksum(const std::string& payload) noexcept;
     static bool isHexByte(const std::string& s) noexcept;
+    static void validateFormat(const std::string& context, const std::string& raw);
+
+    friend class Nmea0183Factory;
 };
 
 } // namespace nmea0183
