@@ -1,7 +1,12 @@
 #include <iostream>
 #include <string>
 
+#ifdef _WIN32
+#include <io.h>
+#define STDIN_FILENO 0
+#else
 #include <unistd.h>
+#endif
 
 #include "nmea0183.hpp"
 #include <nmea0183Factory.hpp>
