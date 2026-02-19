@@ -8,7 +8,7 @@ A modern C++20 library for parsing and validating NMEA messages.
 
 - Generic sentence parsing (`Message0183`)
 - Typed sentence dispatch via `Nmea0183Factory`
-- Sentence-specific classes for `RMC`, `GGA`, `GLL`, `GSA`, `VTG`, and `ZDA`
+- Sentence-specific classes for `RMC`, `GGA`, `GLL`, `GSA`, `MWV`, `VTG`, and `ZDA`
 - Checksum validation and serialization
 - Exception-based error handling
 - CLI utility and test suite
@@ -81,9 +81,12 @@ std::string wire = gll.serialize();
 - `GGA` for `*GGA`
 - `GLL` for `*GLL`
 - `GSA` for `*GSA`
+- `MWV` for `*MWV`
 - `VTG` for `*VTG`
 - `ZDA` for `*ZDA`
 - `Message0183` for other sentence types
+
+`MWV` provides wind angle/reference, wind speed, units, and data validity status.
 
 `GSA` supports both standard and NMEA 4.1+ forms:
 
@@ -116,6 +119,7 @@ Common exceptions:
 - `NotGGAException`
 - `NotGLLException`
 - `NotGSAException`
+- `NotMWVException`
 - `NotVTGException`
 - `NotZDAException`
 
@@ -137,6 +141,7 @@ nmealib/
 │       ├── gga.hpp
 │       ├── gll.hpp
 │       ├── gsa.hpp
+│       ├── mwv.hpp
 │       ├── vtg.hpp
 │       └── zda.hpp
 ├── tests/
@@ -154,7 +159,7 @@ nmealib/
 ## Roadmap
 
 - [x] NMEA 0183 parsing/validation
-- [x] Typed sentence support (`RMC`, `GGA`, `GLL`, `GSA`, `VTG`, `ZDA`)
+- [x] Typed sentence support (`RMC`, `GGA`, `GLL`, `GSA`, `MWV`, `VTG`, `ZDA`)
 - [x] CLI support
 - [ ] Additional NMEA 0183 sentence types
 - [ ] NMEA 2000 support

@@ -120,6 +120,7 @@ Depending on sentence type, `create(...)` returns:
 - `GGA` for `*GGA`
 - `GLL` for `*GLL`
 - `GSA` for `*GSA`
+- `MWV` for `*MWV`
 - `VTG` for `*VTG`
 - `ZDA` for `*ZDA`
 - base `Message0183` for other types
@@ -348,6 +349,39 @@ VTG(std::string talkerId,
 
 ---
 
+### nmealib::nmea0183::MWV
+
+**File:** `src/nmea0183/mwv.hpp`
+
+Wind speed and angle.
+
+#### Public Constructor
+
+```cpp
+MWV(std::string talkerId,
+    double windAngle,
+    char reference,
+    double windSpeed,
+    char windSpeedUnits,
+    char status);
+```
+
+#### Public Methods
+
+| Method | Return Type |
+|--------|-------------|
+| `clone() const override` | `std::unique_ptr<nmealib::Message>` |
+| `getWindAngle() const noexcept` | `double` |
+| `getReference() const noexcept` | `char` |
+| `getWindSpeed() const noexcept` | `double` |
+| `getWindSpeedUnits() const noexcept` | `char` |
+| `getStatus() const noexcept` | `char` |
+| `getStringContent(bool verbose) const noexcept override` | `std::string` |
+| `operator==(const MWV&) const noexcept` | `bool` |
+| `hasEqualContent(const MWV&) const noexcept` | `bool` |
+
+---
+
 ### nmealib::nmea0183::ZDA
 
 **File:** `src/nmea0183/zda.hpp`
@@ -412,6 +446,7 @@ public:
 - `NotGGAException`
 - `NotGLLException`
 - `NotGSAException`
+- `NotMWVException`
 - `NotVTGException`
 - `NotZDAException`
 
@@ -441,6 +476,8 @@ if (auto* rmc = dynamic_cast<nmealib::nmea0183::RMC*>(msg.get())) {
     // use gll-specific getters
 } else if (auto* gsa = dynamic_cast<nmealib::nmea0183::GSA*>(msg.get())) {
     // use gsa-specific getters
+} else if (auto* mwv = dynamic_cast<nmealib::nmea0183::MWV*>(msg.get())) {
+    // use mwv-specific getters
 } else if (auto* vtg = dynamic_cast<nmealib::nmea0183::VTG*>(msg.get())) {
     // use vtg-specific getters
 } else if (auto* zda = dynamic_cast<nmealib::nmea0183::ZDA*>(msg.get())) {

@@ -19,7 +19,7 @@ int main() {
 }
 ```
 
-## Typed dispatch (`RMC`, `GGA`, `GLL`, `GSA`, `VTG`, `ZDA`)
+## Typed dispatch (`RMC`, `GGA`, `GLL`, `GSA`, `MWV`, `VTG`, `ZDA`)
 
 ```cpp
 #include "nmea0183Factory.hpp"
@@ -27,6 +27,7 @@ int main() {
 #include "gga.hpp"
 #include "gll.hpp"
 #include "gsa.hpp"
+#include "mwv.hpp"
 #include "vtg.hpp"
 #include "zda.hpp"
 
@@ -49,6 +50,10 @@ void handle(const std::string& sentence) {
         // GSA fields
         (void)gsa->getMode();
         (void)gsa->getPdop();
+    } else if (auto* mwv = dynamic_cast<nmealib::nmea0183::MWV*>(msg.get())) {
+        // MWV fields
+        (void)mwv->getWindAngle();
+        (void)mwv->getWindSpeed();
     } else if (auto* vtg = dynamic_cast<nmealib::nmea0183::VTG*>(msg.get())) {
         // VTG fields
         (void)vtg->getCourseOverGroundTrue();
@@ -149,6 +154,23 @@ nmealib::nmea0183::VTG vtg(
 );
 
 std::string raw = vtg.serialize();
+```
+
+### MWV
+
+```cpp
+#include "mwv.hpp"
+
+nmealib::nmea0183::MWV mwv(
+    "II",
+    45.0,
+    'R',
+    10.5,
+    'N',
+    'A'
+);
+
+std::string raw = mwv.serialize();
 ```
 
 ### ZDA

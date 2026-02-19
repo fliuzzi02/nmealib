@@ -32,10 +32,12 @@ Where:
 - `GGA` — fix data
 - `GLL` — latitude/longitude + time/status
 - `GSA` — DOP values and active satellites
+- `MWV` — wind speed and angle
 - `VTG` — track made good and ground speed
 - `ZDA` — UTC time/date and local zone offset
 
 `GSA` parsing supports both classic format and NMEA 4.1+ format with optional trailing `System ID`.
+`MWV` parsing supports wind angle/reference, speed, units, and validity status.
 `VTG` parsing supports both modern format and the older compact 5-field format.
 `ZDA` parsing supports UTC time with date and local time zone fields.
 
@@ -80,6 +82,7 @@ Runtime dispatch:
 - sentence type `GGA` → `GGA`
 - sentence type `GLL` → `GLL`
 - sentence type `GSA` → `GSA`
+- sentence type `MWV` → `MWV`
 - sentence type `VTG` → `VTG`
 - sentence type `ZDA` → `ZDA`
 - otherwise → `Message0183`
@@ -91,6 +94,7 @@ $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W,A,V*6A\r\n
 $GNGGA,062735.00,3150.788156,N,11711.922383,E,1,12,2.0,90.0,M,,M,,*55\r\n
 $GNGLL,3150.788156,N,11711.922383,E,062735.00,A,A*76\r\n
 $GNGSA,A,3,80,71,73,79,69,,,,,,,,1.83,1.09,1.47,1*37\r\n
+$IIMWV,45.0,R,10.5,N,A*26\r\n
 $GPVTG,220.86,T,,M,2.550,N,4.724,K,A*34\r\n
 $GPZDA,160012.71,11,03,2004,-1,00*7D\r\n
 ```
@@ -100,7 +104,7 @@ $GPZDA,160012.71,11,03,2004,-1,00*7D\r\n
 - `TooLongSentenceException`
 - `InvalidStartCharacterException`
 - `NoChecksumException`
-- sentence-specific parse exceptions: `NotRMCException`, `NotGGAException`, `NotGLLException`, `NotGSAException`, `NotVTGException`, `NotZDAException`
+- sentence-specific parse exceptions: `NotRMCException`, `NotGGAException`, `NotGLLException`, `NotGSAException`, `NotMWVException`, `NotVTGException`, `NotZDAException`
 
 ## See also
 

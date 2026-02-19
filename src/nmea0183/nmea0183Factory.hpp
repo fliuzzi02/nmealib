@@ -4,6 +4,7 @@
 #include "gga.hpp"
 #include "gsa.hpp"
 #include "gll.hpp"
+#include "mwv.hpp"
 #include "rmc.hpp"
 #include "vtg.hpp"
 #include "zda.hpp"

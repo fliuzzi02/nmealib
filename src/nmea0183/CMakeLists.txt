@@ -4,6 +4,7 @@ add_library(nmealib_nmea0183 STATIC
     gga.cpp
     gsa.cpp
     gll.cpp
+    mwv.cpp
     rmc.cpp
     vtg.cpp
     zda.cpp
