@@ -113,11 +113,20 @@ std::unique_ptr<nmealib::Message> GSA::clone() const {
 
 std::string GSA::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
+    std::string validity = "KO";
+    if (validate()) {
+        validity = "OK";
+    }
+
     if (verbose) {
-        ss << "GSA Message:\n"
-           << "  Selection Mode: " << selectionMode_ << "\n"
-           << "  Mode: " << mode_ << "\n"
-           << "  Satellites: ";
+        ss << "Protocol: " << typeToString(type_) << "\n";
+        ss << "Talker: " << getTalker() << "\n";
+        ss << "Sentence Type: " << getSentenceType() << "\n";
+        ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
+        ss << "Fields:\n";
+        ss << "\tSelection Mode: " << selectionMode_ << "\n";
+        ss << "\tMode: " << mode_ << "\n";
+        ss << "\tSatellites: ";
 
         bool first = true;
         for (unsigned int satelliteId : satelliteIds_) {
@@ -134,17 +143,18 @@ std::string GSA::getStringContent(bool verbose) const noexcept {
             ss << "None";
         }
 
-        ss << "\n"
-           << "  PDOP: " << pdop_ << "\n"
-           << "  HDOP: " << hdop_ << "\n"
-           << "  VDOP: " << vdop_;
+          ss << "\n"
+              << "\tPDOP: " << pdop_ << "\n"
+              << "\tHDOP: " << hdop_ << "\n"
+              << "\tVDOP: " << vdop_;
 
         if (systemId_.has_value()) {
             ss << "\n"
-               << "  System ID: " << systemId_.value();
+                    << "\tSystem ID: " << systemId_.value();
         }
     } else {
-        ss << "GSA(SelectionMode=" << selectionMode_
+          ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
+              << "SelectionMode=" << selectionMode_
            << ", Mode=" << mode_
            << ", PDOP=" << pdop_
            << ", HDOP=" << hdop_

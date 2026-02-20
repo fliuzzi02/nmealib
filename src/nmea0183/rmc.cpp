@@ -120,24 +120,34 @@ std::unique_ptr<nmealib::Message> RMC::clone() const {
 
 std::string RMC::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
+    std::string validity = "KO";
+    if (validate()) {
+        validity = "OK";
+    }
+
     if (verbose) {
-        ss << "RMC Message:\n"
-           << "  UTC Fix: " << utcFix_ << "\n"
-           << "  Status: " << status_ << "\n"
-           << "  Latitude: " << latitude_ << "\n"
-           << "  Latitude Direction: " << latitudeDirection_ << "\n"
-           << "  Longitude: " << longitude_ << "\n"
-           << "  Longitude Direction: " << longitudeDirection_ << "\n"
-           << "  Speed Over Ground: " << speedOverGround_ << "\n"
-           << "  Course Over Ground: " << courseOverGround_ << "\n"
-           << "  Date: " << date_ << "\n"
-           << "  Magnetic Variation: " << magneticVariation_ << "\n"
-           << "  Magnetic Variation Direction: " << magneticVariationDirection_ << "\n"
-           << "  Mode Indicator: " << modeIndicator_ << "\n"
-           << "  Navigation Status: " << navigationStatus_;
+        ss << "Protocol: " << typeToString(type_) << "\n";
+        ss << "Talker: " << getTalker() << "\n";
+        ss << "Sentence Type: " << getSentenceType() << "\n";
+        ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
+        ss << "Fields:\n";
+        ss << "\tUTC Fix: " << utcFix_ << "\n";
+        ss << "\tStatus: " << status_ << "\n";
+        ss << "\tLatitude: " << latitude_ << "\n";
+        ss << "\tLatitude Direction: " << latitudeDirection_ << "\n";
+        ss << "\tLongitude: " << longitude_ << "\n";
+        ss << "\tLongitude Direction: " << longitudeDirection_ << "\n";
+        ss << "\tSpeed Over Ground: " << speedOverGround_ << "\n";
+        ss << "\tCourse Over Ground: " << courseOverGround_ << "\n";
+        ss << "\tDate: " << date_ << "\n";
+        ss << "\tMagnetic Variation: " << magneticVariation_ << "\n";
+        ss << "\tMagnetic Variation Direction: " << magneticVariationDirection_ << "\n";
+        ss << "\tMode Indicator: " << modeIndicator_ << "\n";
+        ss << "\tNavigation Status: " << navigationStatus_;
 
     } else {
-        ss << "RMC(UTC Fix=" << utcFix_
+        ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
+           << "UTC Fix=" << utcFix_
            << ", Status=" << status_
            << ", Lat=" << latitude_ << latitudeDirection_
            << ", Lon=" << longitude_ << longitudeDirection_
@@ -146,9 +156,7 @@ std::string RMC::getStringContent(bool verbose) const noexcept {
            << ", Date=" << date_
            << ", MagVar=" << magneticVariation_ << magneticVariationDirection_
            << ", Mode=" << modeIndicator_
-           << ", NavStatus=" << navigationStatus_
-
-           << ")";
+           << ", NavStatus=" << navigationStatus_;
     }
     return ss.str();
 }

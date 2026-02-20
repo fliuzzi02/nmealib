@@ -155,24 +155,34 @@ std::unique_ptr<nmealib::Message> GGA::clone() const {
 
 std::string GGA::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
+    std::string validity = "KO";
+    if (validate()) {
+        validity = "OK";
+    }
+
     if (verbose) {
-        ss << "GGA Message:\n"
-           << "  Timestamp: " << timestamp_ << "\n"
-           << "  Latitude: " << latitude_ << "\n"
-           << "  Latitude Direction: " << latitudeDirection_ << "\n"
-           << "  Longitude: " << longitude_ << "\n"
-           << "  Longitude Direction: " << longitudeDirection_ << "\n"
-           << "  GPS Quality: " << gpsQuality_ << "\n"
-           << "  Satellites: " << satellites_ << "\n"
-           << "  HDOP: " << hdop_ << "\n"
-           << "  Altitude: " << altitude_ << "\n"
-           << "  Altitude Units: " << altitudeUnits_ << "\n"
-           << "  Geoidal Separation: " << geoidalSeparation_ << "\n"
-           << "  Geoidal Separation Units: " << geoidalSeparationUnits_ << "\n"
-           << "  DGPS Age: " << dgpsAge_ << "\n"
-           << "  DGPS Ref: " << dgpsReferenceStationId_;
+        ss << "Protocol: " << typeToString(type_) << "\n";
+        ss << "Talker: " << getTalker() << "\n";
+        ss << "Sentence Type: " << getSentenceType() << "\n";
+        ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
+        ss << "Fields:\n";
+        ss << "\tTimestamp: " << timestamp_ << "\n";
+        ss << "\tLatitude: " << latitude_ << "\n";
+        ss << "\tLatitude Direction: " << latitudeDirection_ << "\n";
+        ss << "\tLongitude: " << longitude_ << "\n";
+        ss << "\tLongitude Direction: " << longitudeDirection_ << "\n";
+        ss << "\tGPS Quality: " << gpsQuality_ << "\n";
+        ss << "\tSatellites: " << satellites_ << "\n";
+        ss << "\tHDOP: " << hdop_ << "\n";
+        ss << "\tAltitude: " << altitude_ << "\n";
+        ss << "\tAltitude Units: " << altitudeUnits_ << "\n";
+        ss << "\tGeoidal Separation: " << geoidalSeparation_ << "\n";
+        ss << "\tGeoidal Separation Units: " << geoidalSeparationUnits_ << "\n";
+        ss << "\tDGPS Age: " << dgpsAge_ << "\n";
+        ss << "\tDGPS Ref: " << dgpsReferenceStationId_;
     } else {
-        ss << "GGA(Time=" << timestamp_
+        ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
+           << "Time=" << timestamp_
            << ", Lat=" << latitude_ << latitudeDirection_
            << ", Lon=" << longitude_ << longitudeDirection_
            << ", Qual=" << gpsQuality_
@@ -181,8 +191,7 @@ std::string GGA::getStringContent(bool verbose) const noexcept {
            << ", Alt=" << altitude_ << altitudeUnits_
            << ", GeoSep=" << geoidalSeparation_ << geoidalSeparationUnits_
            << ", DGPSAge=" << dgpsAge_
-           << ", DGPSRef=" << dgpsReferenceStationId_
-           << ")";
+           << ", DGPSRef=" << dgpsReferenceStationId_;
     }
     return ss.str();
 }

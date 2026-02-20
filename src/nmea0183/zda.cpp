@@ -97,20 +97,29 @@ std::unique_ptr<nmealib::Message> ZDA::clone() const {
 
 std::string ZDA::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
+    std::string validity = "KO";
+    if (validate()) {
+        validity = "OK";
+    }
+
     if (verbose) {
-        ss << "ZDA Message:\n"
-           << "  UTC Time: " << utcTime_ << "\n"
-           << "  Day: " << day_ << "\n"
-           << "  Month: " << month_ << "\n"
-           << "  Year: " << year_ << "\n"
-           << "  Local Zone Hours: " << localZoneHours_ << "\n"
-           << "  Local Zone Minutes: " << localZoneMinutes_;
+        ss << "Protocol: " << typeToString(type_) << "\n";
+        ss << "Talker: " << getTalker() << "\n";
+        ss << "Sentence Type: " << getSentenceType() << "\n";
+        ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
+        ss << "Fields:\n";
+        ss << "\tUTC Time: " << utcTime_ << "\n";
+        ss << "\tDay: " << day_ << "\n";
+        ss << "\tMonth: " << month_ << "\n";
+        ss << "\tYear: " << year_ << "\n";
+        ss << "\tLocal Zone Hours: " << localZoneHours_ << "\n";
+        ss << "\tLocal Zone Minutes: " << localZoneMinutes_;
     } else {
-        ss << "ZDA(UTC=" << utcTime_
+        ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
+           << "UTC=" << utcTime_
            << ", Date=" << day_ << "/" << month_ << "/" << year_
            << ", Zone=" << localZoneHours_ << ":";
         ss << std::setw(2) << std::setfill('0') << std::abs(localZoneMinutes_);
-        ss << ")";
     }
 
     return ss.str();

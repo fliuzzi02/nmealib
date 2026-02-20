@@ -147,34 +147,44 @@ std::unique_ptr<nmealib::Message> VTG::clone() const {
 
 std::string VTG::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
+    std::string validity = "KO";
+    if (validate()) {
+        validity = "OK";
+    }
+
     if (verbose) {
-        ss << "VTG Message:\n"
-           << "  Legacy Format: " << (legacyFormat_ ? "Yes" : "No") << "\n"
-           << "  Course Over Ground (True): " << courseOverGroundTrue_;
+        ss << "Protocol: " << typeToString(type_) << "\n";
+        ss << "Talker: " << getTalker() << "\n";
+        ss << "Sentence Type: " << getSentenceType() << "\n";
+        ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
+        ss << "Fields:\n";
+        ss << "\tLegacy Format: " << (legacyFormat_ ? "Yes" : "No") << "\n";
+        ss << "\tCourse Over Ground (True): " << courseOverGroundTrue_;
         if (courseOverGroundTrueType_ != '\0') {
             ss << " " << courseOverGroundTrueType_;
         }
         ss << "\n"
-           << "  Course Over Ground (Magnetic): " << courseOverGroundMagnetic_;
+           << "\tCourse Over Ground (Magnetic): " << courseOverGroundMagnetic_;
         if (courseOverGroundMagneticType_ != '\0') {
             ss << " " << courseOverGroundMagneticType_;
         }
         ss << "\n"
-           << "  Speed Over Ground (Knots): " << speedOverGroundKnots_;
+           << "\tSpeed Over Ground (Knots): " << speedOverGroundKnots_;
         if (speedOverGroundKnotsType_ != '\0') {
             ss << " " << speedOverGroundKnotsType_;
         }
         ss << "\n"
-           << "  Speed Over Ground (KPH): " << speedOverGroundKph_;
+           << "\tSpeed Over Ground (KPH): " << speedOverGroundKph_;
         if (speedOverGroundKphType_ != '\0') {
             ss << " " << speedOverGroundKphType_;
         }
         if (faaModeIndicator_.has_value()) {
             ss << "\n"
-               << "  FAA Mode Indicator: " << faaModeIndicator_.value();
+               << "\tFAA Mode Indicator: " << faaModeIndicator_.value();
         }
     } else {
-        ss << "VTG(True=" << courseOverGroundTrue_
+        ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
+           << "True=" << courseOverGroundTrue_
            << ", Magnetic=" << courseOverGroundMagnetic_
            << ", Knots=" << speedOverGroundKnots_
            << ", KPH=" << speedOverGroundKph_;

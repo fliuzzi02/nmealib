@@ -3,7 +3,6 @@
 
 #ifdef _WIN32
 #include <io.h>
-#define STDIN_FILENO 0
 #else
 #include <unistd.h>
 #endif
@@ -24,18 +23,32 @@ void print_usage() {
 }
 
 namespace {
-std::string read_first_sentence_from_stdin() {
+std::size_t process_stream_from_stdin(bool verbose) {
     std::string line;
+    std::size_t error_count = 0;
     while (std::getline(std::cin, line)) {
-        if (!line.empty()) {
-            return line;
+        if (line.empty()) {
+            continue;
+        }
+
+        try {
+            auto message = nmealib::nmea0183::Nmea0183Factory::create(line);
+            std::cout << message->getStringContent(verbose) << "\n";
+        } catch (const nmealib::NmeaException& e) {
+            std::cerr << e.what() << "\n";
+            ++error_count;
         }
     }
-    return {};
+
+    return error_count;
 }
 
 bool stdin_is_tty() {
+#ifdef _WIN32
+    return ::_isatty(::_fileno(stdin)) == 1;
+#else
     return ::isatty(STDIN_FILENO) == 1;
+#endif
 }
 }
 
@@ -50,6 +63,7 @@ int main(int argc, char** argv) {
     bool verbose = false;
     std::string nmea_sentence;
     bool expect_message = false;
+    bool use_stdin_stream = false;
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -72,7 +86,7 @@ int main(int argc, char** argv) {
         } else if (expect_message) {
             expect_message = false;
             if (arg == "-") {
-                nmea_sentence = read_first_sentence_from_stdin();
+                use_stdin_stream = true;
             } else {
                 // Assign nmea sentence without leading/trailing " if present
                 if (arg[0] == '"' && arg[arg.size() - 1] == '"')
@@ -97,8 +111,13 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    if (nmea_sentence.empty() && !stdin_is_tty()) {
-        nmea_sentence = read_first_sentence_from_stdin();
+    if (!use_stdin_stream && nmea_sentence.empty() && !stdin_is_tty()) {
+        use_stdin_stream = true;
+    }
+
+    if (use_stdin_stream) {
+        const auto error_count = process_stream_from_stdin(verbose);
+        return error_count == 0 ? 0 : 1;
     }
 
     if (nmea_sentence.empty()) {
