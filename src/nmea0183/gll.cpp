@@ -35,11 +35,9 @@ std::unique_ptr<GLL> GLL::create(std::unique_ptr<Message0183> baseMessage) {
     }
 
     try {
-        double latitude = fields[0].empty() ? 0.0 : std::stod(fields[0]);
-        latitude = std::floor(latitude / 100) + std::fmod(latitude, 100) / 60; // Convert from ddmm.mmmm to decimal degrees
+        double latitude = Message0183::convertNmeaCoordinateToDecimalDegrees(fields[0]);
         char latitudeDirection = fields[1].empty() ? '\0' : fields[1][0];
-        double longitude = fields[2].empty() ? 0.0 : std::stod(fields[2]);
-        longitude = std::floor(longitude / 100) + std::fmod(longitude, 100) / 60; // Convert from dddmm.mmmm to decimal degrees
+        double longitude = Message0183::convertNmeaCoordinateToDecimalDegrees(fields[2]);
         char longitudeDirection = fields[3].empty() ? '\0' : fields[3][0];
         double timestamp = fields[4].empty() ? 0.0 : std::stod(fields[4]);
         char status = fields[5].empty() ? '\0' : fields[5][0];
@@ -105,6 +103,14 @@ std::unique_ptr<nmealib::Message> GLL::clone() const {
 
 std::string GLL::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
+    std::ostringstream latStream;
+    latStream << std::setprecision(10) << latitude_;
+    const std::string latitudeStr = latStream.str();
+
+    std::ostringstream lonStream;
+    lonStream << std::setprecision(10) << longitude_;
+    const std::string longitudeStr = lonStream.str();
+
     std::string validity = "KO";
     if (validate()) {
         validity = "OK";
@@ -116,17 +122,17 @@ std::string GLL::getStringContent(bool verbose) const noexcept {
         ss << "Sentence Type: " << getSentenceType() << "\n";
         ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
         ss << "Fields:\n";
-        ss << "\tLatitude: " << latitude_ << "\n";
+        ss << "\tLatitude: " << latitudeStr << "\n";
         ss << "\tLatitude Direction: " << latitudeDirection_ << "\n";
-        ss << "\tLongitude: " << longitude_ << "\n";
+        ss << "\tLongitude: " << longitudeStr << "\n";
         ss << "\tLongitude Direction: " << longitudeDirection_ << "\n";
         ss << "\tTimestamp: " << timestamp_ << "\n";
         ss << "\tStatus: " << status_ << "\n";
         ss << "\tMode Indicator: " << modeIndicator_;
     } else {
         ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
-           << "Lat=" << latitude_ << latitudeDirection_
-           << ", Lon=" << longitude_ << longitudeDirection_
+              << "Lat=" << latitudeStr << latitudeDirection_
+              << ", Lon=" << longitudeStr << longitudeDirection_
            << ", Time=" << timestamp_
            << ", Status=" << status_
            << ", Mode=" << modeIndicator_;

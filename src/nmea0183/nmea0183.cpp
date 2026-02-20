@@ -6,6 +6,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <numeric>
+#include <cmath>
 
 namespace nmealib {
 namespace nmea0183 {
@@ -165,6 +166,17 @@ bool Message0183::isHexByte(const std::string& s) noexcept {
     if (s.size() != 2) return false;
     return std::isxdigit(static_cast<unsigned char>(s[0])) &&
            std::isxdigit(static_cast<unsigned char>(s[1]));
+}
+
+double Message0183::convertNmeaCoordinateToDecimalDegrees(const std::string& nmeaCoordinate) {
+    if (nmeaCoordinate.empty()) {
+        return 0.0;
+    }
+
+    const long double raw = std::stold(nmeaCoordinate);
+    const long double degrees = std::floor(raw / 100.0L);
+    const long double minutes = raw - (degrees * 100.0L);
+    return static_cast<double>(degrees + (minutes / 60.0L));
 }
 
 } // namespace nmea0183

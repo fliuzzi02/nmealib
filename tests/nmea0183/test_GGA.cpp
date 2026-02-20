@@ -13,6 +13,7 @@ static const std::string GGA_SENTENCE_NO_CHECKSUM = "$GNGGA,062735.00,3150.78815
 static const std::string INCOMPLETE_GGA_SENTENCE = "$GNGGA,062735.00,,N,11711.922383,E,1,12,2.0,,M,,M,,*7A\r\n";
 static const std::string NOT_GGA_SENTENCE = "$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W,A,V*6A\r\n";
 static const std::string MALFORMED_GGA_SENTENCE = "$GPGGA,062735.00,3150.788156,N\r\n";
+static const std::string HIGH_PRECISION_GGA_SENTENCE_NO_CHECKSUM = "$GNGGA,062735.00,3150.7881569,N,11711.9223839,E,1,12,2.0,90.0,M,,M,,\r\n";
 
 TEST(GGA, CreateFromMessage0183Factory)
 {
@@ -141,4 +142,18 @@ TEST(GGA, FactoryDoesNotPromoteNonGgaSentence)
 TEST(GGA, FactoryThrowsOnMalformedGgaSentence)
 {
     EXPECT_THROW(Nmea0183Factory::create(MALFORMED_GGA_SENTENCE), NotGGAException);
+}
+
+TEST(GGA, ConvertsCoordinatesWithHighPrecision)
+{
+    auto msg = Nmea0183Factory::create(HIGH_PRECISION_GGA_SENTENCE_NO_CHECKSUM);
+    ASSERT_NE(msg, nullptr);
+    auto ggaMsg = dynamic_cast<GGA*>(msg.get());
+    ASSERT_NE(ggaMsg, nullptr);
+
+    const double expectedLatitude = 31.0 + (50.7881569 / 60.0);
+    const double expectedLongitude = 117.0 + (11.9223839 / 60.0);
+
+    EXPECT_NEAR(ggaMsg->getLatitude(), expectedLatitude, 1e-12);
+    EXPECT_NEAR(ggaMsg->getLongitude(), expectedLongitude, 1e-12);
 }

@@ -34,11 +34,9 @@ std::unique_ptr<RMC> RMC::create(std::unique_ptr<Message0183> baseMessage) {
     try {
         unsigned int utcFix = fields[0].empty() ? 0 : std::stoul(fields[0]);
         char status = fields[1].empty() ? '\0' : fields[1][0];
-        double latitude =  fields[2].empty() ? 0.0 : std::stod(fields[2]);
-        latitude = std::floor(latitude / 100) + std::fmod(latitude, 100) / 60; // Convert from ddmm.mmmm to decimal degrees
+        double latitude = Message0183::convertNmeaCoordinateToDecimalDegrees(fields[2]);
         char latDirection = fields[3].empty() ? '\0' : fields[3][0];
-        double longitude = fields[4].empty() ? 0.0 : std::stod(fields[4]);
-        longitude = std::floor(longitude / 100) + std::fmod(longitude, 100) / 60; // Convert from dddmm.mmmm to decimal degrees
+        double longitude = Message0183::convertNmeaCoordinateToDecimalDegrees(fields[4]);
         char lonDirection = fields[5].empty() ? '\0' : fields[5][0];
         double speedOverGround = fields[6].empty() ? 0.0 : std::stod(fields[6]);
         double courseOverGround = fields[7].empty() ? 0.0 : std::stod(fields[7]);
@@ -120,6 +118,14 @@ std::unique_ptr<nmealib::Message> RMC::clone() const {
 
 std::string RMC::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
+    std::ostringstream latStream;
+    latStream << std::setprecision(10) << latitude_;
+    const std::string latitudeStr = latStream.str();
+
+    std::ostringstream lonStream;
+    lonStream << std::setprecision(10) << longitude_;
+    const std::string longitudeStr = lonStream.str();
+
     std::string validity = "KO";
     if (validate()) {
         validity = "OK";
@@ -133,9 +139,9 @@ std::string RMC::getStringContent(bool verbose) const noexcept {
         ss << "Fields:\n";
         ss << "\tUTC Fix: " << utcFix_ << "\n";
         ss << "\tStatus: " << status_ << "\n";
-        ss << "\tLatitude: " << latitude_ << "\n";
+        ss << "\tLatitude: " << latitudeStr << "\n";
         ss << "\tLatitude Direction: " << latitudeDirection_ << "\n";
-        ss << "\tLongitude: " << longitude_ << "\n";
+        ss << "\tLongitude: " << longitudeStr << "\n";
         ss << "\tLongitude Direction: " << longitudeDirection_ << "\n";
         ss << "\tSpeed Over Ground: " << speedOverGround_ << "\n";
         ss << "\tCourse Over Ground: " << courseOverGround_ << "\n";
@@ -149,8 +155,8 @@ std::string RMC::getStringContent(bool verbose) const noexcept {
         ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
            << "UTC Fix=" << utcFix_
            << ", Status=" << status_
-           << ", Lat=" << latitude_ << latitudeDirection_
-           << ", Lon=" << longitude_ << longitudeDirection_
+           << ", Lat=" << latitudeStr << latitudeDirection_
+           << ", Lon=" << longitudeStr << longitudeDirection_
            << ", SOG=" << speedOverGround_
            << ", COG=" << courseOverGround_
            << ", Date=" << date_

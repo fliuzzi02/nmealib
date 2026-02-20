@@ -12,6 +12,7 @@ static const std::string RMC_SENTENCE_NO_CHECKSUM = "$GPRMC,123519,A,4807.038,N,
 static const std::string INCOMPLETE_RMC_SENTENCE = "$GPRMC,123519,A,,N,01131.000,E,022.4,,,,W,A,V*6A\r\n";
 static const std::string NOT_RMC_SENTENCE = "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47\r\n";
 static const std::string MALFORMED_RMC_SENTENCE = "$GPRMC,123519,A\r\n";
+static const std::string HIGH_PRECISION_RMC_SENTENCE_NO_CHECKSUM = "$GPRMC,123519,A,4807.0381234,N,01131.0009876,E,022.4,084.4,230394,003.1,W,A,V\r\n";
 
 // Test RMC creation through parent class factory method
 TEST(RMC, CreateFromMessage0183Factory)
@@ -164,12 +165,12 @@ TEST(RMC, StringContentFormatsAreStable)
     RMC rmc("GP", 123519, 'A', 48.1173, 'N', 11.5166, 'E', 22.4, 84.4, 230394, 3.1, 'W', 'A', 'V');
 
     const std::string compact = rmc.getStringContent(false);
-    EXPECT_NE(compact.find("RMC(UTC Fix=123519"), std::string::npos);
+    EXPECT_NE(compact.find("GP RMC: UTC Fix=123519"), std::string::npos);
     EXPECT_NE(compact.find("Lat=48.1173N"), std::string::npos);
     EXPECT_NE(compact.find("NavStatus=V"), std::string::npos);
 
     const std::string verbose = rmc.getStringContent(true);
-    EXPECT_NE(verbose.find("RMC Message:"), std::string::npos);
+    EXPECT_NE(verbose.find("Protocol: NMEA0183"), std::string::npos);
     EXPECT_NE(verbose.find("UTC Fix: 123519"), std::string::npos);
     EXPECT_NE(verbose.find("Latitude Direction: N"), std::string::npos);
     EXPECT_NE(verbose.find("Navigation Status: V"), std::string::npos);
@@ -186,4 +187,18 @@ TEST(RMC, FactoryDoesNotPromoteNonRmcSentence)
 TEST(RMC, FactoryThrowsOnMalformedRmcSentence)
 {
     EXPECT_THROW(Nmea0183Factory::create(MALFORMED_RMC_SENTENCE), NotRMCException);
+}
+
+TEST(RMC, ConvertsCoordinatesWithHighPrecision)
+{
+    auto msg = Nmea0183Factory::create(HIGH_PRECISION_RMC_SENTENCE_NO_CHECKSUM);
+    ASSERT_NE(msg, nullptr);
+    auto rmcMsg = dynamic_cast<RMC*>(msg.get());
+    ASSERT_NE(rmcMsg, nullptr);
+
+    const double expectedLatitude = 48.0 + (7.0381234 / 60.0);
+    const double expectedLongitude = 11.0 + (31.0009876 / 60.0);
+
+    EXPECT_NEAR(rmcMsg->getLatitude(), expectedLatitude, 1e-12);
+    EXPECT_NEAR(rmcMsg->getLongitude(), expectedLongitude, 1e-12);
 }

@@ -13,6 +13,7 @@ static const std::string GLL_SENTENCE_NO_CHECKSUM = "$GNGLL,3150.788156,N,11711.
 static const std::string INCOMPLETE_GLL_SENTENCE = "$GNGLL,,N,11711.922383,E,,V,N\r\n";
 static const std::string NOT_GLL_SENTENCE = "$GNGGA,062735.00,3150.788156,N,11711.922383,E,1,12,2.0,90.0,M,,M,,*55\r\n";
 static const std::string MALFORMED_GLL_SENTENCE = "$GPGLL,3150.788156,N,11711.922383,E\r\n";
+static const std::string HIGH_PRECISION_GLL_SENTENCE_NO_CHECKSUM = "$GNGLL,3150.7881569,N,11711.9223839,E,062735.00,A,A\r\n";
 
 TEST(GLL, CreateFromMessage0183Factory)
 {
@@ -124,4 +125,18 @@ TEST(GLL, FactoryDoesNotPromoteNonGllSentence)
 TEST(GLL, FactoryThrowsOnMalformedGllSentence)
 {
     EXPECT_THROW(Nmea0183Factory::create(MALFORMED_GLL_SENTENCE), NotGLLException);
+}
+
+TEST(GLL, ConvertsCoordinatesWithHighPrecision)
+{
+    auto msg = Nmea0183Factory::create(HIGH_PRECISION_GLL_SENTENCE_NO_CHECKSUM);
+    ASSERT_NE(msg, nullptr);
+    auto gllMsg = dynamic_cast<GLL*>(msg.get());
+    ASSERT_NE(gllMsg, nullptr);
+
+    const double expectedLatitude = 31.0 + (50.7881569 / 60.0);
+    const double expectedLongitude = 117.0 + (11.9223839 / 60.0);
+
+    EXPECT_NEAR(gllMsg->getLatitude(), expectedLatitude, 1e-12);
+    EXPECT_NEAR(gllMsg->getLongitude(), expectedLongitude, 1e-12);
 }

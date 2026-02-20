@@ -37,11 +37,9 @@ std::unique_ptr<GGA> GGA::create(std::unique_ptr<Message0183> baseMessage) {
 
     try {
         double timestamp = fields[0].empty() ? 0.0 : std::stod(fields[0]);
-        double latitude = fields[1].empty() ? 0.0 : std::stod(fields[1]);
-        latitude = std::floor(latitude / 100) + std::fmod(latitude, 100) / 60; // Convert from ddmm.mmmm to decimal degrees
+        double latitude = Message0183::convertNmeaCoordinateToDecimalDegrees(fields[1]);
         char latitudeDirection = fields[2].empty() ? '\0' : fields[2][0];
-        double longitude = fields[3].empty() ? 0.0 : std::stod(fields[3]);
-        longitude = std::floor(longitude / 100) + std::fmod(longitude, 100) / 60; // Convert from dddmm.mmmm to decimal degrees
+        double longitude = Message0183::convertNmeaCoordinateToDecimalDegrees(fields[3]);
         char longitudeDirection = fields[4].empty() ? '\0' : fields[4][0];
         unsigned int gpsQuality = fields[5].empty() ? 0 : std::stoul(fields[5]);
         unsigned int satellites = fields[6].empty() ? 0 : std::stoul(fields[6]);
@@ -155,6 +153,14 @@ std::unique_ptr<nmealib::Message> GGA::clone() const {
 
 std::string GGA::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
+    std::ostringstream latStream;
+    latStream << std::setprecision(10) << latitude_;
+    const std::string latitudeStr = latStream.str();
+
+    std::ostringstream lonStream;
+    lonStream << std::setprecision(10) << longitude_;
+    const std::string longitudeStr = lonStream.str();
+
     std::string validity = "KO";
     if (validate()) {
         validity = "OK";
@@ -167,9 +173,9 @@ std::string GGA::getStringContent(bool verbose) const noexcept {
         ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
         ss << "Fields:\n";
         ss << "\tTimestamp: " << timestamp_ << "\n";
-        ss << "\tLatitude: " << latitude_ << "\n";
+        ss << "\tLatitude: " << latitudeStr << "\n";
         ss << "\tLatitude Direction: " << latitudeDirection_ << "\n";
-        ss << "\tLongitude: " << longitude_ << "\n";
+        ss << "\tLongitude: " << longitudeStr << "\n";
         ss << "\tLongitude Direction: " << longitudeDirection_ << "\n";
         ss << "\tGPS Quality: " << gpsQuality_ << "\n";
         ss << "\tSatellites: " << satellites_ << "\n";
@@ -183,8 +189,8 @@ std::string GGA::getStringContent(bool verbose) const noexcept {
     } else {
         ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
            << "Time=" << timestamp_
-           << ", Lat=" << latitude_ << latitudeDirection_
-           << ", Lon=" << longitude_ << longitudeDirection_
+              << ", Lat=" << latitudeStr << latitudeDirection_
+              << ", Lon=" << longitudeStr << longitudeDirection_
            << ", Qual=" << gpsQuality_
            << ", Sats=" << satellites_
            << ", HDOP=" << hdop_

@@ -133,6 +133,14 @@ public:
      */
     bool validate() const override;
 
+    /**
+     * @brief Converts an NMEA coordinate in ddmm.mmmm / dddmm.mmmm format to decimal degrees.
+     *
+     * @param nmeaCoordinate Coordinate field as received from the sentence payload.
+     * @return double Decimal degrees representation.
+     */
+    static double convertNmeaCoordinateToDecimalDegrees(const std::string& nmeaCoordinate);
+
 protected:
     char startChar_; // '$' or '!'
     std::string talker_; // e.g. "GP", "II", etc. (first two chars of payload)
