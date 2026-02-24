@@ -13,9 +13,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Ensure release token is set
+      if: ${{ secrets.RELEASE_TOKEN == '' }}
+      run: |
+        echo "RELEASE_TOKEN secret is required to push tags that trigger workflows." >&2
+        exit 1
+
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        token: ${{ secrets.RELEASE_TOKEN }}
 
     - name: Derive version
       id: version
