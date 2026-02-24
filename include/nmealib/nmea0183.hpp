@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../message.hpp"
-#include "../nmeaException.hpp"
+#include "message.hpp"
+#include "nmeaException.hpp"
 
 #include <string>
 
@@ -19,7 +19,7 @@ public:
      * @param context A string identifying where the error occurred.
      * @param details Optional extra information (e.g., actual sentence length).
      */
-    explicit TooLongSentenceException(const std::string& context, const std::string& details = "") : 
+    explicit TooLongSentenceException(const std::string& context, const std::string& details = "") :
     NmeaException(context, "NMEA 0183 sentence exceeds maximum length of 82 characters", details) {}
 };
 
@@ -34,7 +34,7 @@ public:
      * @param context A string identifying where the error occurred.
      * @param details Optional extra information.
      */
-    explicit InvalidStartCharacterException(const std::string& context, const std::string& details = "") : 
+    explicit InvalidStartCharacterException(const std::string& context, const std::string& details = "") :
     NmeaException(context, "NMEA 0183 sentence must start with '$' or '!'", details) {}
 };
 
@@ -49,7 +49,7 @@ public:
      * @param context A string identifying where the error occurred.
      * @param details Optional extra information.
      */
-    explicit NoChecksumException(const std::string& context, const std::string& details = "") : 
+    explicit NoChecksumException(const std::string& context, const std::string& details = "") :
     NmeaException(context, "This sentence does not contain a checksum", details) {}
 };
 
@@ -64,7 +64,7 @@ public:
      * @param context A string identifying where the error occurred.
      * @param details Optional extra information.
      */
-    explicit NoEndlineException(const std::string& context, const std::string& details = "") : 
+    explicit NoEndlineException(const std::string& context, const std::string& details = "") :
     NmeaException(context, "NMEA 0183 sentence must end with <CR><LF>", details) {}
 };
 
@@ -85,7 +85,7 @@ public:
      * @param context A string identifying where the error occurred.
      * @param details Optional extra information (e.g., expected vs. actual field count).
      */
-    explicit NotEnoughFieldsException(const std::string& context, const std::string& details = "") : 
+    explicit NotEnoughFieldsException(const std::string& context, const std::string& details = "") :
     NmeaException(context, "NMEA 0183 sentence does not contain enough fields", details) {}
 };
 
@@ -168,7 +168,7 @@ public:
 
     /**
      * @brief Get the checksum string extracted from the raw sentence.
-     * 
+     *
      * @return std::string The checksum string extracted from the raw NMEA 0183 sentence, if present.
      * @throws NoChecksumException If the sentence does not contain a checksum (i.e., no '*' character followed by two hex digits).
      */
@@ -176,23 +176,23 @@ public:
 
     /**
      * @brief Get the calculated checksum string for the sentence payload.
-     * 
+     *
      * @return std::string The checksum string calculated from the payload of the NMEA 0183 sentence, represented as a two-digit hexadecimal string.
      */
     std::string getCalculatedChecksumStr() const noexcept;
-    
+
     /**
      * @brief Returns a human-readable string representation of the message content.
-     * 
+     *
      * @param verbose Selects whether to print a one-liner or a more detailed multi-line string with field names and values.
-     * @return std::string The string representation of the message content 
+     * @return std::string The string representation of the message content
      */
     virtual std::string getStringContent(bool verbose) const noexcept;
 
     /**
-     * @brief Returns the wire-format representation of the NMEA 0183 sentence, 
+     * @brief Returns the wire-format representation of the NMEA 0183 sentence,
      * that is, the raw information that was passed when the message was created.
-     * 
+     *
      * @return std::string A string with the wire-format
      */
     std::string serialize() const override;
@@ -208,7 +208,7 @@ public:
 
     /**
      * @brief Compares the content of the message only, ignoring the timestamp.
-     * 
+     *
      * @param other The other Message0183 object to compare with
      * @return true if the content of both messages is equal (start char, talker, sentence type, payload, checksum string, and calculated checksum string), regardless of their timestamps;
      * @return false otherwise
@@ -217,7 +217,7 @@ public:
 
     /**
      * @brief Returns whether the message is valid or not.
-     * 
+     *
      * @return true If there is no checksum or if the checksum matches the calculated checksum for the payload
      * @return false If there is a checksum and it does not match the calculated checksum for the payload
      */
@@ -232,12 +232,12 @@ public:
     static double convertNmeaCoordinateToDecimalDegrees(const std::string& nmeaCoordinate);
 
 protected:
-    char startChar_; ///< '$' or '!'
-    std::string talker_; ///< e.g. "GP", "II", etc. (first two chars of payload)
-    std::string sentenceType_; ///< e.g. "GGA", "RMC", etc. (chars 3-5 of payload)
-    std::string payload_; ///< the part between startChar and * (or between startChar and CRLF if no checksum)
-    std::string checksumStr_; ///< the two hex digits after '*', if present
-    std::string calculatedChecksumStr_; ///< the checksum computed from the payload, as a two-digit hex string
+    char startChar_;
+    std::string talker_;
+    std::string sentenceType_;
+    std::string payload_;
+    std::string checksumStr_;
+    std::string calculatedChecksumStr_;
 
     /**
      * @brief Protected factory method to create a Message0183 from a raw sentence string.
@@ -267,7 +267,7 @@ private:
                         std::string sentenceType,
                         std::string payload,
                         std::string checksumStr) noexcept;
-    
+
     static std::string computeChecksum(const std::string& payload) noexcept;
     static bool isHexByte(const std::string& s) noexcept;
     static void validateFormat(const std::string& context, const std::string& raw);
