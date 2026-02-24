@@ -18,6 +18,13 @@ public:
      * 
      */
     enum class Type { Unknown, NMEA0183, NMEA2000 };
+
+    /**
+     * @brief Converts a Message::Type enum value to its string representation.
+     *
+     * @param t The message type to convert.
+     * @return std::string A human-readable string for the given type (e.g., "NMEA0183", "Unknown").
+     */
     static std::string typeToString(Type t) {
         switch (t) {
             case Type::Unknown: return "Unknown";
@@ -42,21 +49,56 @@ public:
     Message(Message&&) noexcept = default;
     Message& operator=(Message&&) noexcept = default;
 
-    // Getters
+    /**
+     * @brief Returns the message type.
+     *
+     * @return Type The type of this NMEA message.
+     */
     Type getType() const noexcept { return type_; }
+
+    /**
+     * @brief Returns the raw, unmodified data string as received.
+     *
+     * @return const std::string& A const reference to the raw data string.
+     */
     const std::string& getRawData() const noexcept { return rawData_; }
+
+    /**
+     * @brief Returns the timestamp associated with this message.
+     *
+     * @return TimePoint The time point at which this message was created or received.
+     */
     TimePoint getTimestamp() const noexcept { return timestamp_; }
 
-    // Polymorphic copy
+    /**
+     * @brief Creates a polymorphic deep copy of this message.
+     *
+     * @return std::unique_ptr<Message> A unique pointer to the cloned message.
+     */
     virtual std::unique_ptr<Message> clone() const = 0;
 
-    // Produce wire-format representation
+    /**
+     * @brief Produces the wire-format representation of this message.
+     *
+     * @return std::string The serialized string suitable for transmission.
+     */
     virtual std::string serialize() const = 0;
 
-    // Validate message contents (checksum, length, etc.)
+    /**
+     * @brief Validates the message contents (e.g., checksum, length).
+     *
+     * @return true  If the message is valid.
+     * @return false If the message fails validation.
+     */
     virtual bool validate() const = 0;
 
-    // Override == operator to compare Message objects based on their content rather than their memory addresses.
+    /**
+     * @brief Compares two Message objects for equality based on their content.
+     *
+     * @param other The other Message to compare against.
+     * @return true  If type, raw data, and timestamp are all equal.
+     * @return false Otherwise.
+     */
     bool operator==(const Message& other) const noexcept {
         return type_ == other.type_ &&
                rawData_ == other.rawData_ &&
@@ -68,8 +110,25 @@ protected:
     Type type_{Type::Unknown};
     TimePoint timestamp_{};
 
+    /**
+     * @brief Sets the message type.
+     *
+     * @param t The new message type.
+     */
     void setType(Type t) noexcept { type_ = t; }
+
+    /**
+     * @brief Sets the raw data string.
+     *
+     * @param r The new raw data string.
+     */
     void setRaw(std::string r) noexcept { rawData_ = std::move(r); }
+
+    /**
+     * @brief Sets the message timestamp.
+     *
+     * @param ts The new timestamp.
+     */
     void setTimestamp(TimePoint ts) noexcept { timestamp_ = ts; }
 };
 

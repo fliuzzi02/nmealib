@@ -2,7 +2,7 @@
 #include <chrono>
 #include <memory>
 #include <string>
-#include "nmea0183.hpp"
+#include <nmealib/nmealib.hpp>
 
 using namespace nmealib::nmea0183;
 

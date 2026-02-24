@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "nmea0183.hpp"
+#include <nmealib/nmealib.hpp>
 
 void print_usage() {
     std::cout << "Usage: nmealib-cli [options] \"<nmea_sentence>\"\n";

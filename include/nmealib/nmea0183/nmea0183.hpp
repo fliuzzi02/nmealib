@@ -8,26 +8,62 @@
 namespace nmealib {
 namespace nmea0183 {
 
+/**
+ * @brief Exception thrown when an NMEA 0183 sentence exceeds the maximum allowed length of 82 characters.
+ */
 class TooLongSentenceException : public NmeaException {
 public:
+    /**
+     * @brief Constructs a TooLongSentenceException.
+     *
+     * @param context A string identifying where the error occurred.
+     * @param details Optional extra information (e.g., actual sentence length).
+     */
     explicit TooLongSentenceException(const std::string& context, const std::string& details = "") : 
     NmeaException(context, "NMEA 0183 sentence exceeds maximum length of 82 characters", details) {}
 };
 
+/**
+ * @brief Exception thrown when an NMEA 0183 sentence does not start with '$' or '!'.
+ */
 class InvalidStartCharacterException : public NmeaException {
 public:
+    /**
+     * @brief Constructs an InvalidStartCharacterException.
+     *
+     * @param context A string identifying where the error occurred.
+     * @param details Optional extra information.
+     */
     explicit InvalidStartCharacterException(const std::string& context, const std::string& details = "") : 
     NmeaException(context, "NMEA 0183 sentence must start with '$' or '!'", details) {}
 };
 
+/**
+ * @brief Exception thrown when an operation requires a checksum but none is present in the sentence.
+ */
 class NoChecksumException : public NmeaException {
 public:
+    /**
+     * @brief Constructs a NoChecksumException.
+     *
+     * @param context A string identifying where the error occurred.
+     * @param details Optional extra information.
+     */
     explicit NoChecksumException(const std::string& context, const std::string& details = "") : 
     NmeaException(context, "This sentence does not contain a checksum", details) {}
 };
 
+/**
+ * @brief Exception thrown when an NMEA 0183 sentence is missing the required <CR><LF> terminator.
+ */
 class NoEndlineException : public NmeaException {
 public:
+    /**
+     * @brief Constructs a NoEndlineException.
+     *
+     * @param context A string identifying where the error occurred.
+     * @param details Optional extra information.
+     */
     explicit NoEndlineException(const std::string& context, const std::string& details = "") : 
     NmeaException(context, "NMEA 0183 sentence must end with <CR><LF>", details) {}
 };
@@ -54,6 +90,7 @@ public:
      * it throws an appropriate exception indicating the reason for failure.
      * 
      * @param raw The raw NMEA 0183 sentence string to parse and validate.
+     * @param ts  Optional timestamp to associate with the message; defaults to the current system time.
      * @return std::unique_ptr<Message0183> A unique pointer to the created Message0183 instance if the input is valid.
      * @throws TooLongSentenceException If the input string exceeds the maximum allowed length of 82 characters.
      * @throws InvalidStartCharacterException If the input string does not start with either '$' or '!'.
@@ -62,22 +99,69 @@ public:
     static std::unique_ptr<Message0183> create(const std::string& raw, 
                                                TimePoint ts = std::chrono::system_clock::now());
 
-    // Accessory constructors
+    /**
+     * @brief Copy constructor.
+     */
     Message0183(const Message0183&) = default;
+
+    /**
+     * @brief Copy assignment operator.
+     */
     Message0183& operator=(const Message0183&) = default;
+
+    /**
+     * @brief Move constructor.
+     */
     Message0183(Message0183&&) noexcept = default;
+
+    /**
+     * @brief Move assignment operator.
+     */
     Message0183& operator=(Message0183&&) noexcept = default;
 
-    // Destructor
+    /**
+     * @brief Destructor.
+     */
     ~Message0183() override = default;
 
-    // Polymorphic copy
+    /**
+     * @brief Creates a polymorphic deep copy of this Message0183.
+     *
+     * @return std::unique_ptr<nmealib::Message> A unique pointer to the cloned message.
+     */
     std::unique_ptr<nmealib::Message> clone() const override;
-    
+
+    /**
+     * @brief Returns the start character of the NMEA 0183 sentence.
+     *
+     * @return char Either '$' (field-delimited) or '!' (encapsulated) sentence start character.
+     */
     char getStartChar() const noexcept;
+
+    /**
+     * @brief Returns the talker identifier extracted from the sentence.
+     *
+     * @return std::string A two-character talker ID (e.g., "GP" for GPS, "II" for integrated instrumentation).
+     */
     std::string getTalker() const noexcept;
+
+    /**
+     * @brief Returns the sentence type identifier extracted from the sentence.
+     *
+     * @return std::string A three-character sentence type code (e.g., "GGA", "RMC").
+     */
     std::string getSentenceType() const noexcept;
+
+    /**
+     * @brief Returns the payload of the NMEA 0183 sentence.
+     *
+     * The payload is the portion of the sentence between the start character and the
+     * checksum delimiter '*' (or end of data if no checksum is present).
+     *
+     * @return std::string The sentence payload string.
+     */
     std::string getPayload() const noexcept;
+
     /**
      * @brief Get the Checksum Str object
      * 
@@ -85,6 +169,7 @@ public:
      * @throws NoChecksumException If the sentence does not contain a checksum (i.e., no '*' character followed by two hex digits).
      */
     std::string getChecksumStr() const;
+
     /**
      * @brief Get the Calculated Checksum Str object
      * 
@@ -95,7 +180,7 @@ public:
     /**
      * @brief Returns a human-readable string representation of the message content.
      * 
-     * @param verbose Selects wheter to print an one-liner or a more detailed multi-line string with field names and values.
+     * @param verbose Selects whether to print an one-liner or a more detailed multi-line string with field names and values.
      * @return std::string The string representation of the message content 
      */
     virtual std::string getStringContent(bool verbose) const noexcept;
@@ -104,11 +189,17 @@ public:
      * @brief Returns the wire-format representation of the NMEA 0183 sentence, 
      * that is, the raw information that was passed when the message was created.
      * 
-     * @return std::string A string with thw wire-format
+     * @return std::string A string with the wire-format
      */
     std::string serialize() const override;
 
-    // Override of the == operator to compare Message0183 objects based on their content rather than their memory addresses.
+    /**
+     * @brief Compares two Message0183 objects for equality based on their content and timestamp.
+     *
+     * @param other The other Message0183 object to compare with.
+     * @return true  If all fields and the base Message data (including timestamp) are equal.
+     * @return false Otherwise.
+     */
     bool operator==(const Message0183& other) const noexcept {
         return startChar_ == other.startChar_ &&
                talker_ == other.talker_ &&
@@ -139,17 +230,17 @@ public:
      * @brief Returns wheter the message is valid or not
      * 
      * @return true If there is no checksum or if the checksum matches the calculated checksum for the payload
-     * @return false if there is a checksum and it does not match the calculated checksum for the payload
+     * @return false If there is a checksum and it does not match the calculated checksum for the payload
      */
     bool validate() const override;
 
 protected:
-    char startChar_; // '$' or '!'
-    std::string talker_; // e.g. "GP", "II", etc. (first two chars of payload)
-    std::string sentenceType_; // e.g. "GGA", "RMC", etc. (chars 3-5 of payload)
-    std::string payload_; // the part between startChar and * (or between startChar and CRLF if no checksum)
-    std::string checksumStr_; // the two hex digits after '*', if present
-    std::string calculatedChecksumStr_; // the checksum computed from the payload, as a two-digit hex string
+    char startChar_; ///< '$' or '!'
+    std::string talker_; ///< e.g. "GP", "II", etc. (first two chars of payload)
+    std::string sentenceType_; ///< e.g. "GGA", "RMC", etc. (chars 3-5 of payload)
+    std::string payload_; ///< the part between startChar and * (or between startChar and CRLF if no checksum)
+    std::string checksumStr_; ///< the two hex digits after '*', if present
+    std::string calculatedChecksumStr_; ///< the checksum computed from the payload, as a two-digit hex string
 
 private:
     explicit Message0183(std::string raw,
