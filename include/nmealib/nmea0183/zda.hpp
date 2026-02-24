@@ -31,21 +31,16 @@ public:
 
     std::unique_ptr<nmealib::Message> clone() const override;
 
-    double getUtcTime() const noexcept { return utcTime_; }
-    unsigned int getDay() const noexcept { return day_; }
-    unsigned int getMonth() const noexcept { return month_; }
-    unsigned int getYear() const noexcept { return year_; }
-    int getLocalZoneHours() const noexcept { return localZoneHours_; }
-    int getLocalZoneMinutes() const noexcept { return localZoneMinutes_; }
+    double getUtcTime() const noexcept;
+    unsigned int getDay() const noexcept;
+    unsigned int getMonth() const noexcept;
+    unsigned int getYear() const noexcept;
+    int getLocalZoneHours() const noexcept;
+    int getLocalZoneMinutes() const noexcept;
 
     std::string getStringContent(bool verbose) const noexcept override;
-    bool operator==(const ZDA& other) const noexcept {
-        return Message0183::operator==(other);
-    }
-
-    bool hasEqualContent(const ZDA& other) const noexcept {
-        return Message0183::hasEqualContent(other);
-    }
+    bool operator==(const ZDA& other) const noexcept;
+    bool hasEqualContent(const ZDA& other) const noexcept;
 
 private:
     double utcTime_;

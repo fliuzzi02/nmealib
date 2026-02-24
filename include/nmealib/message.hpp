@@ -25,24 +25,16 @@ public:
      * @param t The message type to convert.
      * @return std::string A human-readable string for the given type (e.g., "NMEA0183", "Unknown").
      */
-    static std::string typeToString(Type t) {
-        switch (t) {
-            case Type::Unknown: return "Unknown";
-            case Type::NMEA0183: return "NMEA0183";
-            case Type::NMEA2000: return "NMEA2000";
-            default: return "InvalidType";
-        }
-    }
+    static std::string typeToString(Type t);
 
     using TimePoint = std::chrono::system_clock::time_point;
 
-    Message() = default;
+    Message();
     explicit Message(std::string raw,
                      Type type = Type::Unknown,
-                     TimePoint ts = std::chrono::system_clock::now()) noexcept
-        : rawData_(std::move(raw)), type_(type), timestamp_(ts) {}
+                     TimePoint ts = std::chrono::system_clock::now()) noexcept;
 
-    virtual ~Message() = default;
+    virtual ~Message();
     
     Message(const Message&) = default;
     Message& operator=(const Message&) = default;
@@ -54,21 +46,21 @@ public:
      *
      * @return Type The type of this NMEA message.
      */
-    Type getType() const noexcept { return type_; }
+    Type getType() const noexcept;
 
     /**
      * @brief Returns the raw, unmodified data string as received.
      *
      * @return const std::string& A const reference to the raw data string.
      */
-    const std::string& getRawData() const noexcept { return rawData_; }
+    const std::string& getRawData() const noexcept;
 
     /**
      * @brief Returns the timestamp associated with this message.
      *
      * @return TimePoint The time point at which this message was created or received.
      */
-    TimePoint getTimestamp() const noexcept { return timestamp_; }
+    TimePoint getTimestamp() const noexcept;
 
     /**
      * @brief Creates a polymorphic deep copy of this message.
@@ -99,11 +91,7 @@ public:
      * @return true  If type, raw data, and timestamp are all equal.
      * @return false Otherwise.
      */
-    bool operator==(const Message& other) const noexcept {
-        return type_ == other.type_ &&
-               rawData_ == other.rawData_ &&
-               timestamp_ == other.timestamp_;
-    }
+    bool operator==(const Message& other) const noexcept;
 
 protected:
     std::string rawData_;
@@ -115,21 +103,21 @@ protected:
      *
      * @param t The new message type.
      */
-    void setType(Type t) noexcept { type_ = t; }
+    void setType(Type t) noexcept;
 
     /**
      * @brief Sets the raw data string.
      *
      * @param r The new raw data string.
      */
-    void setRaw(std::string r) noexcept { rawData_ = std::move(r); }
+    void setRaw(std::string r) noexcept;
 
     /**
      * @brief Sets the message timestamp.
      *
      * @param ts The new timestamp.
      */
-    void setTimestamp(TimePoint ts) noexcept { timestamp_ = ts; }
+    void setTimestamp(TimePoint ts) noexcept;
 };
 
 } // namespace nmealib

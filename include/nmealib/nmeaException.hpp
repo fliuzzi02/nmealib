@@ -21,8 +21,7 @@ public:
      * @param message  A human-readable description of the error.
      * @param details  Optional extra information appended in parentheses.
      */
-    explicit NmeaException(const std::string& context, const std::string& message, const std::string& details = "") : 
-    std::runtime_error(context + ": " + message + (details.empty() ? "" : " (" + details + ")")) {}
+    explicit NmeaException(const std::string& context, const std::string& message, const std::string& details = "");
 };
 
 } // namespace nmealib

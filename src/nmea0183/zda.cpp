@@ -145,5 +145,37 @@ std::string ZDA::composeRaw(std::string talkerId,
     return "$" + payload + "\r\n";
 }
 
+double ZDA::getUtcTime() const noexcept {
+    return utcTime_;
+}
+
+unsigned int ZDA::getDay() const noexcept {
+    return day_;
+}
+
+unsigned int ZDA::getMonth() const noexcept {
+    return month_;
+}
+
+unsigned int ZDA::getYear() const noexcept {
+    return year_;
+}
+
+int ZDA::getLocalZoneHours() const noexcept {
+    return localZoneHours_;
+}
+
+int ZDA::getLocalZoneMinutes() const noexcept {
+    return localZoneMinutes_;
+}
+
+bool ZDA::operator==(const ZDA& other) const noexcept {
+    return Message0183::operator==(other);
+}
+
+bool ZDA::hasEqualContent(const ZDA& other) const noexcept {
+    return Message0183::hasEqualContent(other);
+}
+
 } // namespace nmea0183
 } // namespace nmealib

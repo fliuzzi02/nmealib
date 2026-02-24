@@ -228,5 +228,57 @@ std::string VTG::composeRaw(std::string talkerId,
     return "$" + payload + "\r\n";
 }
 
+double VTG::getCourseOverGroundTrue() const noexcept {
+    return courseOverGroundTrue_;
+}
+
+char VTG::getCourseOverGroundTrueType() const noexcept {
+    return courseOverGroundTrueType_;
+}
+
+double VTG::getCourseOverGroundMagnetic() const noexcept {
+    return courseOverGroundMagnetic_;
+}
+
+char VTG::getCourseOverGroundMagneticType() const noexcept {
+    return courseOverGroundMagneticType_;
+}
+
+double VTG::getSpeedOverGroundKnots() const noexcept {
+    return speedOverGroundKnots_;
+}
+
+char VTG::getSpeedOverGroundKnotsType() const noexcept {
+    return speedOverGroundKnotsType_;
+}
+
+double VTG::getSpeedOverGroundKph() const noexcept {
+    return speedOverGroundKph_;
+}
+
+char VTG::getSpeedOverGroundKphType() const noexcept {
+    return speedOverGroundKphType_;
+}
+
+bool VTG::hasFaaModeIndicator() const noexcept {
+    return faaModeIndicator_.has_value();
+}
+
+std::optional<char> VTG::getFaaModeIndicator() const noexcept {
+    return faaModeIndicator_;
+}
+
+bool VTG::isLegacyFormat() const noexcept {
+    return legacyFormat_;
+}
+
+bool VTG::operator==(const VTG& other) const noexcept {
+    return Message0183::operator==(other);
+}
+
+bool VTG::hasEqualContent(const VTG& other) const noexcept {
+    return Message0183::hasEqualContent(other);
+}
+
 } // namespace nmea0183
 } // namespace nmealib
