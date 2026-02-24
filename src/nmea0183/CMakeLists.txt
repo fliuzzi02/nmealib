@@ -1,6 +1,7 @@
 add_library(nmealib_nmea0183 STATIC
     nmea0183.cpp
     nmea0183Factory.cpp
+    messageRegistry.cpp
     gga.cpp
     gsa.cpp
     gll.cpp

@@ -1,13 +1,9 @@
 #pragma once
 
 #include "nmea0183.hpp"
-#include "gga.hpp"
-#include "gsa.hpp"
-#include "gll.hpp"
-#include "mwv.hpp"
-#include "rmc.hpp"
-#include "vtg.hpp"
-#include "zda.hpp"
+#include <chrono>
+#include <memory>
+#include <string>
 
 namespace nmealib {
 namespace nmea0183 {

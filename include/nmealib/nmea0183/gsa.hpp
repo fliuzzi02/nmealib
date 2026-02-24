@@ -86,6 +86,7 @@ private:
                                   std::optional<unsigned int> systemId);
 
     friend class Nmea0183Factory;
+    friend class MessageRegistry;
 };
 
 } // namespace nmea0183
