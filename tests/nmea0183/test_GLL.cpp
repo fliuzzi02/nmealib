@@ -3,8 +3,8 @@
 #include <memory>
 #include <string>
 
-#include "gll.hpp"
-#include "nmea0183Factory.hpp"
+
+#include <nmealib/nmealib.hpp>
 
 using namespace nmealib::nmea0183;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "nmea0183.hpp"
+#include <nmealib/nmea0183.hpp>
 
 namespace nmealib {
 namespace nmea0183 {
@@ -37,23 +37,18 @@ public:
     std::unique_ptr<nmealib::Message> clone() const override;
 
     // GLL-specific getters
-    double getLatitude() const noexcept { return latitude_; }
-    char getLatitudeDirection() const noexcept { return latitudeDirection_; }
-    double getLongitude() const noexcept { return longitude_; }
-    char getLongitudeDirection() const noexcept { return longitudeDirection_; }
-    double getTimestamp() const noexcept { return timestamp_; }
-    char getStatus() const noexcept { return status_; }
-    char getModeIndicator() const noexcept { return modeIndicator_; }
+    double getLatitude() const noexcept;
+    char getLatitudeDirection() const noexcept;
+    double getLongitude() const noexcept;
+    char getLongitudeDirection() const noexcept;
+    double getTimestamp() const noexcept;
+    char getStatus() const noexcept;
+    char getModeIndicator() const noexcept;
 
     // Overridden methods
     std::string getStringContent(bool verbose) const noexcept override;
-    bool operator==(const GLL& other) const noexcept {
-        return Message0183::operator==(other);
-    }
-
-    bool hasEqualContent(const GLL& other) const noexcept {
-        return Message0183::hasEqualContent(other);
-    }
+    bool operator==(const GLL& other) const noexcept;
+    bool hasEqualContent(const GLL& other) const noexcept;
 
 private:
     double latitude_;
@@ -89,6 +84,7 @@ private:
                                   char modeIndicator);
 
     friend class Nmea0183Factory;
+    friend class MessageRegistry;
 };
 
 } // namespace nmea0183

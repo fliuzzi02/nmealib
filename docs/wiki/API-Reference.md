@@ -11,7 +11,7 @@ Complete API reference for `nmealib` classes and functions.
 
 ### nmealib::Message
 
-**File:** `src/message.hpp`
+**File:** `include/nmealib/message.hpp`
 
 Base abstract class for all message types.
 
@@ -54,7 +54,7 @@ virtual ~Message() = default;
 
 ### nmealib::nmea0183::Message0183
 
-**File:** `src/nmea0183/nmea0183.hpp`
+**File:** `include/nmealib/nmea0183.hpp`
 
 Represents a parsed NMEA 0183 sentence.
 
@@ -99,7 +99,7 @@ Message0183& operator=(Message0183&&) noexcept = default;
 
 ### nmealib::nmea0183::Nmea0183Factory
 
-**File:** `src/nmea0183/nmea0183Factory.hpp`
+**File:** `include/nmealib/nmea0183/nmea0183Factory.hpp`
 
 Public entry point for parsing NMEA 0183 sentences and creating typed sentence objects.
 
@@ -131,7 +131,7 @@ Depending on sentence type, `create(...)` returns:
 
 ### nmealib::nmea0183::RMC
 
-**File:** `src/nmea0183/rmc.hpp`
+**File:** `include/nmealib/nmea0183/rmc.hpp`
 
 Recommended Minimum Navigation Information.
 
@@ -180,7 +180,7 @@ RMC(std::string talkerId,
 
 ### nmealib::nmea0183::GGA
 
-**File:** `src/nmea0183/gga.hpp`
+**File:** `include/nmealib/nmea0183/gga.hpp`
 
 Global Positioning System Fix Data.
 
@@ -231,7 +231,7 @@ GGA(std::string talkerId,
 
 ### nmealib::nmea0183::GLL
 
-**File:** `src/nmea0183/gll.hpp`
+**File:** `include/nmealib/nmea0183/gll.hpp`
 
 Geographic position (latitude/longitude), timestamp, status, and mode.
 
@@ -268,7 +268,7 @@ GLL(std::string talkerId,
 
 ### nmealib::nmea0183::GSA
 
-**File:** `src/nmea0183/gsa.hpp`
+**File:** `include/nmealib/nmea0183/gsa.hpp`
 
 GPS DOP and active satellites.
 
@@ -309,7 +309,7 @@ GSA(std::string talkerId,
 
 ### nmealib::nmea0183::VTG
 
-**File:** `src/nmea0183/vtg.hpp`
+**File:** `include/nmealib/nmea0183/vtg.hpp`
 
 Track made good and ground speed.
 
@@ -351,7 +351,7 @@ VTG(std::string talkerId,
 
 ### nmealib::nmea0183::MWV
 
-**File:** `src/nmea0183/mwv.hpp`
+**File:** `include/nmealib/nmea0183/mwv.hpp`
 
 Wind speed and angle.
 
@@ -384,7 +384,7 @@ MWV(std::string talkerId,
 
 ### nmealib::nmea0183::ZDA
 
-**File:** `src/nmea0183/zda.hpp`
+**File:** `include/nmealib/nmea0183/zda.hpp`
 
 Time and date in UTC with local time zone offset.
 
@@ -421,7 +421,7 @@ ZDA(std::string talkerId,
 
 ### nmealib::NmeaException
 
-**File:** `src/nmeaException.hpp`
+**File:** `include/nmealib/nmeaException.hpp`
 
 ```cpp
 class NmeaException : public std::runtime_error {
@@ -459,7 +459,7 @@ All inherit from `NmeaException`.
 ### Parse a sentence
 
 ```cpp
-#include "nmea0183Factory.hpp"
+#include <nmealib/nmea0183/nmea0183Factory.hpp>
 
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(
     "$GNGLL,3150.788156,N,11711.922383,E,062735.00,A,A*76\r\n");

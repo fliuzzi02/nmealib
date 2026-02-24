@@ -1,6 +1,6 @@
 #pragma once
 
-#include "nmea0183.hpp"
+#include <nmealib/nmea0183.hpp>
 
 #include <array>
 #include <optional>
@@ -35,24 +35,19 @@ public:
 
     std::unique_ptr<nmealib::Message> clone() const override;
 
-    char getSelectionMode() const noexcept { return selectionMode_; }
-    unsigned int getMode() const noexcept { return mode_; }
-    std::array<unsigned int, 12> getSatelliteIds() const noexcept { return satelliteIds_; }
-    unsigned int getSatelliteId(size_t index) const noexcept { return index < satelliteIds_.size() ? satelliteIds_[index] : 0u; }
-    double getPdop() const noexcept { return pdop_; }
-    double getHdop() const noexcept { return hdop_; }
-    double getVdop() const noexcept { return vdop_; }
-    bool hasSystemId() const noexcept { return systemId_.has_value(); }
-    std::optional<unsigned int> getSystemId() const noexcept { return systemId_; }
+    char getSelectionMode() const noexcept;
+    unsigned int getMode() const noexcept;
+    std::array<unsigned int, 12> getSatelliteIds() const noexcept;
+    unsigned int getSatelliteId(size_t index) const noexcept;
+    double getPdop() const noexcept;
+    double getHdop() const noexcept;
+    double getVdop() const noexcept;
+    bool hasSystemId() const noexcept;
+    std::optional<unsigned int> getSystemId() const noexcept;
 
     std::string getStringContent(bool verbose) const noexcept override;
-    bool operator==(const GSA& other) const noexcept {
-        return Message0183::operator==(other);
-    }
-
-    bool hasEqualContent(const GSA& other) const noexcept {
-        return Message0183::hasEqualContent(other);
-    }
+    bool operator==(const GSA& other) const noexcept;
+    bool hasEqualContent(const GSA& other) const noexcept;
 
 private:
     char selectionMode_;
@@ -86,6 +81,7 @@ private:
                                   std::optional<unsigned int> systemId);
 
     friend class Nmea0183Factory;
+    friend class MessageRegistry;
 };
 
 } // namespace nmea0183

@@ -1,4 +1,4 @@
-#include "gga.hpp"
+#include "nmealib/nmea0183/gga.hpp"
 
 #include <cmath>
 
@@ -257,6 +257,70 @@ std::string GGA::composeRaw(std::string talkerId,
 
     std::string payload = payloadStream.str();
     return "$" + payload + "\r\n";
+}
+
+double GGA::getTimestamp() const noexcept {
+    return timestamp_;
+}
+
+double GGA::getLatitude() const noexcept {
+    return latitude_;
+}
+
+char GGA::getLatitudeDirection() const noexcept {
+    return latitudeDirection_;
+}
+
+double GGA::getLongitude() const noexcept {
+    return longitude_;
+}
+
+char GGA::getLongitudeDirection() const noexcept {
+    return longitudeDirection_;
+}
+
+unsigned int GGA::getGpsQuality() const noexcept {
+    return gpsQuality_;
+}
+
+unsigned int GGA::getSatellites() const noexcept {
+    return satellites_;
+}
+
+double GGA::getHdop() const noexcept {
+    return hdop_;
+}
+
+double GGA::getAltitude() const noexcept {
+    return altitude_;
+}
+
+char GGA::getAltitudeUnits() const noexcept {
+    return altitudeUnits_;
+}
+
+double GGA::getGeoidalSeparation() const noexcept {
+    return geoidalSeparation_;
+}
+
+char GGA::getGeoidalSeparationUnits() const noexcept {
+    return geoidalSeparationUnits_;
+}
+
+double GGA::getDgpsAge() const noexcept {
+    return dgpsAge_;
+}
+
+std::string GGA::getDgpsReferenceStationId() const noexcept {
+    return dgpsReferenceStationId_;
+}
+
+bool GGA::operator==(const GGA& other) const noexcept {
+    return Message0183::operator==(other);
+}
+
+bool GGA::hasEqualContent(const GGA& other) const noexcept {
+    return Message0183::hasEqualContent(other);
 }
 
 } // namespace nmea0183

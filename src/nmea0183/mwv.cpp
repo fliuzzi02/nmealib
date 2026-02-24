@@ -1,4 +1,4 @@
-#include "mwv.hpp"
+#include "nmealib/nmea0183/mwv.hpp"
 
 #include <iomanip>
 #include <sstream>
@@ -132,6 +132,34 @@ std::string MWV::composeRaw(std::string talkerId,
 
     std::string payload = payloadStream.str();
     return "$" + payload + "\r\n";
+}
+
+double MWV::getWindAngle() const noexcept {
+    return windAngle_;
+}
+
+char MWV::getReference() const noexcept {
+    return reference_;
+}
+
+double MWV::getWindSpeed() const noexcept {
+    return windSpeed_;
+}
+
+char MWV::getWindSpeedUnits() const noexcept {
+    return windSpeedUnits_;
+}
+
+char MWV::getStatus() const noexcept {
+    return status_;
+}
+
+bool MWV::operator==(const MWV& other) const noexcept {
+    return Message0183::operator==(other);
+}
+
+bool MWV::hasEqualContent(const MWV& other) const noexcept {
+    return Message0183::hasEqualContent(other);
 }
 
 } // namespace nmea0183

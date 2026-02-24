@@ -1,6 +1,6 @@
 #pragma once
 
-#include "nmea0183.hpp"
+#include <nmealib/nmea0183.hpp>
 
 namespace nmealib {
 namespace nmea0183 {
@@ -44,30 +44,26 @@ public:
     std::unique_ptr<nmealib::Message> clone() const override;
 
     // GGA-specific getters
-    double getTimestamp() const noexcept { return timestamp_; }
-    double getLatitude() const noexcept { return latitude_; }
-    char getLatitudeDirection() const noexcept { return latitudeDirection_; }
-    double getLongitude() const noexcept { return longitude_; }
-    char getLongitudeDirection() const noexcept { return longitudeDirection_; }
-    unsigned int getGpsQuality() const noexcept { return gpsQuality_; }
-    unsigned int getSatellites() const noexcept { return satellites_; }
-    double getHdop() const noexcept { return hdop_; }
-    double getAltitude() const noexcept { return altitude_; }
-    char getAltitudeUnits() const noexcept { return altitudeUnits_; }
-    double getGeoidalSeparation() const noexcept { return geoidalSeparation_; }
-    char getGeoidalSeparationUnits() const noexcept { return geoidalSeparationUnits_; }
-    double getDgpsAge() const noexcept { return dgpsAge_; }
-    std::string getDgpsReferenceStationId() const noexcept { return dgpsReferenceStationId_; }
+    double getTimestamp() const noexcept;
+    double getLatitude() const noexcept;
+    char getLatitudeDirection() const noexcept;
+    double getLongitude() const noexcept;
+    char getLongitudeDirection() const noexcept;
+    unsigned int getGpsQuality() const noexcept;
+    unsigned int getSatellites() const noexcept;
+    double getHdop() const noexcept;
+    double getAltitude() const noexcept;
+    char getAltitudeUnits() const noexcept;
+    double getGeoidalSeparation() const noexcept;
+    char getGeoidalSeparationUnits() const noexcept;
+    double getDgpsAge() const noexcept;
+    std::string getDgpsReferenceStationId() const noexcept;
 
     // Overridden methods
     std::string getStringContent(bool verbose) const noexcept override;
-    bool operator==(const GGA& other) const noexcept {
-        return Message0183::operator==(other);
-    }
+    bool operator==(const GGA& other) const noexcept;
 
-    bool hasEqualContent(const GGA& other) const noexcept {
-        return Message0183::hasEqualContent(other);
-    }
+    bool hasEqualContent(const GGA& other) const noexcept;
 
 private:
     double timestamp_;
@@ -124,6 +120,7 @@ private:
                                   std::string dgpsReferenceStationId);
 
     friend class Nmea0183Factory;
+    friend class MessageRegistry;
 };
 
 } // namespace nmea0183

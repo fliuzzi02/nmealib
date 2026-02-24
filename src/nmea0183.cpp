@@ -1,4 +1,4 @@
-#include "nmea0183.hpp"
+#include "nmealib/nmea0183.hpp"
 
 #include <sstream>
 #include <iomanip>
@@ -177,6 +177,25 @@ double Message0183::convertNmeaCoordinateToDecimalDegrees(const std::string& nme
     const long double degrees = std::floor(raw / 100.0L);
     const long double minutes = raw - (degrees * 100.0L);
     return static_cast<double>(degrees + (minutes / 60.0L));
+}
+
+bool Message0183::operator==(const Message0183& other) const noexcept {
+    return startChar_ == other.startChar_ &&
+           talker_ == other.talker_ &&
+           sentenceType_ == other.sentenceType_ &&
+           payload_ == other.payload_ &&
+           checksumStr_ == other.checksumStr_ &&
+           calculatedChecksumStr_ == other.calculatedChecksumStr_ &&
+           Message::operator==(other);
+}
+
+bool Message0183::hasEqualContent(const Message0183& other) const noexcept {
+    return startChar_ == other.startChar_ &&
+           talker_ == other.talker_ &&
+           sentenceType_ == other.sentenceType_ &&
+           payload_ == other.payload_ &&
+           checksumStr_ == other.checksumStr_ &&
+           calculatedChecksumStr_ == other.calculatedChecksumStr_;
 }
 
 } // namespace nmea0183

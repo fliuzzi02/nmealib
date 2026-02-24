@@ -1,6 +1,6 @@
 #pragma once
 
-#include "nmea0183.hpp"
+#include <nmealib/nmea0183.hpp>
 
 namespace nmealib {
 namespace nmea0183 {
@@ -61,29 +61,25 @@ public:
     std::unique_ptr<nmealib::Message> clone() const override;
 
     // RMC-specific getters
-    unsigned int getUtcFix() const noexcept { return utcFix_; }
-    char getStatus() const noexcept { return status_; }
-    double getLatitude() const noexcept { return latitude_; }
-    char getLatitudeDirection() const noexcept { return latitudeDirection_; }
-    double getLongitude() const noexcept { return longitude_; }
-    char getLongitudeDirection() const noexcept { return longitudeDirection_; }
-    double getSpeedOverGround() const noexcept { return speedOverGround_; }
-    double getCourseOverGround() const noexcept { return courseOverGround_; }
-    unsigned int getDate() const noexcept { return date_; }
-    double getMagneticVariation() const noexcept { return magneticVariation_; }
-    char getMagneticVariationDirection() const noexcept { return magneticVariationDirection_; }
-    char getModeIndicator() const noexcept { return modeIndicator_; }
-    char getNavigationStatus() const noexcept { return navigationStatus_; }
+    unsigned int getUtcFix() const noexcept;
+    char getStatus() const noexcept;
+    double getLatitude() const noexcept;
+    char getLatitudeDirection() const noexcept;
+    double getLongitude() const noexcept;
+    char getLongitudeDirection() const noexcept;
+    double getSpeedOverGround() const noexcept;
+    double getCourseOverGround() const noexcept;
+    unsigned int getDate() const noexcept;
+    double getMagneticVariation() const noexcept;
+    char getMagneticVariationDirection() const noexcept;
+    char getModeIndicator() const noexcept;
+    char getNavigationStatus() const noexcept;
 
     // Overridden methods
     std::string getStringContent(bool verbose) const noexcept override;
-    bool operator==(const RMC& other) const noexcept {
-        return Message0183::operator==(other);
-    }
+    bool operator==(const RMC& other) const noexcept;
 
-    bool hasEqualContent(const RMC& other) const noexcept {
-        return Message0183::hasEqualContent(other);
-    }
+    bool hasEqualContent(const RMC& other) const noexcept;
 
 private:
     unsigned int utcFix_;
@@ -136,6 +132,7 @@ private:
                             char navigationStatus);
     
     friend class Nmea0183Factory;
+    friend class MessageRegistry;
 };
 
 } // namespace nmea0183

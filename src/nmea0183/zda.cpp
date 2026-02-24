@@ -1,4 +1,4 @@
-#include "zda.hpp"
+#include "nmealib/nmea0183/zda.hpp"
 
 #include <cmath>
 #include <iomanip>
@@ -143,6 +143,38 @@ std::string ZDA::composeRaw(std::string talkerId,
 
     std::string payload = payloadStream.str();
     return "$" + payload + "\r\n";
+}
+
+double ZDA::getUtcTime() const noexcept {
+    return utcTime_;
+}
+
+unsigned int ZDA::getDay() const noexcept {
+    return day_;
+}
+
+unsigned int ZDA::getMonth() const noexcept {
+    return month_;
+}
+
+unsigned int ZDA::getYear() const noexcept {
+    return year_;
+}
+
+int ZDA::getLocalZoneHours() const noexcept {
+    return localZoneHours_;
+}
+
+int ZDA::getLocalZoneMinutes() const noexcept {
+    return localZoneMinutes_;
+}
+
+bool ZDA::operator==(const ZDA& other) const noexcept {
+    return Message0183::operator==(other);
+}
+
+bool ZDA::hasEqualContent(const ZDA& other) const noexcept {
+    return Message0183::hasEqualContent(other);
 }
 
 } // namespace nmea0183

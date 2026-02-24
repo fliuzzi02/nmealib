@@ -1,4 +1,4 @@
-#include "gll.hpp"
+#include "nmealib/nmea0183/gll.hpp"
 
 #include <cmath>
 
@@ -169,6 +169,42 @@ std::string GLL::composeRaw(std::string talkerId,
 
     std::string payload = payloadStream.str();
     return "$" + payload + "\r\n";
+}
+
+double GLL::getLatitude() const noexcept {
+    return latitude_;
+}
+
+char GLL::getLatitudeDirection() const noexcept {
+    return latitudeDirection_;
+}
+
+double GLL::getLongitude() const noexcept {
+    return longitude_;
+}
+
+char GLL::getLongitudeDirection() const noexcept {
+    return longitudeDirection_;
+}
+
+double GLL::getTimestamp() const noexcept {
+    return timestamp_;
+}
+
+char GLL::getStatus() const noexcept {
+    return status_;
+}
+
+char GLL::getModeIndicator() const noexcept {
+    return modeIndicator_;
+}
+
+bool GLL::operator==(const GLL& other) const noexcept {
+    return Message0183::operator==(other);
+}
+
+bool GLL::hasEqualContent(const GLL& other) const noexcept {
+    return Message0183::hasEqualContent(other);
 }
 
 } // namespace nmea0183
