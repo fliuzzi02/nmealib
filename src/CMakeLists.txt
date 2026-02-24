@@ -7,5 +7,5 @@ target_link_libraries(nmealib INTERFACE
 )
 
 target_include_directories(nmealib INTERFACE 
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/include
 )

@@ -3,7 +3,7 @@ add_executable(nmealib-cli
 )
 
 target_link_libraries(nmealib-cli PRIVATE
-    nmealib_nmea0183
+    nmealib
 )
 
 target_compile_features(nmealib-cli PRIVATE cxx_std_20)

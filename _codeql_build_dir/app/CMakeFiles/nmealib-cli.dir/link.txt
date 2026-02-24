@@ -1,0 +1,1 @@
+/home/runner/work/nmealib/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/nmealib-cli.dir/link.d "CMakeFiles/nmealib-cli.dir/main.cpp.o" -o nmealib-cli  ../src/nmea0183/libnmealib_nmea0183.a

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libnmealib_nmea0183.a CMakeFiles/nmealib_nmea0183.dir/nmea0183.cpp.o
+/usr/bin/ranlib libnmealib_nmea0183.a
