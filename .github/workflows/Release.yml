@@ -12,11 +12,14 @@ on:
       - "release/v*"
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
+  prepare:
+    runs-on: ubuntu-20.04
     if: github.actor != 'github-actions[bot]'
     permissions:
       contents: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
 
     steps:
     - uses: actions/checkout@v4
@@ -66,6 +69,14 @@ jobs:
         git tag -a "$tag" -m "Release ${{ steps.version.outputs.version }}"
         git push origin "$tag"
 
+  build-linux:
+    runs-on: ubuntu-20.04
+    needs: prepare
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ needs.prepare.outputs.tag }}
+
     - name: Set reusable strings
       id: strings
       shell: bash
@@ -88,33 +99,86 @@ jobs:
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: |
         cmake --install . --component library --prefix nmealib
-        tar -czf nmealib.tar.gz nmealib/
+        tar -czf nmealib-linux64.tar.gz nmealib/
 
     - name: Package cli release
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: |
         cmake --install . --component library --prefix nmealib-cli
         cmake --install . --component cli --prefix nmealib-cli
-        tar -czf nmealib-cli.tar.gz nmealib-cli/
+        tar -czf nmealib-cli-linux64.tar.gz nmealib-cli/
 
     - name: Upload library artifact
       uses: actions/upload-artifact@v4
       with:
-        name: nmealib
-        path: ${{ steps.strings.outputs.build-output-dir }}/nmealib.tar.gz
+        name: nmealib-linux64
+        path: ${{ steps.strings.outputs.build-output-dir }}/nmealib-linux64.tar.gz
 
     - name: Upload cli artifact
       uses: actions/upload-artifact@v4
       with:
-        name: nmealib-cli
-        path: ${{ steps.strings.outputs.build-output-dir }}/nmealib-cli.tar.gz
+        name: nmealib-cli-linux64
+        path: ${{ steps.strings.outputs.build-output-dir }}/nmealib-cli-linux64.tar.gz
+
+  build-windows:
+    runs-on: windows-latest
+    needs: prepare
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ needs.prepare.outputs.tag }}
+
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_CLI=ON
+
+    - name: Build release
+      run: cmake --build build --config Release
+
+    - name: Package library release
+      shell: pwsh
+      working-directory: build
+      run: |
+        cmake --install . --config Release --component library --prefix nmealib
+        Compress-Archive -Path nmealib\* -DestinationPath nmealib-win64.zip
+
+    - name: Package cli release
+      shell: pwsh
+      working-directory: build
+      run: |
+        cmake --install . --config Release --component library --prefix nmealib-cli
+        cmake --install . --config Release --component cli --prefix nmealib-cli
+        Compress-Archive -Path nmealib-cli\* -DestinationPath nmealib-cli-win64.zip
+
+    - name: Upload library artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: nmealib-win64
+        path: build/nmealib-win64.zip
+
+    - name: Upload cli artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: nmealib-cli-win64
+        path: build/nmealib-cli-win64.zip
+
+  publish:
+    runs-on: ubuntu-20.04
+    needs: [prepare, build-linux, build-windows]
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        path: dist
 
     - name: Publish GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ steps.version.outputs.tag }}
-        name: ${{ steps.version.outputs.tag }}
+        tag_name: ${{ needs.prepare.outputs.tag }}
+        name: ${{ needs.prepare.outputs.tag }}
         generate_release_notes: true
         files: |
-          ${{ steps.strings.outputs.build-output-dir }}/nmealib.tar.gz
-          ${{ steps.strings.outputs.build-output-dir }}/nmealib-cli.tar.gz
+          dist/**/nmealib-linux64.tar.gz
+          dist/**/nmealib-cli-linux64.tar.gz
+          dist/**/nmealib-win64.zip
+          dist/**/nmealib-cli-win64.zip
