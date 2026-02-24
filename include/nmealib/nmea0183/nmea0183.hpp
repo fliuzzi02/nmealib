@@ -204,15 +204,7 @@ public:
      * @return true  If all fields and the base Message data (including timestamp) are equal.
      * @return false Otherwise.
      */
-    bool operator==(const Message0183& other) const noexcept {
-        return startChar_ == other.startChar_ &&
-               talker_ == other.talker_ &&
-               sentenceType_ == other.sentenceType_ &&
-               payload_ == other.payload_ &&
-               checksumStr_ == other.checksumStr_ &&
-               calculatedChecksumStr_ == other.calculatedChecksumStr_ &&
-               Message::operator==(other);
-    }
+    bool operator==(const Message0183& other) const noexcept;
 
     /**
      * @brief Compares the content of the message only, ignoring the timestamp.
@@ -221,14 +213,7 @@ public:
      * @return true if the content of both messages is equal (start char, talker, sentence type, payload, checksum string, and calculated checksum string), regardless of their timestamps;
      * @return false otherwise
      */
-    virtual bool hasEqualContent(const Message0183& other) const noexcept {
-        return startChar_ == other.startChar_ &&
-               talker_ == other.talker_ &&
-               sentenceType_ == other.sentenceType_ &&
-               payload_ == other.payload_ &&
-               checksumStr_ == other.checksumStr_ &&
-               calculatedChecksumStr_ == other.calculatedChecksumStr_;
-    }
+    virtual bool hasEqualContent(const Message0183& other) const noexcept;
 
     /**
      * @brief Returns whether the message is valid or not.

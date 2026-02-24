@@ -206,5 +206,65 @@ std::string RMC::composeRaw(std::string talkerId, unsigned int utcFix,
     return "$" + payload + "\r\n";
 }
 
+unsigned int RMC::getUtcFix() const noexcept {
+    return utcFix_;
+}
+
+char RMC::getStatus() const noexcept {
+    return status_;
+}
+
+double RMC::getLatitude() const noexcept {
+    return latitude_;
+}
+
+char RMC::getLatitudeDirection() const noexcept {
+    return latitudeDirection_;
+}
+
+double RMC::getLongitude() const noexcept {
+    return longitude_;
+}
+
+char RMC::getLongitudeDirection() const noexcept {
+    return longitudeDirection_;
+}
+
+double RMC::getSpeedOverGround() const noexcept {
+    return speedOverGround_;
+}
+
+double RMC::getCourseOverGround() const noexcept {
+    return courseOverGround_;
+}
+
+unsigned int RMC::getDate() const noexcept {
+    return date_;
+}
+
+double RMC::getMagneticVariation() const noexcept {
+    return magneticVariation_;
+}
+
+char RMC::getMagneticVariationDirection() const noexcept {
+    return magneticVariationDirection_;
+}
+
+char RMC::getModeIndicator() const noexcept {
+    return modeIndicator_;
+}
+
+char RMC::getNavigationStatus() const noexcept {
+    return navigationStatus_;
+}
+
+bool RMC::operator==(const RMC& other) const noexcept {
+    return Message0183::operator==(other);
+}
+
+bool RMC::hasEqualContent(const RMC& other) const noexcept {
+    return Message0183::hasEqualContent(other);
+}
+
 } // namespace nmea0183
 } // namespace nmealib

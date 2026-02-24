@@ -33,26 +33,21 @@ public:
 
     std::unique_ptr<nmealib::Message> clone() const override;
 
-    double getCourseOverGroundTrue() const noexcept { return courseOverGroundTrue_; }
-    char getCourseOverGroundTrueType() const noexcept { return courseOverGroundTrueType_; }
-    double getCourseOverGroundMagnetic() const noexcept { return courseOverGroundMagnetic_; }
-    char getCourseOverGroundMagneticType() const noexcept { return courseOverGroundMagneticType_; }
-    double getSpeedOverGroundKnots() const noexcept { return speedOverGroundKnots_; }
-    char getSpeedOverGroundKnotsType() const noexcept { return speedOverGroundKnotsType_; }
-    double getSpeedOverGroundKph() const noexcept { return speedOverGroundKph_; }
-    char getSpeedOverGroundKphType() const noexcept { return speedOverGroundKphType_; }
-    bool hasFaaModeIndicator() const noexcept { return faaModeIndicator_.has_value(); }
-    std::optional<char> getFaaModeIndicator() const noexcept { return faaModeIndicator_; }
-    bool isLegacyFormat() const noexcept { return legacyFormat_; }
+    double getCourseOverGroundTrue() const noexcept;
+    char getCourseOverGroundTrueType() const noexcept;
+    double getCourseOverGroundMagnetic() const noexcept;
+    char getCourseOverGroundMagneticType() const noexcept;
+    double getSpeedOverGroundKnots() const noexcept;
+    char getSpeedOverGroundKnotsType() const noexcept;
+    double getSpeedOverGroundKph() const noexcept;
+    char getSpeedOverGroundKphType() const noexcept;
+    bool hasFaaModeIndicator() const noexcept;
+    std::optional<char> getFaaModeIndicator() const noexcept;
+    bool isLegacyFormat() const noexcept;
 
     std::string getStringContent(bool verbose) const noexcept override;
-    bool operator==(const VTG& other) const noexcept {
-        return Message0183::operator==(other);
-    }
-
-    bool hasEqualContent(const VTG& other) const noexcept {
-        return Message0183::hasEqualContent(other);
-    }
+    bool operator==(const VTG& other) const noexcept;
+    bool hasEqualContent(const VTG& other) const noexcept;
 
 private:
     double courseOverGroundTrue_;

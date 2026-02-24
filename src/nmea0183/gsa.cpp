@@ -200,5 +200,49 @@ std::string GSA::composeRaw(std::string talkerId,
     return "$" + payload + "\r\n";
 }
 
+char GSA::getSelectionMode() const noexcept {
+    return selectionMode_;
+}
+
+unsigned int GSA::getMode() const noexcept {
+    return mode_;
+}
+
+std::array<unsigned int, 12> GSA::getSatelliteIds() const noexcept {
+    return satelliteIds_;
+}
+
+unsigned int GSA::getSatelliteId(size_t index) const noexcept {
+    return index < satelliteIds_.size() ? satelliteIds_[index] : 0u;
+}
+
+double GSA::getPdop() const noexcept {
+    return pdop_;
+}
+
+double GSA::getHdop() const noexcept {
+    return hdop_;
+}
+
+double GSA::getVdop() const noexcept {
+    return vdop_;
+}
+
+bool GSA::hasSystemId() const noexcept {
+    return systemId_.has_value();
+}
+
+std::optional<unsigned int> GSA::getSystemId() const noexcept {
+    return systemId_;
+}
+
+bool GSA::operator==(const GSA& other) const noexcept {
+    return Message0183::operator==(other);
+}
+
+bool GSA::hasEqualContent(const GSA& other) const noexcept {
+    return Message0183::hasEqualContent(other);
+}
+
 } // namespace nmea0183
 } // namespace nmealib

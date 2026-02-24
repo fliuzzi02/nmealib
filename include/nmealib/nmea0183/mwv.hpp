@@ -30,20 +30,15 @@ public:
 
     std::unique_ptr<nmealib::Message> clone() const override;
 
-    double getWindAngle() const noexcept { return windAngle_; }
-    char getReference() const noexcept { return reference_; }
-    double getWindSpeed() const noexcept { return windSpeed_; }
-    char getWindSpeedUnits() const noexcept { return windSpeedUnits_; }
-    char getStatus() const noexcept { return status_; }
+    double getWindAngle() const noexcept;
+    char getReference() const noexcept;
+    double getWindSpeed() const noexcept;
+    char getWindSpeedUnits() const noexcept;
+    char getStatus() const noexcept;
 
     std::string getStringContent(bool verbose) const noexcept override;
-    bool operator==(const MWV& other) const noexcept {
-        return Message0183::operator==(other);
-    }
-
-    bool hasEqualContent(const MWV& other) const noexcept {
-        return Message0183::hasEqualContent(other);
-    }
+    bool operator==(const MWV& other) const noexcept;
+    bool hasEqualContent(const MWV& other) const noexcept;
 
 private:
     double windAngle_;

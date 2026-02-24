@@ -17,6 +17,7 @@ MessageRegistry& MessageRegistry::instance() {
 
 std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentenceType,
                                                       std::unique_ptr<Message0183> baseMessage) {
+    // TODO: Consider using a map of string to function pointer for better scalability if many sentence types are supported
     if (sentenceType == "RMC") {
         return createRMC(std::move(baseMessage));
     } else if (sentenceType == "GGA") {
