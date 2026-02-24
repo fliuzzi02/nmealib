@@ -1,58 +1,41 @@
-# nmealib Wiki
+# nmealib
 
-Welcome to the `nmealib` wiki. This documentation covers parsing, validation, typed sentence handling, and development workflows.
+Modern C++ library for working with NMEA messages.
 
-## Quick Links
+## Highlights
+
+- NMEA 0183 sentence parsing and validation
+- Typed sentence classes (`RMC`, `GGA`, `GLL`, `GSA`, `MWV`, `VTG`, `ZDA`)
+- Factory-based dispatch with `Nmea0183Factory`
+- CMake-based build with tests and CLI
+
+## Quick start
+
+```cpp
+#include <nmealib/nmea0183/nmea0183Factory.hpp>
+
+auto msg = nmealib::nmea0183::Nmea0183Factory::create(
+    "$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A\r\n");
+```
+
+## Documentation
 
 - [Getting Started](Getting-Started.md)
+- [Building and Testing](Building-and-Testing.md)
+- [Examples](Examples.md)
 - [API Reference](API-Reference.md)
 - [NMEA 0183 Guide](NMEA-0183-Guide.md)
-- [Examples](Examples.md)
-- [Building and Testing](Building-and-Testing.md)
 - [Contributing](Contributing.md)
 
-## What is nmealib?
+## Status
 
-`nmealib` is a modern C++20 library for NMEA processing with:
 
-- Type-safe parsing via `Nmea0183Factory`
-- Checksum-aware validation
-- Sentence-specific classes for common sentence types
-- Exception-based error handling
-- Unit-tested behavior
+## Roadmap
 
-## Current NMEA 0183 Support
 
-### Core parser
+## Support
 
-- Generic `Message0183` parsing and validation
-- Talker/sentence extraction
-- Checksum calculation and verification
 
-### Typed sentence support
+## License
 
-- `RMC` (Recommended Minimum Navigation Information)
-- `GGA` (Fix data)
-- `GLL` (Geographic position)
-- `GSA` (DOP and active satellites)
-- `MWV` (Wind speed and angle)
-- `VTG` (Track made good and ground speed)
-- `ZDA` (UTC time, date, and local zone)
 
-`Nmea0183Factory::create(...)` automatically returns typed objects (`RMC`, `GGA`, `GLL`, `GSA`, `MWV`, `VTG`, `ZDA`) when recognized.
-
-## Suggested reading order
-
-1. [Getting Started](Getting-Started.md)
-2. [Examples](Examples.md)
-3. [API Reference](API-Reference.md)
-4. [NMEA 0183 Guide](NMEA-0183-Guide.md)
-
-## Version
-
-Current project version: `0.1.0`.
-
-## Repository
-
-- Main repository: https://github.com/fliuzzi02/nmealib
-- Issues: https://github.com/fliuzzi02/nmealib/issues

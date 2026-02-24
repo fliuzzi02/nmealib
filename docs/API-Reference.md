@@ -1,447 +1,68 @@
 # API Reference
 
-Complete API reference for `nmealib` classes and functions.
+This page summarizes the public API surface. It is organized for GitHub Pages navigation and links to the relevant headers.
+
+## Public headers
+
+- `nmealib.h`
+- `nmealib/nmealib.hpp`
+- `nmealib/message.hpp`
+- `nmealib/nmeaException.hpp`
+- `nmealib/nmea0183.hpp`
+- `nmealib/nmea0183/nmea0183Factory.hpp`
+- `nmealib/nmea0183/rmc.hpp`
+- `nmealib/nmea0183/gga.hpp`
+- `nmealib/nmea0183/gll.hpp`
+- `nmealib/nmea0183/gsa.hpp`
+- `nmealib/nmea0183/mwv.hpp`
+- `nmealib/nmea0183/vtg.hpp`
+- `nmealib/nmea0183/zda.hpp`
 
 ## Namespaces
 
-- `nmealib` - Root namespace for all library components
-- `nmealib::nmea0183` - NMEA 0183 specific classes and functions
+- `nmealib`
+- `nmealib::nmea0183`
 
-## Core Classes
+## Core types
 
-### nmealib::Message
+### `nmealib::Message`
 
-**File:** `include/nmealib/message.hpp`
+- Base abstract message type
+- Provides `clone()`, `serialize()`, and `validate()` virtual methods
 
-Base abstract class for all message types.
+### `nmealib::NmeaException`
 
-#### Public Types
+- Base exception for library errors
 
-```cpp
-enum class Type { Unknown, NMEA0183, NMEA2000 };
-using TimePoint = std::chrono::system_clock::time_point;
-```
+## NMEA 0183
 
-#### Constructors / Assignment
+### `nmealib::nmea0183::Message0183`
 
-```cpp
-Message() = default;
-explicit Message(std::string raw,
-                 Type type = Type::Unknown,
-                 TimePoint ts = std::chrono::system_clock::now()) noexcept;
+- Generic NMEA 0183 sentence representation
+- Provides talker ID, sentence type, payload, and checksum helpers
 
-Message(const Message&) = default;
-Message& operator=(const Message&) = default;
-Message(Message&&) noexcept = default;
-Message& operator=(Message&&) noexcept = default;
-virtual ~Message() = default;
-```
+### `nmealib::nmea0183::Nmea0183Factory`
 
-#### Public Methods
+- Entry point for parsing raw NMEA 0183 sentences
+- Returns a typed sentence when the sentence type is supported
 
-| Method | Return Type | Notes |
-|--------|-------------|-------|
-| `static std::string typeToString(Type t)` | `std::string` | String representation of message type |
-| `getType() const noexcept` | `Type` | Stored message type |
-| `getRawData() const noexcept` | `const std::string&` | Raw wire text |
-| `getTimestamp() const noexcept` | `TimePoint` | Message timestamp |
-| `clone() const` | `std::unique_ptr<Message>` | Pure virtual |
-| `serialize() const` | `std::string` | Pure virtual |
-| `validate() const` | `bool` | Pure virtual |
-| `operator==(const Message&) const noexcept` | `bool` | Compares type, raw data, and timestamp |
+### Sentence classes
 
----
-
-### nmealib::nmea0183::Message0183
-
-**File:** `include/nmealib/nmea0183.hpp`
-
-Represents a parsed NMEA 0183 sentence.
-
-#### Creation
-
-`Message0183::create(...)` is an internal/protected factory. Use `Nmea0183Factory::create(...)` for construction.
-
-#### Constructors / Assignment
-
-```cpp
-Message0183(const Message0183&) = default;
-Message0183& operator=(const Message0183&) = default;
-Message0183(Message0183&&) noexcept = default;
-Message0183& operator=(Message0183&&) noexcept = default;
-~Message0183() override = default;
-```
-
-#### Public Methods
-
-| Method | Return Type | Notes |
-|--------|-------------|-------|
-| `clone() const override` | `std::unique_ptr<nmealib::Message>` | Polymorphic copy |
-| `getStartChar() const noexcept` | `char` | `$` or `!` |
-| `getTalker() const noexcept` | `std::string` | 2-char talker ID |
-| `getSentenceType() const noexcept` | `std::string` | 3-char sentence type |
-| `getPayload() const noexcept` | `std::string` | Full payload between start and checksum/end |
-| `getChecksumStr() const` | `std::string` | Throws `NoChecksumException` if missing |
-| `getCalculatedChecksumStr() const noexcept` | `std::string` | Computed checksum |
-| `getStringContent(bool verbose) const noexcept` | `std::string` | Human-readable summary |
-| `serialize() const override` | `std::string` | Returns stored raw wire string |
-| `validate() const override` | `bool` | True when checksum absent or matching |
-| `operator==(const Message0183&) const noexcept` | `bool` | Full equality, includes timestamp via base |
-| `hasEqualContent(const Message0183&) const noexcept` | `bool` | Content equality, ignores timestamp |
-
-#### Notes
-
-- Maximum sentence length enforced: 82 chars.
-- Start char must be `$` or `!`.
-- Checksum is optional; if present, it must be two hex digits.
-
----
-
-### nmealib::nmea0183::Nmea0183Factory
-
-**File:** `include/nmealib/nmea0183/nmea0183Factory.hpp`
-
-Public entry point for parsing NMEA 0183 sentences and creating typed sentence objects.
-
-```cpp
-class Nmea0183Factory {
-public:
-    static std::unique_ptr<Message0183> create(
-        const std::string& raw,
-        Message::TimePoint ts = std::chrono::system_clock::now());
-};
-```
-
-#### Runtime dispatch
-
-Depending on sentence type, `create(...)` returns:
-
-- `RMC` for `*RMC`
-- `GGA` for `*GGA`
-- `GLL` for `*GLL`
-- `GSA` for `*GSA`
-- `MWV` for `*MWV`
-- `VTG` for `*VTG`
-- `ZDA` for `*ZDA`
-- base `Message0183` for other types
-
----
-
-## Sentence Classes
-
-### nmealib::nmea0183::RMC
-
-**File:** `include/nmealib/nmea0183/rmc.hpp`
-
-Recommended Minimum Navigation Information.
-
-#### Public Constructor
-
-```cpp
-RMC(std::string talkerId,
-    unsigned int utcFix,
-    char status,
-    double latitude,
-    char latitudeDirection,
-    double longitude,
-    char longitudeDirection,
-    double speedOverGround,
-    double courseOverGround,
-    unsigned int date,
-    double magneticVariation,
-    char magneticVariationDirection,
-    char modeIndicator,
-    char navigationStatus);
-```
-
-#### Public Methods
-
-| Method | Return Type |
-|--------|-------------|
-| `clone() const override` | `std::unique_ptr<nmealib::Message>` |
-| `getUtcFix() const noexcept` | `unsigned int` |
-| `getStatus() const noexcept` | `char` |
-| `getLatitude() const noexcept` | `double` |
-| `getLatitudeDirection() const noexcept` | `char` |
-| `getLongitude() const noexcept` | `double` |
-| `getLongitudeDirection() const noexcept` | `char` |
-| `getSpeedOverGround() const noexcept` | `double` |
-| `getCourseOverGround() const noexcept` | `double` |
-| `getDate() const noexcept` | `unsigned int` |
-| `getMagneticVariation() const noexcept` | `double` |
-| `getMagneticVariationDirection() const noexcept` | `char` |
-| `getModeIndicator() const noexcept` | `char` |
-| `getNavigationStatus() const noexcept` | `char` |
-| `getStringContent(bool verbose) const noexcept override` | `std::string` |
-| `operator==(const RMC&) const noexcept` | `bool` |
-| `hasEqualContent(const RMC&) const noexcept` | `bool` |
-
----
-
-### nmealib::nmea0183::GGA
-
-**File:** `include/nmealib/nmea0183/gga.hpp`
-
-Global Positioning System Fix Data.
-
-#### Public Constructor
-
-```cpp
-GGA(std::string talkerId,
-    double timestamp,
-    double latitude,
-    char latitudeDirection,
-    double longitude,
-    char longitudeDirection,
-    unsigned int gpsQuality,
-    unsigned int satellites,
-    double hdop,
-    double altitude,
-    char altitudeUnits,
-    double geoidalSeparation,
-    char geoidalSeparationUnits,
-    double dgpsAge,
-    std::string dgpsReferenceStationId);
-```
-
-#### Public Methods
-
-| Method | Return Type |
-|--------|-------------|
-| `clone() const override` | `std::unique_ptr<nmealib::Message>` |
-| `getTimestamp() const noexcept` | `double` |
-| `getLatitude() const noexcept` | `double` |
-| `getLatitudeDirection() const noexcept` | `char` |
-| `getLongitude() const noexcept` | `double` |
-| `getLongitudeDirection() const noexcept` | `char` |
-| `getGpsQuality() const noexcept` | `unsigned int` |
-| `getSatellites() const noexcept` | `unsigned int` |
-| `getHdop() const noexcept` | `double` |
-| `getAltitude() const noexcept` | `double` |
-| `getAltitudeUnits() const noexcept` | `char` |
-| `getGeoidalSeparation() const noexcept` | `double` |
-| `getGeoidalSeparationUnits() const noexcept` | `char` |
-| `getDgpsAge() const noexcept` | `double` |
-| `getDgpsReferenceStationId() const noexcept` | `std::string` |
-| `getStringContent(bool verbose) const noexcept override` | `std::string` |
-| `operator==(const GGA&) const noexcept` | `bool` |
-| `hasEqualContent(const GGA&) const noexcept` | `bool` |
-
----
-
-### nmealib::nmea0183::GLL
-
-**File:** `include/nmealib/nmea0183/gll.hpp`
-
-Geographic position (latitude/longitude), timestamp, status, and mode.
-
-#### Public Constructor
-
-```cpp
-GLL(std::string talkerId,
-    double latitude,
-    char latitudeDirection,
-    double longitude,
-    char longitudeDirection,
-    double timestamp,
-    char status,
-    char modeIndicator);
-```
-
-#### Public Methods
-
-| Method | Return Type |
-|--------|-------------|
-| `clone() const override` | `std::unique_ptr<nmealib::Message>` |
-| `getLatitude() const noexcept` | `double` |
-| `getLatitudeDirection() const noexcept` | `char` |
-| `getLongitude() const noexcept` | `double` |
-| `getLongitudeDirection() const noexcept` | `char` |
-| `getTimestamp() const noexcept` | `double` |
-| `getStatus() const noexcept` | `char` |
-| `getModeIndicator() const noexcept` | `char` |
-| `getStringContent(bool verbose) const noexcept override` | `std::string` |
-| `operator==(const GLL&) const noexcept` | `bool` |
-| `hasEqualContent(const GLL&) const noexcept` | `bool` |
-
----
-
-### nmealib::nmea0183::GSA
-
-**File:** `include/nmealib/nmea0183/gsa.hpp`
-
-GPS DOP and active satellites.
-
-Supports both classic GSA payloads and NMEA 4.1+ payloads with optional trailing `System ID`.
-
-#### Public Constructor
-
-```cpp
-GSA(std::string talkerId,
-    char selectionMode,
-    unsigned int mode,
-    std::array<unsigned int, 12> satelliteIds,
-    double pdop,
-    double hdop,
-    double vdop,
-    std::optional<unsigned int> systemId = std::nullopt);
-```
-
-#### Public Methods
-
-| Method | Return Type |
-|--------|-------------|
-| `clone() const override` | `std::unique_ptr<nmealib::Message>` |
-| `getSelectionMode() const noexcept` | `char` |
-| `getMode() const noexcept` | `unsigned int` |
-| `getSatelliteIds() const noexcept` | `std::array<unsigned int, 12>` |
-| `getSatelliteId(size_t index) const noexcept` | `unsigned int` |
-| `getPdop() const noexcept` | `double` |
-| `getHdop() const noexcept` | `double` |
-| `getVdop() const noexcept` | `double` |
-| `hasSystemId() const noexcept` | `bool` |
-| `getSystemId() const noexcept` | `std::optional<unsigned int>` |
-| `getStringContent(bool verbose) const noexcept override` | `std::string` |
-| `operator==(const GSA&) const noexcept` | `bool` |
-| `hasEqualContent(const GSA&) const noexcept` | `bool` |
-
----
-
-### nmealib::nmea0183::VTG
-
-**File:** `include/nmealib/nmea0183/vtg.hpp`
-
-Track made good and ground speed.
-
-Supports both modern VTG payloads (with `T/M/N/K` fields and optional FAA mode) and legacy 5-field VTG payloads.
-
-#### Public Constructor
-
-```cpp
-VTG(std::string talkerId,
-    double courseOverGroundTrue,
-    double courseOverGroundMagnetic,
-    double speedOverGroundKnots,
-    double speedOverGroundKph,
-    std::optional<char> faaModeIndicator = std::nullopt,
-    bool legacyFormat = false);
-```
-
-#### Public Methods
-
-| Method | Return Type |
-|--------|-------------|
-| `clone() const override` | `std::unique_ptr<nmealib::Message>` |
-| `getCourseOverGroundTrue() const noexcept` | `double` |
-| `getCourseOverGroundTrueType() const noexcept` | `char` |
-| `getCourseOverGroundMagnetic() const noexcept` | `double` |
-| `getCourseOverGroundMagneticType() const noexcept` | `char` |
-| `getSpeedOverGroundKnots() const noexcept` | `double` |
-| `getSpeedOverGroundKnotsType() const noexcept` | `char` |
-| `getSpeedOverGroundKph() const noexcept` | `double` |
-| `getSpeedOverGroundKphType() const noexcept` | `char` |
-| `hasFaaModeIndicator() const noexcept` | `bool` |
-| `getFaaModeIndicator() const noexcept` | `std::optional<char>` |
-| `isLegacyFormat() const noexcept` | `bool` |
-| `getStringContent(bool verbose) const noexcept override` | `std::string` |
-| `operator==(const VTG&) const noexcept` | `bool` |
-| `hasEqualContent(const VTG&) const noexcept` | `bool` |
-
----
-
-### nmealib::nmea0183::MWV
-
-**File:** `include/nmealib/nmea0183/mwv.hpp`
-
-Wind speed and angle.
-
-#### Public Constructor
-
-```cpp
-MWV(std::string talkerId,
-    double windAngle,
-    char reference,
-    double windSpeed,
-    char windSpeedUnits,
-    char status);
-```
-
-#### Public Methods
-
-| Method | Return Type |
-|--------|-------------|
-| `clone() const override` | `std::unique_ptr<nmealib::Message>` |
-| `getWindAngle() const noexcept` | `double` |
-| `getReference() const noexcept` | `char` |
-| `getWindSpeed() const noexcept` | `double` |
-| `getWindSpeedUnits() const noexcept` | `char` |
-| `getStatus() const noexcept` | `char` |
-| `getStringContent(bool verbose) const noexcept override` | `std::string` |
-| `operator==(const MWV&) const noexcept` | `bool` |
-| `hasEqualContent(const MWV&) const noexcept` | `bool` |
-
----
-
-### nmealib::nmea0183::ZDA
-
-**File:** `include/nmealib/nmea0183/zda.hpp`
-
-Time and date in UTC with local time zone offset.
-
-#### Public Constructor
-
-```cpp
-ZDA(std::string talkerId,
-    double utcTime,
-    unsigned int day,
-    unsigned int month,
-    unsigned int year,
-    int localZoneHours,
-    int localZoneMinutes);
-```
-
-#### Public Methods
-
-| Method | Return Type |
-|--------|-------------|
-| `clone() const override` | `std::unique_ptr<nmealib::Message>` |
-| `getUtcTime() const noexcept` | `double` |
-| `getDay() const noexcept` | `unsigned int` |
-| `getMonth() const noexcept` | `unsigned int` |
-| `getYear() const noexcept` | `unsigned int` |
-| `getLocalZoneHours() const noexcept` | `int` |
-| `getLocalZoneMinutes() const noexcept` | `int` |
-| `getStringContent(bool verbose) const noexcept override` | `std::string` |
-| `operator==(const ZDA&) const noexcept` | `bool` |
-| `hasEqualContent(const ZDA&) const noexcept` | `bool` |
-
----
+- `RMC`
+- `GGA`
+- `GLL`
+- `GSA`
+- `MWV`
+- `VTG`
+- `ZDA`
 
 ## Exceptions
-
-### nmealib::NmeaException
-
-**File:** `include/nmealib/nmeaException.hpp`
-
-```cpp
-class NmeaException : public std::runtime_error {
-public:
-    explicit NmeaException(const std::string& context,
-                           const std::string& message,
-                           const std::string& details = "");
-};
-```
-
-### NMEA 0183 generic exceptions
 
 - `TooLongSentenceException`
 - `InvalidStartCharacterException`
 - `NoChecksumException`
 - `NoEndlineException`
 - `NotEnoughFieldsException`
-
-### Sentence-specific exceptions
-
 - `NotRMCException`
 - `NotGGAException`
 - `NotGLLException`
@@ -450,46 +71,11 @@ public:
 - `NotVTGException`
 - `NotZDAException`
 
-All inherit from `NmeaException`.
-
----
-
-## Minimal usage examples
-
-### Parse a sentence
-
-```cpp
-#include <nmealib/nmea0183/nmea0183Factory.hpp>
-
-auto msg = nmealib::nmea0183::Nmea0183Factory::create(
-    "$GNGLL,3150.788156,N,11711.922383,E,062735.00,A,A*76\r\n");
-```
-
-### Type-dispatch after parse
-
-```cpp
-if (auto* rmc = dynamic_cast<nmealib::nmea0183::RMC*>(msg.get())) {
-    // use rmc-specific getters
-} else if (auto* gga = dynamic_cast<nmealib::nmea0183::GGA*>(msg.get())) {
-    // use gga-specific getters
-} else if (auto* gll = dynamic_cast<nmealib::nmea0183::GLL*>(msg.get())) {
-    // use gll-specific getters
-} else if (auto* gsa = dynamic_cast<nmealib::nmea0183::GSA*>(msg.get())) {
-    // use gsa-specific getters
-} else if (auto* mwv = dynamic_cast<nmealib::nmea0183::MWV*>(msg.get())) {
-    // use mwv-specific getters
-} else if (auto* vtg = dynamic_cast<nmealib::nmea0183::VTG*>(msg.get())) {
-    // use vtg-specific getters
-} else if (auto* zda = dynamic_cast<nmealib::nmea0183::ZDA*>(msg.get())) {
-    // use zda-specific getters
-}
-```
-
----
+## Notes
 
 ## See also
 
 - [Getting Started](Getting-Started.md)
-- [NMEA 0183 Guide](NMEA-0183-Guide.md)
 - [Examples](Examples.md)
+- [NMEA 0183 Guide](NMEA-0183-Guide.md)
 - [Building and Testing](Building-and-Testing.md)
