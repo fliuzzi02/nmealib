@@ -9,6 +9,8 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
     - uses: actions/checkout@v4
@@ -25,19 +27,40 @@ jobs:
         -DCMAKE_CXX_COMPILER=g++
         -DCMAKE_C_COMPILER=gcc
         -DCMAKE_BUILD_TYPE=Release
+        -DBUILD_CLI=ON
         -S ${{ github.workspace }}
 
     - name: Build release
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config Release
 
-    - name: Package release
+    - name: Package library release
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: |
-        cmake --install . --prefix nmealib-release
-        tar -czf nmealib-release.tar.gz nmealib-release/
+        cmake --install . --component library --prefix nmealib-lib
+        tar -czf nmealib-lib.tar.gz nmealib-lib/
 
-    - name: Upload release artifacts
+    - name: Package cli release
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run: |
+        cmake --install . --component library --prefix nmealib-cli
+        cmake --install . --component cli --prefix nmealib-cli
+        tar -czf nmealib-cli.tar.gz nmealib-cli/
+
+    - name: Upload library artifact
       uses: actions/upload-artifact@v4
       with:
-        name: nmealib-release
-        path: ${{ steps.strings.outputs.build-output-dir }}/nmealib-release.tar.gz
+        name: nmealib-lib
+        path: ${{ steps.strings.outputs.build-output-dir }}/nmealib-lib.tar.gz
+
+    - name: Upload cli artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: nmealib-cli
+        path: ${{ steps.strings.outputs.build-output-dir }}/nmealib-cli.tar.gz
+
+    - name: Publish GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          ${{ steps.strings.outputs.build-output-dir }}/nmealib-lib.tar.gz
+          ${{ steps.strings.outputs.build-output-dir }}/nmealib-cli.tar.gz
