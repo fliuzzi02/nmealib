@@ -71,7 +71,7 @@ $$
 ## Parse flow in code
 
 ```cpp
-#include "nmea0183Factory.hpp"
+#include <nmealib/nmea0183/nmea0183Factory.hpp>
 
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
 ```

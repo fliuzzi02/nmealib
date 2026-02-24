@@ -26,8 +26,8 @@ ctest --test-dir out/build/gcc-full -L nmea0183 --output-on-failure
 ## First parse example
 
 ```cpp
-#include "nmea0183Factory.hpp"
-#include "gll.hpp"
+#include <nmealib/nmea0183/nmea0183Factory.hpp>
+#include <nmealib/nmea0183/gll.hpp>
 #include <iostream>
 
 int main() {
@@ -50,7 +50,7 @@ int main() {
 Construct typed messages from field values and serialize them back to wire format.
 
 ```cpp
-#include "gga.hpp"
+#include <nmealib/nmea0183/gga.hpp>
 
 nmealib::nmea0183::GGA gga(
     "GN", 62735.0,

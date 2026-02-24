@@ -5,7 +5,7 @@ Practical examples for parsing and working with NMEA 0183 data using `nmealib`.
 ## Parse a generic sentence
 
 ```cpp
-#include "nmea0183Factory.hpp"
+#include <nmealib/nmea0183/nmea0183Factory.hpp>
 #include <iostream>
 
 int main() {
@@ -22,14 +22,14 @@ int main() {
 ## Typed dispatch (`RMC`, `GGA`, `GLL`, `GSA`, `MWV`, `VTG`, `ZDA`)
 
 ```cpp
-#include "nmea0183Factory.hpp"
-#include "rmc.hpp"
-#include "gga.hpp"
-#include "gll.hpp"
-#include "gsa.hpp"
-#include "mwv.hpp"
-#include "vtg.hpp"
-#include "zda.hpp"
+#include <nmealib/nmea0183/nmea0183Factory.hpp>
+#include <nmealib/nmea0183/rmc.hpp>
+#include <nmealib/nmea0183/gga.hpp>
+#include <nmealib/nmea0183/gll.hpp>
+#include <nmealib/nmea0183/gsa.hpp>
+#include <nmealib/nmea0183/mwv.hpp>
+#include <nmealib/nmea0183/vtg.hpp>
+#include <nmealib/nmea0183/zda.hpp>
 
 void handle(const std::string& sentence) {
     auto msg = nmealib::nmea0183::Nmea0183Factory::create(sentence);
@@ -71,7 +71,7 @@ void handle(const std::string& sentence) {
 ### RMC
 
 ```cpp
-#include "rmc.hpp"
+#include <nmealib/nmea0183/rmc.hpp>
 
 nmealib::nmea0183::RMC rmc(
     "GP", 123519, 'A',
@@ -89,7 +89,7 @@ std::string raw = rmc.serialize();
 ### GGA
 
 ```cpp
-#include "gga.hpp"
+#include <nmealib/nmea0183/gga.hpp>
 
 nmealib::nmea0183::GGA gga(
     "GN", 62735.0,
@@ -107,7 +107,7 @@ std::string raw = gga.serialize();
 ### GLL
 
 ```cpp
-#include "gll.hpp"
+#include <nmealib/nmea0183/gll.hpp>
 
 nmealib::nmea0183::GLL gll(
     "GN",
@@ -123,7 +123,7 @@ std::string raw = gll.serialize();
 ### GSA
 
 ```cpp
-#include "gsa.hpp"
+#include <nmealib/nmea0183/gsa.hpp>
 
 nmealib::nmea0183::GSA gsa(
     "GN",
@@ -142,7 +142,7 @@ std::string raw = gsa.serialize();
 ### VTG
 
 ```cpp
-#include "vtg.hpp"
+#include <nmealib/nmea0183/vtg.hpp>
 
 nmealib::nmea0183::VTG vtg(
     "GP",
@@ -159,7 +159,7 @@ std::string raw = vtg.serialize();
 ### MWV
 
 ```cpp
-#include "mwv.hpp"
+#include <nmealib/nmea0183/mwv.hpp>
 
 nmealib::nmea0183::MWV mwv(
     "II",
@@ -176,7 +176,7 @@ std::string raw = mwv.serialize();
 ### ZDA
 
 ```cpp
-#include "zda.hpp"
+#include <nmealib/nmea0183/zda.hpp>
 
 nmealib::nmea0183::ZDA zda(
     "GP",
