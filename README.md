@@ -39,8 +39,8 @@ ctest --test-dir out/build/gcc-full -L nmea0183 --output-on-failure
 ### Parse with factory
 
 ```cpp
-#include "nmea0183Factory.hpp"
-#include "rmc.hpp"
+#include <nmealib/nmea0183/nmea0183Factory.hpp>
+#include <nmealib/nmea0183/rmc.hpp>
 #include <iostream>
 
 int main() {
@@ -60,7 +60,7 @@ int main() {
 ### Construct typed message from fields
 
 ```cpp
-#include "gll.hpp"
+#include <nmealib/nmea0183/gll.hpp>
 
 nmealib::nmea0183::GLL gll(
     "GN",
@@ -131,19 +131,33 @@ All derive from `nmealib::NmeaException`.
 nmealib/
 ├── app/
 ├── docs/wiki/
-├── src/
-│   ├── message.hpp
-│   ├── nmeaException.hpp
-│   └── nmea0183/
+├── include/
+│   └── nmealib/
+│       ├── message.hpp
+│       ├── nmeaException.hpp
 │       ├── nmea0183.hpp
-│       ├── nmea0183Factory.hpp
-│       ├── rmc.hpp
-│       ├── gga.hpp
-│       ├── gll.hpp
-│       ├── gsa.hpp
-│       ├── mwv.hpp
-│       ├── vtg.hpp
-│       └── zda.hpp
+│       └── nmea0183/
+│           ├── nmea0183Factory.hpp
+│           ├── rmc.hpp
+│           ├── gga.hpp
+│           ├── gll.hpp
+│           ├── gsa.hpp
+│           ├── mwv.hpp
+│           ├── vtg.hpp
+│           └── zda.hpp
+├── src/
+│   ├── message.cpp
+│   └── nmea0183/
+│       ├── nmea0183.cpp
+│       ├── nmea0183Factory.cpp
+│       ├── messageRegistry.cpp
+│       ├── rmc.cpp
+│       ├── gga.cpp
+│       ├── gll.cpp
+│       ├── gsa.cpp
+│       ├── mwv.cpp
+│       ├── vtg.cpp
+│       └── zda.cpp
 ├── tests/
 └── CMakeLists.txt
 ```
