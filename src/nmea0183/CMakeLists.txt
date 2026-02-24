@@ -1,5 +1,13 @@
 add_library(nmealib_nmea0183 STATIC
     nmea0183.cpp
+    nmea0183Factory.cpp
+    gga.cpp
+    gsa.cpp
+    gll.cpp
+    mwv.cpp
+    rmc.cpp
+    vtg.cpp
+    zda.cpp
 )
 
 # Public headers live under include/ at the repository root

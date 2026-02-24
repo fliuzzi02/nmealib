@@ -6,18 +6,20 @@
  *
  * Including this single header provides access to all public types and
  * functions exported by the library:
- *  - nmealib::Message          (base message class)
- *  - nmealib::NmeaException    (base exception class)
+ *  - nmealib::Message              (base message class)
+ *  - nmealib::NmeaException        (base exception class)
  *  - nmealib::nmea0183::Message0183 and its associated exceptions
+ *  - nmealib::nmea0183::GGA, GLL, GSA, MWV, RMC, VTG, ZDA (typed sentence classes)
+ *  - nmealib::nmea0183::Nmea0183Factory (factory for creating typed messages)
  *
  * Example usage:
  * @code
  * #include <nmealib/nmealib.hpp>
  *
- * auto msg = nmealib::nmea0183::Message0183::create("$GPGGA,...*47\r\n");
+ * auto msg = nmealib::nmea0183::Nmea0183Factory::create("$GPGGA,...*47\r\n");
  * @endcode
  */
 
 #include "message.hpp"
 #include "nmeaException.hpp"
-#include "nmea0183/nmea0183.hpp"
+#include "nmea0183/nmea0183Factory.hpp"

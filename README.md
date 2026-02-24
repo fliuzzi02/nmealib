@@ -1,309 +1,175 @@
 # nmealib
 
-A modern C++20 library for parsing and validating NMEA (National Marine Electronics Association) messages.
+A modern C++20 library for parsing and validating NMEA messages.
 
 ## Overview
 
-nmealib is a lightweight, header-friendly C++ library designed to parse, validate, and manipulate NMEA messages. Currently, it supports the NMEA 0183 standard with plans to extend support to NMEA 2000 in the future.
+`nmealib` currently focuses on NMEA 0183 and provides:
 
-NMEA 0183 is a widely-used standard for communication between marine electronics such as GPS receivers, autopilots, echo sounders, and other navigational equipment.
-
-## Features
-
-- **NMEA 0183 Support**: Full parsing and validation of NMEA 0183 sentences
-- **Checksum Validation**: Automatic calculation and verification of message checksums
-- **Type-Safe API**: Modern C++20 design with strong type safety
-- **Exception-Based Error Handling**: Clear error reporting for invalid messages
-- **Timestamp Support**: Automatic timestamping of parsed messages
-- **Message Serialization**: Convert parsed messages back to wire format
-- **Command-Line Interface**: Included CLI tool for testing and message parsing
-- **Comprehensive Testing**: Full test suite using Google Test
+- Generic sentence parsing (`Message0183`)
+- Typed sentence dispatch via `Nmea0183Factory`
+- Sentence-specific classes for `RMC`, `GGA`, `GLL`, `GSA`, `MWV`, `VTG`, and `ZDA`
+- Checksum validation and serialization
+- Exception-based error handling
+- CLI utility and test suite
 
 ## Requirements
 
-- C++20 compatible compiler (GCC 10+, Clang 12+, MSVC 2019+)
-- CMake 3.20 or higher
-- Google Test (automatically fetched during build if tests are enabled)
+- C++20 compiler (GCC 10+, Clang 12+, MSVC 2019+)
+- CMake 3.20+
 
-## Installation
+## Build
 
-### Building from Source
-
-1. Clone the repository:
 ```bash
 git clone https://github.com/fliuzzi02/nmealib.git
 cd nmealib
-```
-
-2. Configure with CMake:
-```bash
 cmake --preset gcc-full
-```
-
-3. Build the library:
-```bash
 cmake --build out/build/gcc-full
 ```
 
-4. (Optional) Run tests:
+## Testing
+
 ```bash
-ctest --test-dir out/build/gcc-full
+ctest --test-dir out/build/gcc-full --output-on-failure
+ctest --test-dir out/build/gcc-full -L nmea0183 --output-on-failure
 ```
 
-### Using in Your Project
+## Quick usage
 
-#### As a CMake Subdirectory
-
-Add nmealib as a subdirectory in your CMakeLists.txt:
-
-```cmake
-add_subdirectory(nmealib)
-target_link_libraries(your_target PRIVATE nmealib)
-```
-
-#### Manual Integration
-
-Include the necessary headers and link against the `nmealib_nmea0183` library:
-
-```cmake
-target_include_directories(your_target PRIVATE ${NMEALIB_SOURCE_DIR}/src)
-target_link_libraries(your_target PRIVATE nmealib_nmea0183)
-```
-
-## Usage
-
-### Library Usage
-
-#### Basic Parsing
+### Parse with factory
 
 ```cpp
-#include "nmea0183/nmea0183.hpp"
+#include "nmea0183Factory.hpp"
+#include "rmc.hpp"
 #include <iostream>
-#include <memory>
 
 int main() {
-    std::string sentence = "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47\r\n";
-    
-    try {
-        auto msg = nmealib::nmea0183::Message0183::create(sentence);
-        
-        std::cout << "Talker: " << msg->getTalker() << std::endl;
-        std::cout << "Sentence Type: " << msg->getSentenceType() << std::endl;
-        std::cout << "Payload: " << msg->getPayload() << std::endl;
-        std::cout << "Valid: " << (msg->validate() ? "Yes" : "No") << std::endl;
-        
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-        return 1;
+    const std::string raw = "$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W,A,V*6A\r\n";
+
+    auto msg = nmealib::nmea0183::Nmea0183Factory::create(raw);
+
+    std::cout << msg->getTalker() << msg->getSentenceType() << "\n";
+    std::cout << "Valid: " << std::boolalpha << msg->validate() << "\n";
+
+    if (auto* rmc = dynamic_cast<nmealib::nmea0183::RMC*>(msg.get())) {
+        std::cout << "SOG: " << rmc->getSpeedOverGround() << " kn\n";
     }
-    
-    return 0;
 }
 ```
 
-#### Checksum Validation
+### Construct typed message from fields
 
 ```cpp
-auto msg = nmealib::nmea0183::Message0183::create(sentence);
+#include "gll.hpp"
 
-// Check if message has a checksum
-try {
-    std::string checksum = msg->getChecksumStr();
-    std::string calculated = msg->getCalculatedChecksumStr();
-    
-    if (checksum == calculated) {
-        std::cout << "Checksum valid!" << std::endl;
-    }
-} catch (const nmealib::nmea0183::NoChecksumException&) {
-    std::cout << "Message has no checksum" << std::endl;
-}
+nmealib::nmea0183::GLL gll(
+    "GN",
+    31.8464692667, 'N',
+    117.1987063833, 'E',
+    62735.0,
+    'A', 'A'
+);
 
-// Or simply use validate()
-bool isValid = msg->validate();
+std::string wire = gll.serialize();
 ```
 
-#### Message Cloning
+## NMEA 0183 support
 
-```cpp
-auto original = nmealib::nmea0183::Message0183::create(sentence);
-auto clone = original->clone();
+`Nmea0183Factory::create(...)` returns:
 
-// Compare messages
-if (original->hasEqualContent(*dynamic_cast<nmealib::nmea0183::Message0183*>(clone.get()))) {
-    std::cout << "Messages are equal!" << std::endl;
-}
-```
+- `RMC` for `*RMC`
+- `GGA` for `*GGA`
+- `GLL` for `*GLL`
+- `GSA` for `*GSA`
+- `MWV` for `*MWV`
+- `VTG` for `*VTG`
+- `ZDA` for `*ZDA`
+- `Message0183` for other sentence types
 
-### Command-Line Interface
+`MWV` provides wind angle/reference, wind speed, units, and data validity status.
 
-The library includes a CLI tool for parsing NMEA sentences:
+`GSA` supports both standard and NMEA 4.1+ forms:
+
+- Standard: selection mode, fix mode, up to 12 satellite IDs, PDOP/HDOP/VDOP
+- NMEA 4.1+: optional trailing `System ID` field before checksum
+
+`VTG` supports both newer and older forms:
+
+- Newer form: includes `T/M/N/K` unit markers and optional FAA mode indicator (NMEA 2.3+)
+- Older form: compact 5-field payload without explicit unit markers
+
+`ZDA` provides UTC time/date plus local timezone offset fields.
+
+## CLI
+
+After building:
 
 ```bash
-# Parse a sentence
-./nmealib-cli --nmea0183 '$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47\r\n'
-
-# Output:
-# Raw:      $GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47
-# Payload:  GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,
-# Checksum: 47
-# Valid:    true
-# Timestamp: 2026-02-14 17:48:28
-# Serialized: $GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47
+./out/build/gcc-full/app/nmealib-cli --nmea0183 $'$GNGLL,3150.788156,N,11711.922383,E,062735.00,A,A*76\r\n'
 ```
 
-## NMEA 0183 Format
+## Error handling
 
-NMEA 0183 sentences follow a specific format:
+Common exceptions:
 
-```
-$TALKER_ID,data_field_1,data_field_2,...,data_field_n*CHECKSUM\r\n
-```
+- `TooLongSentenceException`
+- `InvalidStartCharacterException`
+- `NoChecksumException`
+- `NotRMCException`
+- `NotGGAException`
+- `NotGLLException`
+- `NotGSAException`
+- `NotMWVException`
+- `NotVTGException`
+- `NotZDAException`
 
-Where:
-- `$` or `!` - Start character ($ for standard, ! for encapsulated)
-- `TALKER_ID` - Two-character talker identifier (e.g., GP for GPS)
-- `SENTENCE_TYPE` - Three-character sentence type (e.g., GGA, RMC)
-- Data fields - Comma-separated values
-- `*CHECKSUM` - Optional: asterisk followed by two-digit hex checksum
-- `\r\n` - Carriage return and line feed
+All derive from `nmealib::NmeaException`.
 
-**Constraints:**
-- Maximum length: 82 characters (including start and end characters)
-- Checksum: XOR of all characters between $ and * (exclusive)
+## Project structure
 
-## API Reference
-
-### Core Classes
-
-#### `nmealib::Message`
-Base class for all NMEA message types. Provides common functionality:
-- `getType()` - Get message type (NMEA0183, NMEA2000, etc.)
-- `getRawData()` - Get original raw message string
-- `getTimestamp()` - Get message timestamp
-- `clone()` - Create a polymorphic copy
-- `serialize()` - Convert to wire format
-- `validate()` - Validate message integrity
-
-#### `nmealib::nmea0183::Message0183`
-NMEA 0183 specific message implementation. Key methods:
-- `static create(raw, timestamp)` - Factory method to create from raw string
-- `getStartChar()` - Get start character ($ or !)
-- `getTalker()` - Get two-character talker ID
-- `getSentenceType()` - Get three-character sentence type
-- `getPayload()` - Get message payload (data between start and checksum)
-- `getChecksumStr()` - Get checksum from message (throws if none)
-- `getCalculatedChecksumStr()` - Get calculated checksum
-- `validate()` - Validate checksum and format
-
-### Exception Types
-
-All exceptions inherit from `nmealib::NmeaException`:
-
-- `TooLongSentenceException` - Sentence exceeds 82 characters
-- `InvalidStartCharacterException` - Invalid start character (not $ or !)
-- `NoEndlineException` - Missing \r\n terminator
-- `NoChecksumException` - No checksum when one was expected
-
-## Building and Testing
-
-### Build Options
-
-CMake options:
-- `ENABLE_TESTS` - Enable building tests (default: OFF)
-- `ENABLE_STATIC_ANALYSIS` - Enable clang-tidy and cppcheck (default: OFF)
-
-### Running Tests
-
-```bash
-# Configure with tests enabled
-cmake --preset gcc-full
-
-# Build
-cmake --build out/build/gcc-full
-
-# Run all tests
-ctest --test-dir out/build/gcc-full
-
-# Run specific test suite
-ctest --test-dir out/build/gcc-full -L nmea0183
-```
-
-### Static Analysis
-
-```bash
-# Configure with static analysis enabled
-cmake -B build -DENABLE_STATIC_ANALYSIS=ON
-
-# Run analysis
-cmake --build build --target static-analysis
-```
-
-## Project Structure
-
-```
+```text
 nmealib/
-├── src/               # Library source code
-│   ├── message.hpp    # Base message class
-│   ├── nmeaException.hpp  # Exception definitions
-│   └── nmea0183/      # NMEA 0183 implementation
-│       ├── nmea0183.hpp
-│       └── nmea0183.cpp
-├── app/               # Command-line application
-│   └── main.cpp
-├── tests/             # Test suite
+├── app/
+├── docs/wiki/
+├── src/
+│   ├── message.hpp
+│   ├── nmeaException.hpp
 │   └── nmea0183/
-│       └── test_nmea0183.cpp
-├── CMakeLists.txt     # Root CMake configuration
-└── README.md          # This file
+│       ├── nmea0183.hpp
+│       ├── nmea0183Factory.hpp
+│       ├── rmc.hpp
+│       ├── gga.hpp
+│       ├── gll.hpp
+│       ├── gsa.hpp
+│       ├── mwv.hpp
+│       ├── vtg.hpp
+│       └── zda.hpp
+├── tests/
+└── CMakeLists.txt
 ```
+
+## Documentation
+
+- [Wiki Home](docs/wiki/Home.md)
+- [Getting Started](docs/wiki/Getting-Started.md)
+- [API Reference](docs/wiki/API-Reference.md)
+- [Examples](docs/wiki/Examples.md)
+- [Building and Testing](docs/wiki/Building-and-Testing.md)
 
 ## Roadmap
 
-- [x] NMEA 0183 basic parsing and validation
-- [x] Command-line interface
-- [x] Comprehensive test suite
-- [ ] Sentence-specific parsers (GGA, RMC, etc.)
+- [x] NMEA 0183 parsing/validation
+- [x] Typed sentence support (`RMC`, `GGA`, `GLL`, `GSA`, `MWV`, `VTG`, `ZDA`)
+- [x] CLI support
+- [ ] Additional NMEA 0183 sentence types
 - [ ] NMEA 2000 support
-- [ ] Doxygen documentation generation
-- [ ] Python bindings
-- [ ] Additional examples and tutorials
 
 ## Contributing
 
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes with appropriate tests
-4. Ensure all tests pass (`ctest`)
-5. Run static analysis if possible
-6. Commit your changes (`git commit -m 'Add amazing feature'`)
-7. Push to the branch (`git push origin feature/amazing-feature`)
-8. Open a Pull Request
-
-### Coding Standards
-
-- Follow C++20 best practices
-- Use meaningful variable and function names
-- Add tests for new functionality
-- Document public APIs with Doxygen-style comments
-- Ensure code passes clang-tidy and cppcheck
-
-## License
-
-This project is open source. Please see the LICENSE file for details.
-
-## Acknowledgments
-
-- NMEA 0183 Standard by National Marine Electronics Association
-- Google Test framework for testing infrastructure
+See [Contributing Guide](docs/wiki/Contributing.md).
 
 ## Support
 
-For issues, questions, or contributions, please use the GitHub issue tracker:
-https://github.com/fliuzzi02/nmealib/issues
+For issues and feature requests:
 
-## See Also
-
-- [Wiki Documentation](https://github.com/fliuzzi02/nmealib/wiki) - Detailed guides and tutorials
-- [NMEA 0183 Standard Reference](https://www.nmea.org/)
+- https://github.com/fliuzzi02/nmealib/issues
