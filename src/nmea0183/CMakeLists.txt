@@ -21,3 +21,9 @@ target_link_libraries(nmealib_nmea0183 PUBLIC
 )
 
 target_compile_features(nmealib_nmea0183 PUBLIC cxx_std_20)
+
+install(TARGETS nmealib_nmea0183
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    COMPONENT library
+)

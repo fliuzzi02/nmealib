@@ -2,26 +2,122 @@
     "version": 8,
     "configurePresets": [
         {
-            "name": "gcc-full",
-            "displayName": "GCC Full Build",
-            "description": "Using compilers: C = /usr/bin/gcc, CXX = /usr/bin/g++",
+      "name": "gcc-base",
+      "displayName": "GCC Base",
+      "description": "GCC toolchain and default paths",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
                 "CMAKE_C_COMPILER": "/usr/bin/gcc",
-                "CMAKE_CXX_COMPILER": "/usr/bin/g++",
-                "CMAKE_BUILD_TYPE": "Debug",
-                "ENABLE_TESTS": "ON",
-                "ENABLE_STATIC_ANALYSIS": "OFF"
+        "CMAKE_CXX_COMPILER": "/usr/bin/g++"
             }
+    },
+    {
+      "name": "gcc-debug",
+      "displayName": "GCC Debug",
+      "inherits": "gcc-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "ENABLE_TESTS": "OFF",
+        "ENABLE_STATIC_ANALYSIS": "OFF",
+        "BUILD_CLI": "ON"
+      }
+    },
+    {
+      "name": "gcc-release",
+      "displayName": "GCC Release",
+      "inherits": "gcc-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "ENABLE_TESTS": "OFF",
+        "ENABLE_STATIC_ANALYSIS": "OFF",
+        "BUILD_CLI": "ON"
+      }
+    },
+    {
+      "name": "gcc-debug-tests",
+      "displayName": "GCC Debug + Tests",
+      "inherits": "gcc-debug",
+      "cacheVariables": {
+        "ENABLE_TESTS": "ON"
+      }
+    },
+    {
+      "name": "gcc-release-tests",
+      "displayName": "GCC Release + Tests",
+      "inherits": "gcc-release",
+      "cacheVariables": {
+        "ENABLE_TESTS": "ON"
+      }
+    },
+    {
+      "name": "gcc-debug-static",
+      "displayName": "GCC Debug + Static Analysis",
+      "inherits": "gcc-debug",
+      "cacheVariables": {
+        "ENABLE_STATIC_ANALYSIS": "ON"
+      }
+    },
+    {
+      "name": "gcc-release-static",
+      "displayName": "GCC Release + Static Analysis",
+      "inherits": "gcc-release",
+      "cacheVariables": {
+        "ENABLE_STATIC_ANALYSIS": "ON"
+      }
+    },
+    {
+      "name": "gcc-release-lib-only",
+      "displayName": "GCC Release (Library Only)",
+      "inherits": "gcc-release",
+      "cacheVariables": {
+        "BUILD_CLI": "OFF"
+      }
         }
     ],
+  "buildPresets": [
+    {
+      "name": "build-debug",
+      "displayName": "Build Debug",
+      "configurePreset": "gcc-debug"
+    },
+    {
+      "name": "build-release",
+      "displayName": "Build Release",
+      "configurePreset": "gcc-release"
+    },
+    {
+      "name": "build-debug-tests",
+      "displayName": "Build Debug + Tests",
+      "configurePreset": "gcc-debug-tests"
+    },
+    {
+      "name": "build-release-tests",
+      "displayName": "Build Release + Tests",
+      "configurePreset": "gcc-release-tests"
+    },
+    {
+      "name": "build-debug-static",
+      "displayName": "Build Debug + Static Analysis",
+      "configurePreset": "gcc-debug-static"
+    },
+    {
+      "name": "build-release-static",
+      "displayName": "Build Release + Static Analysis",
+      "configurePreset": "gcc-release-static"
+    },
+    {
+      "name": "build-release-lib-only",
+      "displayName": "Build Release (Library Only)",
+      "configurePreset": "gcc-release-lib-only"
+    }
+  ],
     "testPresets": [
     {
       "name": "test-nmea0183",
       "displayName": "Nmea0183",
       "description": "Run only nmea0183 tests",
-      "configurePreset": "gcc-full",
+    "configurePreset": "gcc-debug-tests",
       "filter": {
         "include": {
           "label": "nmea0183"
@@ -32,7 +128,7 @@
       "name": "test-nmea2000",
       "displayName": "Nmea2000",
       "description": "Run only nmea2000 tests",
-      "configurePreset": "gcc-full",
+    "configurePreset": "gcc-debug-tests",
       "filter": {
         "include": {
           "label": "nmea2000"
@@ -43,7 +139,7 @@
       "name": "test-all",
       "displayName": "All",
       "description": "Run all tests (aggregate target)",
-      "configurePreset": "gcc-full"
+    "configurePreset": "gcc-debug-tests"
     }
   ]
 }

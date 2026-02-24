@@ -11,6 +11,12 @@ target_include_directories(nmealib_core PUBLIC
 
 target_compile_features(nmealib_core PUBLIC cxx_std_20)
 
+install(TARGETS nmealib_core
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    COMPONENT library
+)
+
 # Public umbrella target for downstream consumers (header + component libraries)
 add_library(nmealib INTERFACE)
 
