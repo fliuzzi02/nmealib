@@ -68,12 +68,6 @@ public:
     NmeaException(context, "NMEA 0183 sentence must end with <CR><LF>", details) {}
 };
 
-class NotEnoughFieldsException : public NmeaException {
-public:
-    explicit NotEnoughFieldsException(const std::string& context, const std::string& details = "") : 
-    NmeaException(context, "NMEA 0183 sentence does not contain enough fields", details) {}
-};
-
 /**
  * @brief Exception thrown when an NMEA 0183 sentence does not contain enough comma-separated fields.
  */
