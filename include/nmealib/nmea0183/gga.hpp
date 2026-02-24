@@ -1,6 +1,6 @@
 #pragma once
 
-#include "nmea0183.hpp"
+#include <nmealib/nmea0183.hpp>
 
 namespace nmealib {
 namespace nmea0183 {
