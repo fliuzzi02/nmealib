@@ -124,6 +124,7 @@ private:
                                   std::string dgpsReferenceStationId);
 
     friend class Nmea0183Factory;
+    friend class MessageRegistry;
 };
 
 } // namespace nmea0183
