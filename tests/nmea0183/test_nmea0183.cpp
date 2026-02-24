@@ -2,6 +2,7 @@
 #include <chrono>
 #include <memory>
 #include <string>
+
 #include <nmealib/nmealib.hpp>
 
 using namespace nmealib::nmea0183;

@@ -1,4 +1,4 @@
-#include "gsa.hpp"
+#include "nmealib/nmea0183/gsa.hpp"
 
 #include <iomanip>
 #include <sstream>

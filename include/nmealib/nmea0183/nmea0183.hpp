@@ -75,6 +75,21 @@ public:
 };
 
 /**
+ * @brief Exception thrown when an NMEA 0183 sentence does not contain enough comma-separated fields.
+ */
+class NotEnoughFieldsException : public NmeaException {
+public:
+    /**
+     * @brief Constructs a NotEnoughFieldsException.
+     *
+     * @param context A string identifying where the error occurred.
+     * @param details Optional extra information (e.g., expected vs. actual field count).
+     */
+    explicit NotEnoughFieldsException(const std::string& context, const std::string& details = "") : 
+    NmeaException(context, "NMEA 0183 sentence does not contain enough fields", details) {}
+};
+
+/**
  * @brief Represents an NMEA 0183 sentence
  * @attention NMEA 0183 sentences are ASCII text strings that follow a specific format:
  *      - Messages have a maximum length of 82 characters, including the $ or ! starting character and the ending <LF>
@@ -88,23 +103,6 @@ public:
  */
 class Message0183 : public nmealib::Message {
 public:
-    // Factory method
-    /**
-     * @brief Creates a Message0183 instance from a raw NMEA 0183 sentence string. 
-     * This method performs validation on the input string, ensuring it adheres to the NMEA 0183 format and constraints. 
-     * If the input is valid, it returns a unique pointer to a Message0183 object; otherwise, 
-     * it throws an appropriate exception indicating the reason for failure.
-     * 
-     * @param raw The raw NMEA 0183 sentence string to parse and validate.
-     * @param ts  Optional timestamp to associate with the message; defaults to the current system time.
-     * @return std::unique_ptr<Message0183> A unique pointer to the created Message0183 instance if the input is valid.
-     * @throws TooLongSentenceException If the input string exceeds the maximum allowed length of 82 characters.
-     * @throws InvalidStartCharacterException If the input string does not start with either '$' or '!'.
-     * @throws NoEndlineException If the input string does not end with the required <CR><LF> sequence.
-     */
-    static std::unique_ptr<Message0183> create(const std::string& raw, 
-                                               TimePoint ts = std::chrono::system_clock::now());
-
     /**
      * @brief Copy constructor.
      */
@@ -169,7 +167,7 @@ public:
     std::string getPayload() const noexcept;
 
     /**
-     * @brief Get the Checksum Str object
+     * @brief Get the checksum string extracted from the raw sentence.
      * 
      * @return std::string The checksum string extracted from the raw NMEA 0183 sentence, if present.
      * @throws NoChecksumException If the sentence does not contain a checksum (i.e., no '*' character followed by two hex digits).
@@ -177,7 +175,7 @@ public:
     std::string getChecksumStr() const;
 
     /**
-     * @brief Get the Calculated Checksum Str object
+     * @brief Get the calculated checksum string for the sentence payload.
      * 
      * @return std::string The checksum string calculated from the payload of the NMEA 0183 sentence, represented as a two-digit hexadecimal string.
      */
@@ -186,7 +184,7 @@ public:
     /**
      * @brief Returns a human-readable string representation of the message content.
      * 
-     * @param verbose Selects whether to print an one-liner or a more detailed multi-line string with field names and values.
+     * @param verbose Selects whether to print a one-liner or a more detailed multi-line string with field names and values.
      * @return std::string The string representation of the message content 
      */
     virtual std::string getStringContent(bool verbose) const noexcept;
@@ -217,7 +215,7 @@ public:
     }
 
     /**
-     * @brief Compares the content of the message only, ignoring the timestamp
+     * @brief Compares the content of the message only, ignoring the timestamp.
      * 
      * @param other The other Message0183 object to compare with
      * @return true if the content of both messages is equal (start char, talker, sentence type, payload, checksum string, and calculated checksum string), regardless of their timestamps;
@@ -233,7 +231,7 @@ public:
     }
 
     /**
-     * @brief Returns wheter the message is valid or not
+     * @brief Returns whether the message is valid or not.
      * 
      * @return true If there is no checksum or if the checksum matches the calculated checksum for the payload
      * @return false If there is a checksum and it does not match the calculated checksum for the payload
@@ -256,7 +254,18 @@ protected:
     std::string checksumStr_; ///< the two hex digits after '*', if present
     std::string calculatedChecksumStr_; ///< the checksum computed from the payload, as a two-digit hex string
 
-    // Protected internal factory
+    /**
+     * @brief Protected factory method to create a Message0183 from a raw sentence string.
+     *
+     * Validates format and parses the raw sentence. Intended to be called from
+     * Nmea0183Factory or derived-class factories.
+     *
+     * @param raw The raw NMEA 0183 sentence string to parse and validate.
+     * @param ts  Optional timestamp; defaults to the current system time.
+     * @return std::unique_ptr<Message0183> A unique pointer to the created Message0183 instance.
+     * @throws TooLongSentenceException If the input string exceeds the maximum allowed length of 82 characters.
+     * @throws InvalidStartCharacterException If the input string does not start with either '$' or '!'.
+     */
     static std::unique_ptr<Message0183> create(std::string raw, TimePoint ts = std::chrono::system_clock::now());
 
 private:

@@ -1,4 +1,4 @@
-#include "nmea0183Factory.hpp"
+#include "nmealib/nmea0183/nmea0183Factory.hpp"
 
 namespace nmealib {
 namespace nmea0183 {

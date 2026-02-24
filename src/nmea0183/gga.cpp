@@ -1,4 +1,4 @@
-#include "gga.hpp"
+#include "nmealib/nmea0183/gga.hpp"
 
 #include <cmath>
 
