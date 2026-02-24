@@ -1,4 +1,4 @@
-#include "nmea0183.hpp"
+#include "nmealib/nmea0183.hpp"
 
 #include <sstream>
 #include <iomanip>
@@ -6,6 +6,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <numeric>
+#include <cmath>
 
 namespace nmealib {
 namespace nmea0183 {
@@ -40,8 +41,38 @@ Message0183::Message0183(std::string raw,
     calculatedChecksumStr_ = computeChecksum(payload_);
 }
 
-std::unique_ptr<Message0183> Message0183::create(const std::string& raw, TimePoint ts) {
+std::unique_ptr<Message0183> Message0183::create(std::string raw, TimePoint ts) {
     std::string context = "Message0183::create";
+    validateFormat(context, raw);
+
+    char startChar = raw[0];
+
+    bool hasCRLF = raw.size() >= 2 && raw.substr(raw.size() - 2) == "\r\n";
+
+    // Extract talker and sentence type from the raw sentence.
+    std::string talker = raw.substr(1, 2);
+    std::string sentenceType = raw.substr(3, 3);
+    bool hasChecksum = raw.find('*') != std::string::npos;
+    if(hasChecksum) {
+        size_t asteriskPos = raw.find('*');
+        std::string payload = raw.substr(1, asteriskPos - 1); // Exclude start char and checksum part
+        std::string checksumStr = raw.substr(asteriskPos + 1, 2);
+        return std::unique_ptr<Message0183>(new Message0183(raw, ts, startChar, talker, sentenceType, payload, checksumStr));
+    } else {
+        if (hasCRLF) {
+            std::string payload = raw.substr(1, raw.size() - 3); // Exclude start char and CRLF
+            return std::unique_ptr<Message0183>(new Message0183(raw, ts, startChar, talker, sentenceType, payload));
+        } else {
+            std::string payload = raw.substr(1); // Exclude start char only
+            return std::unique_ptr<Message0183>(new Message0183(raw, ts, startChar, talker, sentenceType, payload));
+        }
+    }
+}
+
+void Message0183::validateFormat(const std::string& context, const std::string& raw) {
+    // TODO: I have to check that it correspons to the minimum sentence: $XXXXX*ZZ<CR><LF>
+    // and also without checksum: $XXXXX<CR><LF>
+    // and also without CRLF: $XXXXX*ZZ and $XXXXX
     if(raw.size() > 82) {
         throw TooLongSentenceException(context, "Input string length: " + std::to_string(raw.size()));
     }
@@ -49,33 +80,14 @@ std::unique_ptr<Message0183> Message0183::create(const std::string& raw, TimePoi
         throw InvalidStartCharacterException("NMEA 0183 sentence must start with '$' or '!'");
     }
 
-    char startChar = raw[0];
-
-    // TODO: Decide whether to allow sentences that end with just LF, or just CR, or neither. For now we require do not require it.
-    bool hasCRLF = raw.size() >= 2 && raw.substr(raw.size() - 2) == "\r\n";
-    if(!hasCRLF) {
-        // throw NoEndlineException(context, "Input string: " + raw);
-    }
-
-    // Extract talker and sentence type from the raw sentence.
-    std::string talker = raw.substr(1, 2);
-    std::string sentenceType = raw.substr(3, 3);
-    std::string payload;
     bool hasChecksum = raw.find('*') != std::string::npos;
-
     if (hasChecksum) {
         // If it has a checksum, find the position of '*' and extract payload and checksum accordingly.
         size_t asteriskPos = raw.find('*');
-        payload = raw.substr(1, asteriskPos - 1); // Exclude start char and checksum part
         std::string checksumStr = raw.substr(asteriskPos + 1, 2);
         if(!isHexByte(checksumStr)) {
             throw NoChecksumException(context, "Invalid checksum format: " + checksumStr);
         }
-        return std::unique_ptr<Message0183>(new Message0183(raw, ts, startChar, talker, sentenceType, payload, checksumStr));
-    } else {
-
-        payload = raw.substr(1, raw.size() - 3); // Exclude start char and CRLF
-        return std::unique_ptr<Message0183>(new Message0183(raw, ts, startChar, talker, sentenceType, payload));
     }
 }
 
@@ -154,6 +166,36 @@ bool Message0183::isHexByte(const std::string& s) noexcept {
     if (s.size() != 2) return false;
     return std::isxdigit(static_cast<unsigned char>(s[0])) &&
            std::isxdigit(static_cast<unsigned char>(s[1]));
+}
+
+double Message0183::convertNmeaCoordinateToDecimalDegrees(const std::string& nmeaCoordinate) {
+    if (nmeaCoordinate.empty()) {
+        return 0.0;
+    }
+
+    const long double raw = std::stold(nmeaCoordinate);
+    const long double degrees = std::floor(raw / 100.0L);
+    const long double minutes = raw - (degrees * 100.0L);
+    return static_cast<double>(degrees + (minutes / 60.0L));
+}
+
+bool Message0183::operator==(const Message0183& other) const noexcept {
+    return startChar_ == other.startChar_ &&
+           talker_ == other.talker_ &&
+           sentenceType_ == other.sentenceType_ &&
+           payload_ == other.payload_ &&
+           checksumStr_ == other.checksumStr_ &&
+           calculatedChecksumStr_ == other.calculatedChecksumStr_ &&
+           Message::operator==(other);
+}
+
+bool Message0183::hasEqualContent(const Message0183& other) const noexcept {
+    return startChar_ == other.startChar_ &&
+           talker_ == other.talker_ &&
+           sentenceType_ == other.sentenceType_ &&
+           payload_ == other.payload_ &&
+           checksumStr_ == other.checksumStr_ &&
+           calculatedChecksumStr_ == other.calculatedChecksumStr_;
 }
 
 } // namespace nmea0183

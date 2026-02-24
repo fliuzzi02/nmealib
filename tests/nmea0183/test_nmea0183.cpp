@@ -2,7 +2,8 @@
 #include <chrono>
 #include <memory>
 #include <string>
-#include "nmea0183.hpp"
+
+#include <nmealib/nmealib.hpp>
 
 using namespace nmealib::nmea0183;
 
@@ -14,7 +15,7 @@ static const std::string SAMPLE_NO_CHECKSUM =
 
 TEST(Message0183, CreateSucceedsAndAccessors)
 {
-    auto msg = Message0183::create(SAMPLE_WITH_CHECKSUM);
+    auto msg = Nmea0183Factory::create(SAMPLE_WITH_CHECKSUM);
     ASSERT_NE(msg, nullptr);
     EXPECT_EQ(msg->getStartChar(), '$');
     EXPECT_EQ(msg->getTalker(), "GP");
@@ -33,7 +34,7 @@ TEST(Message0183, CreateSucceedsAndAccessors)
 
 TEST(Message0183, CreateWithoutChecksumAndGetChecksumThrows)
 {
-    auto msg = Message0183::create(SAMPLE_NO_CHECKSUM);
+    auto msg = Nmea0183Factory::create(SAMPLE_NO_CHECKSUM);
     ASSERT_NE(msg, nullptr);
     EXPECT_THROW(msg->getChecksumStr(), NoChecksumException);
     // But calculated checksum is still available and noexcept
@@ -48,14 +49,14 @@ TEST(Message0183, CreateThrowsOnTooLongSentence)
     // Construct a string longer than 82 characters
     std::string longRaw(90, 'A');
     longRaw[0] = '$';
-    EXPECT_THROW(Message0183::create(longRaw), TooLongSentenceException);
+    EXPECT_THROW(Nmea0183Factory::create(longRaw), TooLongSentenceException);
 }
 
 TEST(Message0183, CreateThrowsOnInvalidStartCharacter)
 {
     std::string s = SAMPLE_WITH_CHECKSUM;
     s.erase(0,1); // remove leading '$'
-    EXPECT_THROW(Message0183::create(s), InvalidStartCharacterException);
+    EXPECT_THROW(Nmea0183Factory::create(s), InvalidStartCharacterException);
 }
 
 TEST(Message0183, CreateThrowsOnMissingEndline)
@@ -64,13 +65,13 @@ TEST(Message0183, CreateThrowsOnMissingEndline)
     std::string s = SAMPLE_WITH_CHECKSUM;
     if (s.size() >= 2) s.erase(s.size()-2);
     EXPECT_NO_THROW({
-        auto test = Message0183::create(s);
+        auto test = Nmea0183Factory::create(s);
     });
 }
 
 TEST(Message0183, CloneProducesEqualObject)
 {
-    auto msg = Message0183::create(SAMPLE_WITH_CHECKSUM);
+    auto msg = Nmea0183Factory::create(SAMPLE_WITH_CHECKSUM);
     ASSERT_NE(msg, nullptr);
 
     std::unique_ptr<nmealib::Message> baseClone = msg->clone();
@@ -87,8 +88,8 @@ TEST(Message0183, EqualityAndHasEqualContent)
     using Clock = std::chrono::system_clock;
     auto ts = Clock::now();
 
-    auto m1 = Message0183::create(SAMPLE_WITH_CHECKSUM, ts);
-    auto m2 = Message0183::create(SAMPLE_WITH_CHECKSUM, ts);
+    auto m1 = Nmea0183Factory::create(SAMPLE_WITH_CHECKSUM, ts);
+    auto m2 = Nmea0183Factory::create(SAMPLE_WITH_CHECKSUM, ts);
     ASSERT_NE(m1, nullptr);
     ASSERT_NE(m2, nullptr);
 
@@ -96,7 +97,7 @@ TEST(Message0183, EqualityAndHasEqualContent)
     EXPECT_TRUE(*m1 == *m2);
 
     // Different timestamps -> operator== may be false, but hasEqualContent ignores timestamp
-    auto m3 = Message0183::create(SAMPLE_WITH_CHECKSUM);
+    auto m3 = Nmea0183Factory::create(SAMPLE_WITH_CHECKSUM);
     ASSERT_NE(m3, nullptr);
     EXPECT_TRUE(m1->hasEqualContent(*m3));
 }
@@ -104,7 +105,7 @@ TEST(Message0183, EqualityAndHasEqualContent)
 TEST(Message0183, ValidateBehavior)
 {
     // Valid checksum -> validate() == true
-    auto good = Message0183::create(SAMPLE_WITH_CHECKSUM);
+    auto good = Nmea0183Factory::create(SAMPLE_WITH_CHECKSUM);
     ASSERT_NE(good, nullptr);
     EXPECT_TRUE(good->validate());
 
@@ -115,12 +116,12 @@ TEST(Message0183, ValidateBehavior)
         bad[star+1] = '0';
         bad[star+2] = '0';
     }
-    auto invalid = Message0183::create(bad);
+    auto invalid = Nmea0183Factory::create(bad);
     ASSERT_NE(invalid, nullptr);
     EXPECT_FALSE(invalid->validate());
 
     // No checksum -> validate() == true
-    auto no = Message0183::create(SAMPLE_NO_CHECKSUM);
+    auto no = Nmea0183Factory::create(SAMPLE_NO_CHECKSUM);
     ASSERT_NE(no, nullptr);
     EXPECT_TRUE(no->validate());
 }

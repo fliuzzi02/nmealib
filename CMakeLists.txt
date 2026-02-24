@@ -9,9 +9,15 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_subdirectory(app)
 add_subdirectory(src)
+add_subdirectory(app)
 
+# Install cli application
+install(TARGETS nmealib-cli
+    RUNTIME DESTINATION bin
+)
+
+# Unit testing options
 option(ENABLE_TESTS "Enable building and running tests" OFF)
 
 if(ENABLE_TESTS)
@@ -19,10 +25,11 @@ if(ENABLE_TESTS)
     include(CTest)
 
     enable_testing()
-    
-    add_subdirectory(tests)
+
+    add_subdirectory(tests EXCLUDE_FROM_INSTALL)
 endif()
 
+# Static analysis options
 option(ENABLE_STATIC_ANALYSIS "Enable static analysis (clang-tidy and cppcheck)" OFF)
 
 if(ENABLE_STATIC_ANALYSIS)
