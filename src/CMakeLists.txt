@@ -9,8 +9,6 @@ target_include_directories(nmealib_core PUBLIC
     ${PROJECT_SOURCE_DIR}/include
 )
 
-target_compile_features(nmealib_core PUBLIC cxx_std_20)
-
 install(TARGETS nmealib_core
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib

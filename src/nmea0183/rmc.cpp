@@ -1,5 +1,8 @@
 #include "nmealib/nmea0183/rmc.hpp"
 #include <cmath>
+#include <iomanip>
+#include <sstream>
+#include <vector>
 
 #include "nmealib/nmea0183/nmea0183Factory.hpp"
 

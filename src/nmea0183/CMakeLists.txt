@@ -5,7 +5,6 @@ function(_nmealib_configure_nmea0183_target target_name)
     target_link_libraries(${target_name} PUBLIC
         nmealib_core
     )
-    target_compile_features(${target_name} PUBLIC cxx_std_20)
 endfunction()
 
 # Common NMEA 0183 base parsing/type support
