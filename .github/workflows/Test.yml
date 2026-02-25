@@ -12,13 +12,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.workflow_run.head_sha }}
 
     - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      run: >
+        cmake -B build
+        -S .
+        -DCMAKE_BUILD_TYPE=Release
+        -DENABLE_TESTS=ON
 
     - name: Build
       run: cmake --build build --config Release
 
     - name: Run all tests
-      working-directory: build
-      run: ctest --build-config Release --output-on-failure
+      run: ctest --test-dir build --build-config Release --output-on-failure --no-tests=error
