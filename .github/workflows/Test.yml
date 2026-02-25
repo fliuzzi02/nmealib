@@ -1,19 +1,17 @@
 name: Run Tests
 
 on:
-  workflow_run:
-    workflows: ["Build"]
-    types: [completed]
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
     - uses: actions/checkout@v4
-      with:
-        ref: ${{ github.event.workflow_run.head_sha }}
 
     - name: Configure CMake
       run: >
@@ -21,9 +19,11 @@ jobs:
         -S .
         -DCMAKE_BUILD_TYPE=Release
         -DENABLE_TESTS=ON
+        -DBUILD_TESTING=ON
 
     - name: Build
       run: cmake --build build --config Release
 
     - name: Run all tests
-      run: ctest --test-dir build --build-config Release --output-on-failure --no-tests=error
+      working-directory: build
+      run: ctest --output-on-failure --no-tests=error
