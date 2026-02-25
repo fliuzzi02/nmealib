@@ -2,6 +2,12 @@ function(_nmealib_configure_nmea0183_target target_name)
     target_include_directories(${target_name} PUBLIC
         ${PROJECT_SOURCE_DIR}/include
     )
+    if(NOT TARGET nmealib_core)
+        message(FATAL_ERROR
+            "nmealib_core target must be defined before configuring ${target_name}. "
+            "Ensure nmealib_core is created before adding the nmea0183 subdirectory."
+        )
+    endif()
     target_link_libraries(${target_name} PUBLIC
         nmealib_core
     )
