@@ -21,6 +21,23 @@ cmake --preset gcc-full
 cmake --build out/build/gcc-full
 ```
 
+## Link options (CMake)
+
+- `nmealib`: umbrella target (core + all NMEA0183 messages)
+- `nmealib_nmea0183_all`: all NMEA0183 message libraries
+- `nmealib_nmea0183_<msg>`: single-message libraries (`dbt`, `gga`, `gsa`, `gll`, `mwv`, `rmc`, `vtg`, `zda`)
+
+Example (only GGA + RMC):
+
+```cmake
+target_link_libraries(your_app PRIVATE
+    nmealib_core
+    nmealib_nmea0183_base
+    nmealib_nmea0183_gga
+    nmealib_nmea0183_rmc
+)
+```
+
 ## Quick start
 
 ```cpp

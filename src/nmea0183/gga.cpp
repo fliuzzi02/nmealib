@@ -1,6 +1,9 @@
 #include "nmealib/nmea0183/gga.hpp"
 
 #include <cmath>
+#include <iomanip>
+#include <sstream>
+#include <vector>
 
 namespace nmealib {
 namespace nmea0183 {

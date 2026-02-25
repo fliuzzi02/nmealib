@@ -22,6 +22,24 @@ add_subdirectory(path/to/nmealib)
 target_link_libraries(your_app PRIVATE nmealib)
 ```
 
+Or link only required message libraries:
+
+```cmake
+add_subdirectory(path/to/nmealib)
+target_link_libraries(your_app PRIVATE
+    nmealib_core
+    nmealib_nmea0183_base
+    nmealib_nmea0183_gga
+    nmealib_nmea0183_rmc
+)
+```
+
+To force full NMEA 0183 coverage without using umbrella target:
+
+```cmake
+target_link_libraries(your_app PRIVATE nmealib_nmea0183_all)
+```
+
 ## First parse
 
 ```cpp
