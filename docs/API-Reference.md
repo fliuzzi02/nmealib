@@ -65,13 +65,18 @@ This page summarizes the public API surface. It is organized for GitHub Pages na
 ### `nmealib::nmea2000::Message2000`
 
 - Generic NMEA 2000 message representation
-- Supports full CAN-frame parsing (29-bit CAN ID + payload bytes)
-- Supports compact no-space raw frame parsing
-- Provides decoded CAN ID fields (`priority`, `dataPage`, `PF`, `PS`, `sourceAddress`)
+- Supports both single-frame (0-8 bytes) and fast-packet frames (up to 223 bytes)
+- Accepts any valid 18-bit PGN (0x000000-0x3FFFF)
+- Flexible input format parsing:
+  - Canonical format: `"CANID:data"` (e.g., `"18FD1234:0102030405060708"`)
+  - Comma-separated: `"0xCANID, 0xBB 0xCC ..."` (e.g., `"0x18FD1234, 0x01 0x02 0x03 ..."`)
+  - Space-separated with 0x: `"0xCANID 0xBB 0xCC ..."` (e.g., `"0x18FD1234 0x01 0x02 0x03 ..."`)
+  - Space-separated: `"CANID BB CC ..."` (e.g., `"18FD1234 01 02 03 ..."`)
 
 ### `nmealib::nmea2000::Nmea2000Factory`
 
-- Entry point for parsing raw NMEA 2000 frames
+- Entry point for parsing raw NMEA 2000 frames in multiple formats
+- Automatically detects and normalizes input format
 - Returns a typed PGN object when the PGN is supported
 
 ### PGN classes

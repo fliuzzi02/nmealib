@@ -60,20 +60,34 @@ auto msg = nmealib::nmea0183::Nmea0183Factory::create(
     "$GNGLL,3150.788156,N,11711.922383,E,062735.00,A,A*76\r\n");
 ```
 
-NMEA 2000 from full raw CAN frame:
+### NMEA 2000 (multiple formats supported)
 
+All of these formats are equivalent:
+
+**Canonical format:**
 ```cpp
 #include <nmealib/nmea2000/nmea2000Factory.hpp>
 
 auto msg2000 = nmealib::nmea2000::Nmea2000Factory::create(
-    "18F80523 1D 01 23 45 67 FE DC BA 98 00 01 86 A0 12 00 04 E2 0C");
+    "18FD1234:0102030405060708");
 ```
 
-Compact (no spaces) input is also accepted:
-
+**Comma-separated with 0x prefix:**
 ```cpp
-auto msg2000Compact = nmealib::nmea2000::Nmea2000Factory::create(
-    "18F805231D01234567FEDCBA98000186A0120004E20C");
+auto msg2000 = nmealib::nmea2000::Nmea2000Factory::create(
+    "0x18FD1234, 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08");
+```
+
+**Space-separated with 0x prefix:**
+```cpp
+auto msg2000 = nmealib::nmea2000::Nmea2000Factory::create(
+    "0x18FD1234 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08");
+```
+
+**Space-separated without 0x prefix:**
+```cpp
+auto msg2000 = nmealib::nmea2000::Nmea2000Factory::create(
+    "18FD1234 01 02 03 04 05 06 07 08");
 ```
 
 ## Run the CLI

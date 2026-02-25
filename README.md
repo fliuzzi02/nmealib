@@ -7,8 +7,9 @@ C++ library for working with NMEA messages.
 - NMEA 0183 parsing and validation
 - Typed sentence classes (`RMC`, `GGA`, `GLL`, `GSA`, `MWV`, `VTG`, `ZDA`)
 - Factory-based parsing with `Nmea0183Factory`
-- NMEA 2000 parsing with full CAN ID frame input
-- Typed PGN class (`PGN129029`) via `Nmea2000Factory`
+- NMEA 2000 single-frame and fast-packet message support (up to 223 bytes)
+- Flexible input format parsing for NMEA 2000 (multiple formats supported)
+- Typed PGN classes (e.g., `PGN129029`) via `Nmea2000Factory`
 - CMake build, tests, and CLI
 
 ## Requirements

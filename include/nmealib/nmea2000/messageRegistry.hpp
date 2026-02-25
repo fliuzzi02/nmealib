@@ -18,8 +18,6 @@ public:
 private:
     MessageRegistry() = default;
 
-    std::unique_ptr<Message2000> createPGN129029(std::unique_ptr<Message2000> baseMessage);
-
     friend class PGN129029;
 };
 

@@ -4,399 +4,244 @@
 #include <iomanip>
 #include <sstream>
 #include <vector>
+#include <algorithm>
+#include <cstring>
 
 namespace nmealib {
 namespace nmea2000 {
 
+/**
+ * @brief Normalizes raw CAN frame string to the canonical "CANID:data" format.
+ * 
+ * Supports multiple input formats:
+ * - "CANID:data" (already canonical, returned as-is)
+ * - "0xCANID, 0xBB 0xCC 0xDD ..." (comma-separated with 0x prefix)
+ * - "0xCANID 0xBB 0xCC 0xDD ..." (space-separated with 0x prefix)
+ * - "CANID BB CC DD ..." (space-separated without prefix)
+ * 
+ * @param raw The raw CAN frame string in any supported format.
+ * @return std::string The normalized string in "CANID:data" format.
+ */
+static std::string normalizeRawFormat(const std::string& raw) {
+    // If already in CANID:data format, use as-is
+    if (raw.find(':') != std::string::npos) {
+        return raw;
+    }
+    
+    // Check for comma-separated format (e.g., "0x1CFF63CC, 0x3B 0x9F ...")
+    size_t commaPos = raw.find(',');
+    if (commaPos != std::string::npos) {
+        std::string canIdPart = raw.substr(0, commaPos);
+        std::string dataPart = raw.substr(commaPos + 1);
+        
+        // Clean up CAN ID: remove whitespace and 0x prefix
+        canIdPart.erase(std::remove_if(canIdPart.begin(), canIdPart.end(), 
+                                       [](unsigned char c) { return std::isspace(c); }), 
+                       canIdPart.end());
+        if (canIdPart.size() >= 2 && (canIdPart.substr(0, 2) == "0x" || canIdPart.substr(0, 2) == "0X")) {
+            canIdPart = canIdPart.substr(2);
+        }
+        
+        // Process data bytes: extract hex values, remove 0x prefix
+        std::string dataHex;
+        std::istringstream iss(dataPart);
+        std::string token;
+        while (iss >> token) {
+            if (token.size() >= 2 && (token.substr(0, 2) == "0x" || token.substr(0, 2) == "0X")) {
+                token = token.substr(2);
+            }
+            dataHex += token;
+        }
+        
+        return canIdPart + ":" + dataHex;
+    }
+    
+    // Check for space-separated format (e.g., "0x1CFF63CC 0x3B 0x9F ..." or "1CFF63CC 3B 9F ...")
+    if (raw.find(' ') != std::string::npos) {
+        std::istringstream iss(raw);
+        std::string token;
+        std::string canId;
+        std::string dataHex;
+        bool firstToken = true;
+        
+        while (iss >> token) {
+            // Remove 0x prefix if present
+            if (token.size() >= 2 && (token.substr(0, 2) == "0x" || token.substr(0, 2) == "0X")) {
+                token = token.substr(2);
+            }
+            
+            if (firstToken) {
+                canId = token;
+                firstToken = false;
+            } else {
+                dataHex += token;
+            }
+        }
+        
+        return canId + ":" + dataHex;
+    }
+    
+    // If no special formatting detected, return as-is and let create() handle validation
+    return raw;
+}
+
 Message2000::Message2000(std::string raw,
-                        TimePoint ts,
-                        std::uint32_t pgn,
-                        bool hasCanId,
-                        std::uint32_t canId,
-                        std::uint8_t priority,
-                        std::uint8_t dataPage,
-                        std::uint8_t pduFormat,
-                        std::uint8_t pduSpecific,
-                        std::uint8_t sourceAddress,
-                        std::string payload,
-                        std::vector<std::uint8_t> payloadBytes) noexcept
+                         TimePoint ts,
+                         uint32_t pgn,
+                         std::vector<uint8_t> canFrame) noexcept
     : Message(std::move(raw), Type::NMEA2000, ts),
-    pgn_(pgn),
-    hasCanId_(hasCanId),
-    canId_(canId),
-    priority_(priority),
-    dataPage_(dataPage),
-    pduFormat_(pduFormat),
-    pduSpecific_(pduSpecific),
-    sourceAddress_(sourceAddress),
-    payload_(std::move(payload)),
-    payloadBytes_(std::move(payloadBytes)) {}
+      pgn_(pgn),
+      canFrame_(std::move(canFrame)) {
+}
 
 std::unique_ptr<Message2000> Message2000::create(std::string raw, TimePoint ts) {
     std::string context = "Message2000::create";
-    validateFormat(context, raw);
+    
+    // Normalize raw format to canonical "CANID:data" format
+    std::string normalizedRaw = normalizeRawFormat(raw);
+    
+    // Parse raw string in format "CANID:data"
+    size_t colonPos = normalizedRaw.find(':');
+    if (colonPos == std::string::npos) {
+        throw InvalidCanFrameException(context, "Raw CAN frame must be in format 'CANID:data'");
+    }
 
-    bool hasCanId = false;
-    std::uint32_t canId = 0;
-    std::uint8_t priority = 0;
-    std::uint8_t dataPage = 0;
-    std::uint8_t pduFormat = 0;
-    std::uint8_t pduSpecific = 0;
-    std::uint8_t sourceAddress = 0;
+    // Extract and parse CAN ID
+    std::string canIdStr = normalizedRaw.substr(0, colonPos);
+    uint32_t canId;
+    try {
+        canId = std::stoul(canIdStr, nullptr, 16);
+    } catch (const std::exception& e) {
+        throw InvalidCanFrameException(context, "Invalid CAN ID format: " + canIdStr);
+    }
 
-    std::uint32_t pgn = 0;
-    std::string payloadToken;
+    // Extract and parse frame data
+    std::string dataStr = normalizedRaw.substr(colonPos + 1);
+    std::vector<uint8_t> frameData;
+    
+    if (!dataStr.empty()) {
+        if (dataStr.length() % 2 != 0) {
+            throw InvalidCanFrameException(context, 
+                                           "Frame data must have even number of hex characters");
+        }
 
-    if (raw.find('#') != std::string::npos) {
-        std::size_t payloadSeparator = raw.find('#');
-        std::string leftToken = raw.substr(0, payloadSeparator);
-        payloadToken = raw.substr(payloadSeparator + 1);
-
-        std::uint64_t tokenValue = 0;
-        bool parsedNumeric = false;
         try {
-            std::size_t parsedChars = 0;
-            tokenValue = std::stoull(leftToken, &parsedChars, 0);
-            parsedNumeric = parsedChars == leftToken.size();
-        } catch (...) {
-            parsedNumeric = false;
-        }
-
-        if (parsedNumeric && tokenValue > 0x3FFFFULL && tokenValue <= 0x1FFFFFFFULL) {
-            hasCanId = true;
-            canId = parseCanId(context, leftToken);
-            decodeCanIdFields(canId, priority, dataPage, pduFormat, pduSpecific, sourceAddress);
-            pgn = extractPgnFromCanId(canId);
-        } else {
-            pgn = parsePgn(context, leftToken);
-        }
-    } else {
-        std::istringstream ss(raw);
-        std::vector<std::string> tokens;
-        std::string token;
-        while (ss >> token) {
-            tokens.push_back(token);
-        }
-
-        if (tokens.empty()) {
-            throw InvalidPgnException(context, "Input message is empty");
-        }
-
-        if (tokens.size() == 1) {
-            const std::string& compactToken = tokens[0];
-
-            bool allHex = !compactToken.empty();
-            for (char c : compactToken) {
-                if (!std::isxdigit(static_cast<unsigned char>(c))) {
-                    allHex = false;
-                    break;
-                }
+            for (size_t i = 0; i < dataStr.length(); i += 2) {
+                std::string byteStr = dataStr.substr(i, 2);
+                uint8_t byte = static_cast<uint8_t>(std::stoul(byteStr, nullptr, 16));
+                frameData.push_back(byte);
             }
-
-            const bool looksLikeCompactCanFrame =
-                allHex &&
-                compactToken.size() > 8 &&
-                ((compactToken.size() - 8) % 2 == 0);
-
-            if (looksLikeCompactCanFrame) {
-                std::string canIdToken = compactToken.substr(0, 8);
-                payloadToken = compactToken.substr(8);
-
-                canId = parseCanId(context, canIdToken);
-                hasCanId = true;
-                decodeCanIdFields(canId, priority, dataPage, pduFormat, pduSpecific, sourceAddress);
-                pgn = extractPgnFromCanId(canId);
-            } else {
-                pgn = parsePgn(context, compactToken);
-            }
-        } else {
-            canId = parseCanId(context, tokens[0]);
-            hasCanId = true;
-            decodeCanIdFields(canId, priority, dataPage, pduFormat, pduSpecific, sourceAddress);
-            pgn = extractPgnFromCanId(canId);
-
-            std::ostringstream payloadStream;
-            for (std::size_t i = 1; i < tokens.size(); ++i) {
-                if (i > 1) {
-                    payloadStream << ' ';
-                }
-                payloadStream << tokens[i];
-            }
-            payloadToken = payloadStream.str();
+        } catch (const std::exception& e) {
+            throw InvalidCanFrameException(context, "Invalid frame data hex format");
         }
     }
 
-    std::vector<std::uint8_t> payloadBytes = parsePayloadBytes(context, payloadToken);
-    return std::unique_ptr<Message2000>(new Message2000(std::move(raw),
-                                                        ts,
-                                                        pgn,
-                                                        hasCanId,
-                                                        canId,
-                                                        priority,
-                                                        dataPage,
-                                                        pduFormat,
-                                                        pduSpecific,
-                                                        sourceAddress,
-                                                        bytesToHex(payloadBytes),
-                                                        std::move(payloadBytes)));
+    // Validate frame length (supports single-frame and fast-packet up to 223 bytes)
+    if (frameData.size() > 223) {
+        throw FrameTooLongException(context, "Frame length: " + std::to_string(frameData.size()));
+    }
+
+    // Extract and validate PGN from CAN ID
+    uint32_t pgn = extractPgnFromCanId(canId);
+    if (!isValidPgn(pgn)) {
+        throw InvalidPgnException(context, "PGN out of valid range: 0x" + 
+                                 std::to_string(pgn));
+    }
+
+    return std::unique_ptr<Message2000>(
+        new Message2000(std::move(raw), ts, pgn, frameData)
+    );
 }
 
-void Message2000::validateFormat(const std::string& context, const std::string& raw) {
-    if (raw.empty()) {
-        throw InvalidPgnException(context, "Input message is empty");
-    }
+uint32_t Message2000::extractPgnFromCanId(uint32_t canId) noexcept {
+    // In NMEA2000, the CAN ID structure is 29-bit extended format:
+    // Priority (3 bits) | Reserved (1 bit) | PGN (18 bits) | Source Address (8 bits)
+    // The PGN is in bits 8-25 (counting from bit 0)
+    return (canId >> 8) & 0x3FFFF;  // Mask 18 bits for PGN
 }
 
-std::uint32_t Message2000::parsePgn(const std::string& context, const std::string& token) {
-    if (token.empty()) {
-        throw InvalidPgnException(context, "PGN token is empty");
-    }
-
-    std::string normalized = token;
-    if (normalized.rfind("PGN", 0) == 0) {
-        normalized = normalized.substr(3);
-    }
-
-    if (normalized.empty()) {
-        throw InvalidPgnException(context, "PGN token is empty after PGN prefix removal");
-    }
-
-    std::uint64_t parsed = 0;
-    try {
-        std::size_t parsedChars = 0;
-        parsed = static_cast<std::uint64_t>(std::stoull(normalized, &parsedChars, 0));
-        if (parsedChars != normalized.size()) {
-            throw InvalidPgnException(context, "Invalid PGN token: " + token);
-        }
-    } catch (const std::exception& e) {
-        throw InvalidPgnException(context, "Failed to parse PGN token '" + token + "': " + e.what());
-    }
-
-    if (parsed > 262143ULL) {
-        throw InvalidPgnException(context, "PGN out of range (0..262143): " + std::to_string(parsed));
-    }
-
-    return static_cast<std::uint32_t>(parsed);
-}
-
-std::uint32_t Message2000::parseCanId(const std::string& context, const std::string& token) {
-    if (token.empty()) {
-        throw InvalidPgnException(context, "CAN ID token is empty");
-    }
-
-    std::uint64_t parsed = 0;
-    try {
-        std::size_t parsedChars = 0;
-        parsed = static_cast<std::uint64_t>(std::stoull(token, &parsedChars, 16));
-        if (parsedChars != token.size()) {
-            throw InvalidPgnException(context, "Invalid CAN ID token: " + token);
-        }
-    } catch (const std::exception& e) {
-        throw InvalidPgnException(context, "Failed to parse CAN ID token '" + token + "': " + e.what());
-    }
-
-    if (parsed > 0x1FFFFFFFULL) {
-        throw InvalidPgnException(context, "CAN ID out of 29-bit range: " + token);
-    }
-
-    return static_cast<std::uint32_t>(parsed);
-}
-
-std::uint32_t Message2000::extractPgnFromCanId(std::uint32_t canId) {
-    const std::uint8_t pduFormat = static_cast<std::uint8_t>((canId >> 16) & 0xFFU);
-    const std::uint8_t pduSpecific = static_cast<std::uint8_t>((canId >> 8) & 0xFFU);
-    const std::uint8_t dataPage = static_cast<std::uint8_t>((canId >> 24) & 0x01U);
-
-    if (pduFormat < 240U) {
-        return (static_cast<std::uint32_t>(dataPage) << 16) |
-               (static_cast<std::uint32_t>(pduFormat) << 8);
-    }
-
-    std::uint32_t pgn = (static_cast<std::uint32_t>(dataPage) << 16) |
-           (static_cast<std::uint32_t>(pduFormat) << 8) |
-           static_cast<std::uint32_t>(pduSpecific);
-
-    if ((pgn & 0x10000U) == 0U) {
-        pgn |= 0x10000U;
-    }
-    return pgn;
-}
-
-void Message2000::decodeCanIdFields(std::uint32_t canId,
-                                    std::uint8_t& priority,
-                                    std::uint8_t& dataPage,
-                                    std::uint8_t& pduFormat,
-                                    std::uint8_t& pduSpecific,
-                                    std::uint8_t& sourceAddress) {
-    priority = static_cast<std::uint8_t>((canId >> 26) & 0x07U);
-    dataPage = static_cast<std::uint8_t>((canId >> 24) & 0x01U);
-    pduFormat = static_cast<std::uint8_t>((canId >> 16) & 0xFFU);
-    pduSpecific = static_cast<std::uint8_t>((canId >> 8) & 0xFFU);
-    sourceAddress = static_cast<std::uint8_t>(canId & 0xFFU);
-}
-
-std::vector<std::uint8_t> Message2000::parsePayloadBytes(const std::string& context, const std::string& payloadToken) {
-    std::vector<std::uint8_t> bytes;
-    if (payloadToken.empty()) {
-        return bytes;
-    }
-
-    std::string compact;
-    compact.reserve(payloadToken.size());
-    for (char c : payloadToken) {
-        if (!std::isspace(static_cast<unsigned char>(c)) && c != ':') {
-            compact.push_back(c);
-        }
-    }
-
-    if (compact.size() % 2 != 0) {
-        throw InvalidPgnException(context, "Payload hex string must have even length");
-    }
-
-    for (std::size_t i = 0; i < compact.size(); i += 2) {
-        const char hi = compact[i];
-        const char lo = compact[i + 1];
-        if (!std::isxdigit(static_cast<unsigned char>(hi)) || !std::isxdigit(static_cast<unsigned char>(lo))) {
-            throw InvalidPgnException(context, "Payload contains non-hex character");
-        }
-        std::uint8_t value = static_cast<std::uint8_t>(std::stoul(compact.substr(i, 2), nullptr, 16));
-        bytes.push_back(value);
-    }
-
-    return bytes;
-}
-
-std::string Message2000::bytesToHex(const std::vector<std::uint8_t>& bytes) {
-    std::ostringstream ss;
-    ss << std::uppercase << std::hex;
-    for (std::size_t i = 0; i < bytes.size(); ++i) {
-        ss << std::setw(2) << std::setfill('0') << static_cast<unsigned int>(bytes[i]);
-    }
-    return ss.str();
-}
-
-std::string Message2000::bytesToSpacedHex(const std::vector<std::uint8_t>& bytes) {
-    std::ostringstream ss;
-    ss << std::uppercase << std::hex;
-    for (std::size_t i = 0; i < bytes.size(); ++i) {
-        if (i > 0) {
-            ss << ' ';
-        }
-        ss << std::setw(2) << std::setfill('0') << static_cast<unsigned int>(bytes[i]);
-    }
-    return ss.str();
+bool Message2000::isValidPgn(uint32_t pgn) noexcept {
+    // Accept any PGN that fits within 18 bits (0x000000-0x3FFFF)
+    // Both single-frame and fast-packet messages use this range
+    return pgn <= 0x3FFFF;
 }
 
 std::unique_ptr<nmealib::Message> Message2000::clone() const {
     return std::unique_ptr<Message2000>(new Message2000(*this));
 }
 
-std::uint32_t Message2000::getPgn() const noexcept {
+uint32_t Message2000::getPgn() const noexcept {
     return pgn_;
 }
 
-bool Message2000::hasCanId() const noexcept {
-    return hasCanId_;
+const std::vector<uint8_t>& Message2000::getCanFrame() const noexcept {
+    return canFrame_;
 }
 
-std::uint32_t Message2000::getCanId() const noexcept {
-    return canId_;
-}
-
-std::uint8_t Message2000::getPriority() const noexcept {
-    return priority_;
-}
-
-std::uint8_t Message2000::getDataPage() const noexcept {
-    return dataPage_;
-}
-
-std::uint8_t Message2000::getPduFormat() const noexcept {
-    return pduFormat_;
-}
-
-std::uint8_t Message2000::getPduSpecific() const noexcept {
-    return pduSpecific_;
-}
-
-std::uint8_t Message2000::getSourceAddress() const noexcept {
-    return sourceAddress_;
-}
-
-std::string Message2000::getPayload() const noexcept {
-    return payload_;
-}
-
-const std::vector<std::uint8_t>& Message2000::getPayloadBytes() const noexcept {
-    return payloadBytes_;
+uint8_t Message2000::getCanFrameLength() const noexcept {
+    return static_cast<uint8_t>(canFrame_.size());
 }
 
 std::string Message2000::getStringContent(bool verbose) const noexcept {
-    std::stringstream ss;
+    std::ostringstream oss;
 
-    if (!verbose) {
-        ss << "[OK] " << typeToString(type_) << " PGN " << pgn_;
-        if (hasCanId_) {
-            ss << " CANID=0x" << std::uppercase << std::hex << canId_ << std::dec;
+    if (verbose) {
+        oss << "PGN: 0x" << std::hex << std::setfill('0') << std::setw(5) << pgn_ << std::dec << "\n";
+        oss << "Frame Length: " << static_cast<int>(getCanFrameLength()) << " bytes\n";
+        oss << "Frame Data: ";
+        for (size_t i = 0; i < canFrame_.size(); ++i) {
+            if (i > 0) oss << " ";
+            oss << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(canFrame_[i]);
         }
-        ss << ": " << "Unimplemented PGN";
+        oss << std::dec;
     } else {
-        ss << "Protocol: " << typeToString(type_) << "\n";
-        ss << "PGN: " << pgn_ << "\n";
-        if (hasCanId_) {
-            ss << "CAN ID: 0x" << std::uppercase << std::hex << canId_ << std::dec << "\n";
-            ss << "Priority: " << static_cast<unsigned int>(priority_) << "\n";
-            ss << "Data Page: " << static_cast<unsigned int>(dataPage_) << "\n";
-            ss << "PF: " << static_cast<unsigned int>(pduFormat_) << "\n";
-            ss << "PS: " << static_cast<unsigned int>(pduSpecific_) << "\n";
-            ss << "Source: " << static_cast<unsigned int>(sourceAddress_) << "\n";
+        oss << "PGN=0x" << std::hex << std::setfill('0') << std::setw(5) << pgn_ 
+            << " Len=" << static_cast<int>(getCanFrameLength()) << " Data=";
+        for (size_t i = 0; i < canFrame_.size(); ++i) {
+            if (i > 0) oss << " ";
+            oss << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(canFrame_[i]);
         }
-        ss << "Fields: \n";
-        ss << "\tUnimplemented PGN";
+        oss << std::dec;
     }
 
-    return ss.str();
+    return oss.str();
 }
 
 std::string Message2000::serialize() const {
-    if (hasCanId_) {
-        std::ostringstream ss;
-        ss << std::uppercase << std::hex << std::setw(8) << std::setfill('0') << canId_;
-        if (!payloadBytes_.empty()) {
-            ss << ' ' << bytesToSpacedHex(payloadBytes_);
-        }
-        return ss.str();
-    }
-    return std::to_string(pgn_) + "#" + bytesToHex(payloadBytes_);
-}
+    std::ostringstream oss;
+    oss << std::hex << std::setfill('0');
 
-bool Message2000::validate() const {
-    return true;
+    // Output PGN
+    oss << std::setw(5) << pgn_ << ":";
+
+    // Output frame data as hex bytes
+    for (size_t i = 0; i < canFrame_.size(); ++i) {
+        oss << std::setw(2) << static_cast<int>(canFrame_[i]);
+    }
+
+    return oss.str();
 }
 
 bool Message2000::operator==(const Message2000& other) const noexcept {
-    return pgn_ == other.pgn_ &&
-           hasCanId_ == other.hasCanId_ &&
-           canId_ == other.canId_ &&
-           priority_ == other.priority_ &&
-           dataPage_ == other.dataPage_ &&
-           pduFormat_ == other.pduFormat_ &&
-           pduSpecific_ == other.pduSpecific_ &&
-           sourceAddress_ == other.sourceAddress_ &&
-           payloadBytes_ == other.payloadBytes_ &&
-           Message::operator==(other);
+    return Message::operator==(other) && hasEqualContent(other);
 }
 
 bool Message2000::hasEqualContent(const Message2000& other) const noexcept {
-    return pgn_ == other.pgn_ &&
-           hasCanId_ == other.hasCanId_ &&
-           canId_ == other.canId_ &&
-           priority_ == other.priority_ &&
-           dataPage_ == other.dataPage_ &&
-           pduFormat_ == other.pduFormat_ &&
-           pduSpecific_ == other.pduSpecific_ &&
-           sourceAddress_ == other.sourceAddress_ &&
-           payloadBytes_ == other.payloadBytes_;
+    return pgn_ == other.pgn_ && canFrame_ == other.canFrame_;
+}
+
+bool Message2000::validate() const {
+    // Validate PGN is valid (fits in 18 bits)
+    if (!isValidPgn(pgn_)) {
+        return false;
+    }
+
+    // Validate frame length (CAN single/fast-packet is 0-223 bytes)
+    if (canFrame_.size() > 223) {
+        return false;
+    }
+
+    return true;
 }
 
 } // namespace nmea2000

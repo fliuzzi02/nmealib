@@ -31,12 +31,6 @@ target_link_libraries(nmealib_nmea2000_factory PUBLIC
     nmealib_nmea2000_registry
 )
 
-add_library(nmealib_nmea2000_pgn129029 STATIC pgn129029.cpp)
-
-set(NMEALIB_NMEA2000_MESSAGE_TARGETS
-    nmealib_nmea2000_pgn129029
-)
-
 foreach(message_target IN LISTS NMEALIB_NMEA2000_MESSAGE_TARGETS)
     _nmealib_configure_nmea2000_target(${message_target})
     target_link_libraries(${message_target} PUBLIC
