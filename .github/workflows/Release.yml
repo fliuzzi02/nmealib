@@ -7,14 +7,26 @@ on:
         description: "Release version (X.Y.Z). Leave empty to derive from release/vX.Y.Z branch."
         required: false
         type: string
-  push:
-    branches:
-      - "release/v*"
+  workflow_call:
+    inputs:
+      version:
+        required: false
+        type: string
+      branch:
+        required: true
+        type: string
+      sha:
+        required: true
+        type: string
+      publish:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   prepare:
     runs-on: ubuntu-latest
-    if: github.actor != 'github-actions[bot]'
+    if: ${{ github.actor != 'github-actions[bot]' }}
     permissions:
       contents: write
     outputs:
@@ -25,15 +37,22 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        ref: ${{ github.event_name == 'workflow_call' && inputs.sha || github.sha }}
 
     - name: Derive version
       id: version
       shell: bash
       run: |
-        if [[ -n "${{ github.event.inputs.version }}" ]]; then
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.version }}" ]]; then
           version="${{ github.event.inputs.version }}"
+        elif [[ "${{ github.event_name }}" == "workflow_call" && -n "${{ inputs.version }}" ]]; then
+          version="${{ inputs.version }}"
         else
-          branch="${GITHUB_REF_NAME}"
+          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+            branch="${{ inputs.branch }}"
+          else
+            branch="${GITHUB_REF_NAME}"
+          fi
           version="${branch#release/}"
           version="${version#v}"
         fi
@@ -45,6 +64,7 @@ jobs:
         echo "tag=v$version" >> "$GITHUB_OUTPUT"
 
     - name: Update VERSION
+      if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
       shell: bash
       run: |
         echo "${{ steps.version.outputs.version }}" > VERSION
@@ -59,6 +79,7 @@ jobs:
         fi
 
     - name: Create tag
+      if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
       shell: bash
       run: |
         tag="${{ steps.version.outputs.tag }}"
@@ -74,8 +95,14 @@ jobs:
     needs: prepare
     steps:
     - uses: actions/checkout@v4
+      if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
       with:
         ref: ${{ needs.prepare.outputs.tag }}
+
+    - uses: actions/checkout@v4
+      if: ${{ github.event_name == 'workflow_call' && !inputs.publish }}
+      with:
+        ref: ${{ inputs.sha }}
 
     - name: Set reusable strings
       id: strings
@@ -139,6 +166,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     needs: [prepare, build-linux]
+    if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
     permissions:
       contents: write
     steps:

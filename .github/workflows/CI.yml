@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "release/**" ]
+  pull_request:
+    branches: [ "main", "release/**" ]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  test:
+    uses: ./.github/workflows/Test.yml
+
+  handle-release-test-failure:
+    runs-on: ubuntu-latest
+    needs: test
+    if: ${{ always() && needs.test.result == 'failure' && (startsWith(github.ref_name, 'release/') || startsWith(github.head_ref, 'release/')) }}
+    steps:
+    - name: Open issue for failed release test
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const branch = context.eventName === 'pull_request'
+            ? context.payload.pull_request?.head?.ref
+            : context.ref.replace('refs/heads/', '');
+          const issueTitle = `[Release Chain Failure] Tests failed on ${branch}`;
+          const issueBody = [
+            'Release CI path failed at test stage.',
+            '',
+            `- Workflow: ${context.workflow}`,
+            `- Job: test`,
+            `- Run ID: ${context.runId}`,
+            `- Event: ${context.eventName}`,
+            `- Branch: ${branch}`,
+            `- Commit: ${context.sha}`,
+            `- Run URL: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+          ].join('\n');
+          await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: issueTitle,
+            body: issueBody,
+            labels: ['release', 'ci', 'failure']
+          });
+
+  build:
+    needs: test
+    if: ${{ needs.test.result == 'success' }}
+    uses: ./.github/workflows/Build.yml
+
+  release:
+    needs: test
+    if: ${{ needs.test.result == 'success' && (startsWith(github.ref_name, 'release/') || startsWith(github.head_ref, 'release/')) }}
+    uses: ./.github/workflows/Release.yml
+    with:
+      branch: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+      sha: ${{ github.sha }}
+      publish: ${{ github.event_name == 'push' }}
+    secrets: inherit
