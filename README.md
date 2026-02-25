@@ -150,7 +150,7 @@ For full official and compliant NMEA 2000 support, you must obtain the appropria
     - [x] Wind sentencies
     - [x] Cross track error sentencies
 - [x] NMEA2000 Support:
-    - [x] TBD, possibly all sentencies that can be translated to/from supporten N0183 ones
+    - [x] TBD, possibly all sentencies that can be translated to/from supported N0183 ones
 - [x] Documentation
 - [x] PlatformIO Release
 - [x] Windows support
