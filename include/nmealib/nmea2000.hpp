@@ -162,7 +162,7 @@ protected:
      * @return std::unique_ptr<Message2000> A unique pointer to the created Message2000 instance.
      * @throws InvalidCanFrameException If the raw format is invalid.
      * @throws InvalidPgnException If the PGN is outside the valid range.
-     * @throws FrameTooLongException If the frame exceeds 8 bytes.
+     * @throws FrameTooLongException If the frame exceeds 223 bytes.
      */
     static std::unique_ptr<Message2000> create(std::string raw, 
                                                TimePoint ts = std::chrono::system_clock::now());
