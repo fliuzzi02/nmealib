@@ -10,6 +10,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 add_subdirectory(nmea0183)
+add_subdirectory(nmea2000)
 
 # Collect existing per-module test targets and create an aggregate custom target
 set(TEST_TARGETS "")

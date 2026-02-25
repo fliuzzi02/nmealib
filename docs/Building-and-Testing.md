@@ -24,12 +24,14 @@ ctest --test-dir out/build/gcc-full --output-on-failure
 
 ```bash
 ctest --test-dir out/build/gcc-full -L nmea0183 --output-on-failure
+ctest --test-dir out/build/gcc-full -L nmea2000 --output-on-failure
 ```
 
 ## Test presets
 
 ```bash
 ctest --preset test-nmea0183
+ctest --preset test-nmea2000
 ctest --preset test-all
 ```
 
