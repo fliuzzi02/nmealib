@@ -67,6 +67,17 @@ jobs:
       if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
       shell: bash
       run: |
+        if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+          branch="${{ inputs.branch }}"
+        else
+          branch="${GITHUB_REF_NAME}"
+        fi
+        git fetch origin "$branch" || true
+        if git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+          git checkout -B "$branch" "origin/$branch"
+        else
+          git checkout -B "$branch"
+        fi
         echo "${{ steps.version.outputs.version }}" > VERSION
         if git diff --quiet; then
           echo "VERSION already up to date."
@@ -75,7 +86,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add VERSION
           git commit -m "chore(release): set version ${{ steps.version.outputs.version }}"
-          git push
+          git push origin "$branch"
         fi
 
     - name: Create tag
