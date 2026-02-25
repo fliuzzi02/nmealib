@@ -62,7 +62,7 @@ foreach(message_target IN LISTS NMEALIB_NMEA0183_MESSAGE_TARGETS)
 endforeach()
 
 # Registry needs all currently implemented sentence types
-target_link_libraries(nmealib_nmea0183_registry PUBLIC
+target_link_libraries(nmealib_nmea0183_registry PRIVATE
     ${NMEALIB_NMEA0183_MESSAGE_TARGETS}
 )
 
