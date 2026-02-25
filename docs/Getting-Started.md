@@ -34,6 +34,17 @@ target_link_libraries(your_app PRIVATE
 )
 ```
 
+NMEA 2000 only:
+
+```cmake
+add_subdirectory(path/to/nmealib)
+target_link_libraries(your_app PRIVATE
+    nmealib_core
+    nmealib_nmea2000_base
+    nmealib_nmea2000_pgn129029
+)
+```
+
 To force full NMEA 0183 coverage without using umbrella target:
 
 ```cmake
@@ -47,6 +58,22 @@ target_link_libraries(your_app PRIVATE nmealib_nmea0183_all)
 
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(
     "$GNGLL,3150.788156,N,11711.922383,E,062735.00,A,A*76\r\n");
+```
+
+NMEA 2000 from full raw CAN frame:
+
+```cpp
+#include <nmealib/nmea2000/nmea2000Factory.hpp>
+
+auto msg2000 = nmealib::nmea2000::Nmea2000Factory::create(
+    "18F80523 1D 01 23 45 67 FE DC BA 98 00 01 86 A0 12 00 04 E2 0C");
+```
+
+Compact (no spaces) input is also accepted:
+
+```cpp
+auto msg2000Compact = nmealib::nmea2000::Nmea2000Factory::create(
+    "18F805231D01234567FEDCBA98000186A0120004E20C");
 ```
 
 ## Run the CLI

@@ -9,7 +9,10 @@ This page summarizes the public API surface. It is organized for GitHub Pages na
 - `nmealib/message.hpp`
 - `nmealib/nmeaException.hpp`
 - `nmealib/nmea0183.hpp`
+- `nmealib/nmea2000.hpp`
 - `nmealib/nmea0183/nmea0183Factory.hpp`
+- `nmealib/nmea2000/nmea2000Factory.hpp`
+- `nmealib/nmea2000/pgn129029.hpp`
 - `nmealib/nmea0183/rmc.hpp`
 - `nmealib/nmea0183/gga.hpp`
 - `nmealib/nmea0183/gll.hpp`
@@ -22,6 +25,7 @@ This page summarizes the public API surface. It is organized for GitHub Pages na
 
 - `nmealib`
 - `nmealib::nmea0183`
+- `nmealib::nmea2000`
 
 ## Core types
 
@@ -56,6 +60,24 @@ This page summarizes the public API surface. It is organized for GitHub Pages na
 - `VTG`
 - `ZDA`
 
+## NMEA 2000
+
+### `nmealib::nmea2000::Message2000`
+
+- Generic NMEA 2000 message representation
+- Supports full CAN-frame parsing (29-bit CAN ID + payload bytes)
+- Supports compact no-space raw frame parsing
+- Provides decoded CAN ID fields (`priority`, `dataPage`, `PF`, `PS`, `sourceAddress`)
+
+### `nmealib::nmea2000::Nmea2000Factory`
+
+- Entry point for parsing raw NMEA 2000 frames
+- Returns a typed PGN object when the PGN is supported
+
+### PGN classes
+
+- `PGN129029`
+
 ## Exceptions
 
 - `TooLongSentenceException`
@@ -70,6 +92,8 @@ This page summarizes the public API surface. It is organized for GitHub Pages na
 - `NotMWVException`
 - `NotVTGException`
 - `NotZDAException`
+- `InvalidPgnException`
+- `NotPGN129029Exception`
 
 ## Notes
 
