@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 #ifdef _WIN32
 #include <io.h>
@@ -12,17 +13,39 @@
 void print_usage() {
     std::cout << "Usage: nmealib-cli [options] [-m \"<nmea_sentence>\" | -m -]\n";
     std::cout << "Options:\n";
-    std::cout << "  -h, --help        Show this help message and exit\n";
-    std::cout << "  -v, --version     Show version information and exit\n";
-    std::cout << "  -V, --verbose     Enable verbose output\n";
-    std::cout << "  -m, --message     Parse a single NMEA sentence (use '-' for stdin)\n";
+    std::cout << "  -h, --help                      Show this help message and exit\n";
+    std::cout << "  -v, --version                   Show version information and exit\n";
+    std::cout << "  -V, --verbose                   Enable verbose output\n";
+    std::cout << "  -t=<type>, --type=<type>        Protocol type: N0183 (default) or N2K\n";
+    std::cout << "  -m, --message                   Parse a single NMEA sentence (use '-' for stdin)\n";
     std::cout << "Example:\n";
-    std::cout << "  nmealib-cli -V -m \"$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47\"\n";
+    std::cout << "  nmealib-cli -V -t=N0183 -m \"$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47\"\n";
+    std::cout << "  nmealib-cli -t=N2K -m \"18F80523 1D 01 23 45 67 FE DC BA 98 00 01 86 A0 12 00 04 E2 0C\"\n";
     std::cout << "  cat nmea.txt | nmealib-cli\n";
 }
 
 namespace {
-std::size_t process_stream_from_stdin(bool verbose) {
+enum class ProtocolType {
+    N0183,
+    N2K
+};
+
+bool parse_protocol(const std::string& arg, ProtocolType& protocol) {
+    std::string value = arg;
+    std::transform(value.begin(), value.end(), value.begin(),
+                   [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+    if (value == "N0183") {
+        protocol = ProtocolType::N0183;
+        return true;
+    }
+    if (value == "N2K") {
+        protocol = ProtocolType::N2K;
+        return true;
+    }
+    return false;
+}
+
+std::size_t process_stream_from_stdin(bool verbose, ProtocolType protocol) {
     std::string line;
     std::size_t error_count = 0;
     while (std::getline(std::cin, line)) {
@@ -31,8 +54,13 @@ std::size_t process_stream_from_stdin(bool verbose) {
         }
 
         try {
-            auto message = nmealib::nmea0183::Nmea0183Factory::create(line);
-            std::cout << message->getStringContent(verbose) << "\n";
+            if (protocol == ProtocolType::N0183) {
+                auto message = nmealib::nmea0183::Nmea0183Factory::create(line);
+                std::cout << message->getStringContent(verbose) << "\n";
+            } else {
+                auto message = nmealib::nmea2000::Nmea2000Factory::create(line);
+                std::cout << message->getStringContent(verbose) << "\n";
+            }
         } catch (const nmealib::NmeaException& e) {
             std::cerr << e.what() << "\n";
             ++error_count;
@@ -63,6 +91,7 @@ int main(int argc, char** argv) {
     std::string nmea_sentence;
     bool expect_message = false;
     bool use_stdin_stream = false;
+    ProtocolType protocol = ProtocolType::N0183;
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -74,6 +103,13 @@ int main(int argc, char** argv) {
             return 0;
         } else if (arg == "-V" || arg == "--verbose") {
             verbose = true;
+        } else if (arg.rfind("-t=", 0) == 0 || arg.rfind("--type=", 0) == 0) {
+            std::string protocolValue = arg.rfind("-t=", 0) == 0 ? arg.substr(3) : arg.substr(7);
+            if (!parse_protocol(protocolValue, protocol)) {
+                std::cerr << "Invalid protocol type: " << protocolValue << ". Use N0183 or N2K\n";
+                print_usage();
+                return 1;
+            }
         } else if (arg == "-m" || arg == "--message") {
             if (i + 1 >= argc) {
                 std::cerr << "Missing argument for " << arg << "\n";
@@ -115,7 +151,7 @@ int main(int argc, char** argv) {
     }
 
     if (use_stdin_stream) {
-        const auto error_count = process_stream_from_stdin(verbose);
+        const auto error_count = process_stream_from_stdin(verbose, protocol);
         return error_count == 0 ? 0 : 1;
     }
 
@@ -127,8 +163,13 @@ int main(int argc, char** argv) {
 
     // Create a Message0183 object from the input sentence
     try {
-        auto message = nmealib::nmea0183::Nmea0183Factory::create(nmea_sentence);
-        std::cout << message->getStringContent(verbose) << "\n";
+        if (protocol == ProtocolType::N0183) {
+            auto message = nmealib::nmea0183::Nmea0183Factory::create(nmea_sentence);
+            std::cout << message->getStringContent(verbose) << "\n";
+        } else {
+            auto message = nmealib::nmea2000::Nmea2000Factory::create(nmea_sentence);
+            std::cout << message->getStringContent(verbose) << "\n";
+        }
     } catch (const nmealib::NmeaException& e) {
         std::cerr << e.what() << "\n";
         return 1;
