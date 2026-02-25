@@ -1,5 +1,6 @@
 add_executable(nmea0183_tests
     test_nmea0183.cpp
+    test_DBT.cpp
     test_RMC.cpp
     test_GGA.cpp
     test_GSA.cpp
