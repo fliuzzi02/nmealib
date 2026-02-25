@@ -1,4 +1,5 @@
 #include "nmealib/nmea0183/messageRegistry.hpp"
+#include "nmealib/nmea0183/dbt.hpp"
 #include "nmealib/nmea0183/gga.hpp"
 #include "nmealib/nmea0183/gll.hpp"
 #include "nmealib/nmea0183/gsa.hpp"
@@ -18,7 +19,9 @@ MessageRegistry& MessageRegistry::instance() {
 std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentenceType,
                                                       std::unique_ptr<Message0183> baseMessage) {
     // TODO: Consider using a map of string to function pointer for better scalability if many sentence types are supported
-    if (sentenceType == "RMC") {
+    if (sentenceType == "DBT") {
+        return createDBT(std::move(baseMessage));
+    } else if (sentenceType == "RMC") {
         return createRMC(std::move(baseMessage));
     } else if (sentenceType == "GGA") {
         return createGGA(std::move(baseMessage));
@@ -36,6 +39,10 @@ std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentence
         // Return generic Message0183 if type not registered
         return baseMessage;
     }
+}
+
+std::unique_ptr<Message0183> MessageRegistry::createDBT(std::unique_ptr<Message0183> baseMessage) {
+    return DBT::create(std::move(baseMessage));
 }
 
 std::unique_ptr<Message0183> MessageRegistry::createRMC(std::unique_ptr<Message0183> baseMessage) {
