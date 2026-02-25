@@ -81,11 +81,26 @@ jobs:
       id: strings
       shell: bash
       run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "build-lib-dir=${{ github.workspace }}/build-lib" >> "$GITHUB_OUTPUT"
+        echo "build-cli-dir=${{ github.workspace }}/build-cli" >> "$GITHUB_OUTPUT"
 
-    - name: Configure CMake
+    - name: Configure CMake (library only)
       run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        cmake -B ${{ steps.strings.outputs.build-lib-dir }}
+        -DCMAKE_CXX_COMPILER=g++
+        -DCMAKE_C_COMPILER=gcc
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++ -static-libgcc"
+        -DCMAKE_SHARED_LINKER_FLAGS="-static-libstdc++ -static-libgcc"
+        -DBUILD_CLI=OFF
+        -S ${{ github.workspace }}
+
+    - name: Build release (library only)
+      run: cmake --build ${{ steps.strings.outputs.build-lib-dir }} --config Release
+
+    - name: Configure CMake (library + cli)
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-cli-dir }}
         -DCMAKE_CXX_COMPILER=g++
         -DCMAKE_C_COMPILER=gcc
         -DCMAKE_BUILD_TYPE=Release
@@ -94,78 +109,36 @@ jobs:
         -DBUILD_CLI=ON
         -S ${{ github.workspace }}
 
-    - name: Build release
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config Release
+    - name: Build release (library + cli)
+      run: cmake --build ${{ steps.strings.outputs.build-cli-dir }} --config Release
 
     - name: Package library release
-      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      working-directory: ${{ steps.strings.outputs.build-lib-dir }}
       run: |
-        cmake --install . --component library --prefix nmealib
+        cmake --install . --prefix nmealib
         tar -czf nmealib-linux64.tar.gz nmealib/
 
     - name: Package cli release
-      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      working-directory: ${{ steps.strings.outputs.build-cli-dir }}
       run: |
-        cmake --install . --component library --prefix nmealib-cli
-        cmake --install . --component cli --prefix nmealib-cli
+        cmake --install . --prefix nmealib-cli
         tar -czf nmealib-cli-linux64.tar.gz nmealib-cli/
 
     - name: Upload library artifact
       uses: actions/upload-artifact@v4
       with:
         name: nmealib-linux64
-        path: ${{ steps.strings.outputs.build-output-dir }}/nmealib-linux64.tar.gz
+        path: ${{ steps.strings.outputs.build-lib-dir }}/nmealib-linux64.tar.gz
 
     - name: Upload cli artifact
       uses: actions/upload-artifact@v4
       with:
         name: nmealib-cli-linux64
-        path: ${{ steps.strings.outputs.build-output-dir }}/nmealib-cli-linux64.tar.gz
-
-  build-windows:
-    runs-on: windows-latest
-    needs: prepare
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: ${{ needs.prepare.outputs.tag }}
-
-    - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_CLI=ON
-
-    - name: Build release
-      run: cmake --build build --config Release
-
-    - name: Package library release
-      shell: pwsh
-      working-directory: build
-      run: |
-        cmake --install . --config Release --component library --prefix nmealib
-        Compress-Archive -Path nmealib\* -DestinationPath nmealib-win64.zip
-
-    - name: Package cli release
-      shell: pwsh
-      working-directory: build
-      run: |
-        cmake --install . --config Release --component library --prefix nmealib-cli
-        cmake --install . --config Release --component cli --prefix nmealib-cli
-        Compress-Archive -Path nmealib-cli\* -DestinationPath nmealib-cli-win64.zip
-
-    - name: Upload library artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: nmealib-win64
-        path: build/nmealib-win64.zip
-
-    - name: Upload cli artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: nmealib-cli-win64
-        path: build/nmealib-cli-win64.zip
+        path: ${{ steps.strings.outputs.build-cli-dir }}/nmealib-cli-linux64.tar.gz
 
   publish:
     runs-on: ubuntu-latest
-    needs: [prepare, build-linux, build-windows]
+    needs: [prepare, build-linux]
     permissions:
       contents: write
     steps:
@@ -182,5 +155,3 @@ jobs:
         files: |
           dist/**/nmealib-linux64.tar.gz
           dist/**/nmealib-cli-linux64.tar.gz
-          dist/**/nmealib-win64.zip
-          dist/**/nmealib-cli-win64.zip
