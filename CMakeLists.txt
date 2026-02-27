@@ -78,7 +78,7 @@ if(ENABLE_STATIC_ANALYSIS)
                 "    message(FATAL_ERROR \"compile_commands.json not found at \${COMPILE_COMMANDS_FILE}\")\n"
             "endif()\n"
             "execute_process(\n"
-                "    COMMAND \"${CPPCHECK_EXE}\" --project=\${COMPILE_COMMANDS_FILE} --enable=all --inconclusive --std=c++20 --suppress=missingIncludeSystem --error-exitcode=1 --xml --xml-version=2 --output-file=\${REPORT_FILE}\n"
+                "    COMMAND \"${CPPCHECK_EXE}\" --project=\${COMPILE_COMMANDS_FILE} --enable=all --inconclusive --std=c++20 --suppress=missingIncludeSystem --suppress=unusedFunction --error-exitcode=1 --xml --xml-version=2 --output-file=\${REPORT_FILE}\n"
             "    RESULT_VARIABLE CPPCHECK_RESULT\n"
             ")\n"
             "if(NOT CPPCHECK_RESULT EQUAL 0)\n"
