@@ -125,7 +125,7 @@ std::string ZDA::getStringContent(bool verbose) const noexcept {
     return ss.str();
 }
 
-std::string ZDA::composeRaw(std::string talkerId,
+std::string ZDA::composeRaw(const std::string& talkerId,
                             double utcTime,
                             unsigned int day,
                             unsigned int month,

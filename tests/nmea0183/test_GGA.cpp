@@ -25,7 +25,7 @@ TEST(GGA, CreateFromMessage0183Factory)
 
     EXPECT_EQ(ggaMsg->getTalker(), "GN");
     EXPECT_EQ(ggaMsg->getSentenceType(), "GGA");
-    EXPECT_DOUBLE_EQ(ggaMsg->getTimestamp(), 62735.0);
+    EXPECT_DOUBLE_EQ(ggaMsg->getUtcTime(), 62735.0);
     EXPECT_NEAR(ggaMsg->getLatitude(), 31.8464692667, 1e-9);
     EXPECT_EQ(ggaMsg->getLatitudeDirection(), 'N');
     EXPECT_NEAR(ggaMsg->getLongitude(), 117.1987063833, 1e-9);
@@ -47,7 +47,7 @@ TEST(GGA, CreateFromMessage0183Factory)
 
     EXPECT_EQ(ggaMsg->getTalker(), "GN");
     EXPECT_EQ(ggaMsg->getSentenceType(), "GGA");
-    EXPECT_DOUBLE_EQ(ggaMsg->getTimestamp(), 62735.0);
+    EXPECT_DOUBLE_EQ(ggaMsg->getUtcTime(), 62735.0);
     EXPECT_NEAR(ggaMsg->getLatitude(), 31.8464692667, 1e-9);
     EXPECT_EQ(ggaMsg->getLatitudeDirection(), 'N');
     EXPECT_NEAR(ggaMsg->getLongitude(), 117.1987063833, 1e-9);
@@ -60,7 +60,7 @@ TEST(GGA, CreateFromFields)
 
     EXPECT_EQ(gga.getTalker(), "GN");
     EXPECT_EQ(gga.getSentenceType(), "GGA");
-    EXPECT_DOUBLE_EQ(gga.getTimestamp(), 62735.0);
+    EXPECT_DOUBLE_EQ(gga.getUtcTime(), 62735.0);
     EXPECT_NEAR(gga.getLatitude(), 31.8464692667, 1e-9);
     EXPECT_EQ(gga.getLatitudeDirection(), 'N');
     EXPECT_NEAR(gga.getLongitude(), 117.1987063833, 1e-9);
@@ -85,7 +85,7 @@ TEST(GGA, SerializeRoundTripFromFields)
     auto parsed = dynamic_cast<GGA*>(parsedBase.get());
     ASSERT_NE(parsed, nullptr);
 
-    EXPECT_DOUBLE_EQ(parsed->getTimestamp(), 62735.0);
+    EXPECT_DOUBLE_EQ(parsed->getUtcTime(), 62735.0);
     EXPECT_NEAR(parsed->getLatitude(), 31.8464692667, 1e-6);
     EXPECT_EQ(parsed->getLatitudeDirection(), 'N');
     EXPECT_NEAR(parsed->getLongitude(), 117.1987063833, 1e-6);
@@ -106,7 +106,7 @@ TEST(GGA, CreateFromMessageFactoryWithIncompleteFieldsDefaults)
     auto ggaMsg = dynamic_cast<GGA*>(msg.get());
     ASSERT_NE(ggaMsg, nullptr);
 
-    EXPECT_DOUBLE_EQ(ggaMsg->getTimestamp(), 62735.0);
+    EXPECT_DOUBLE_EQ(ggaMsg->getUtcTime(), 62735.0);
     EXPECT_DOUBLE_EQ(ggaMsg->getLatitude(), 0.0);
     EXPECT_EQ(ggaMsg->getLatitudeDirection(), 'N');
     EXPECT_NEAR(ggaMsg->getLongitude(), 117.1987063833, 1e-9);

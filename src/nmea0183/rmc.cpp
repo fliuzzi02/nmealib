@@ -170,7 +170,7 @@ std::string RMC::getStringContent(bool verbose) const noexcept {
     return ss.str();
 }
 
-std::string RMC::composeRaw(std::string talkerId, unsigned int utcFix, 
+std::string RMC::composeRaw(const std::string& talkerId, unsigned int utcFix, 
                             char status, 
                             double latitude,
                             char latitudeDirection, 

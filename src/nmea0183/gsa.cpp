@@ -168,7 +168,7 @@ std::string GSA::getStringContent(bool verbose) const noexcept {
     return ss.str();
 }
 
-std::string GSA::composeRaw(std::string talkerId,
+std::string GSA::composeRaw(const std::string& talkerId,
                             char selectionMode,
                             unsigned int mode,
                             std::array<unsigned int, 12> satelliteIds,

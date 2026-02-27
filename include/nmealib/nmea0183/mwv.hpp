@@ -41,11 +41,11 @@ public:
     bool hasEqualContent(const MWV& other) const noexcept;
 
 private:
-    double windAngle_;
-    char reference_;
-    double windSpeed_;
-    char windSpeedUnits_;
-    char status_;
+    double windAngle_{};
+    char reference_{};
+    double windSpeed_{};
+    char windSpeedUnits_{};
+    char status_{};
 
     MWV() = default;
 
@@ -58,7 +58,7 @@ private:
     ) noexcept;
 
     static std::unique_ptr<MWV> create(std::unique_ptr<Message0183> baseMessage);
-    static std::string composeRaw(std::string talkerId,
+    static std::string composeRaw(const std::string& talkerId,
                                   double windAngle,
                                   char reference,
                                   double windSpeed,

@@ -44,7 +44,7 @@ public:
     std::unique_ptr<nmealib::Message> clone() const override;
 
     // GGA-specific getters
-    double getTimestamp() const noexcept;
+    double getUtcTime() const noexcept;
     double getLatitude() const noexcept;
     char getLatitudeDirection() const noexcept;
     double getLongitude() const noexcept;
@@ -66,20 +66,20 @@ public:
     bool hasEqualContent(const GGA& other) const noexcept;
 
 private:
-    double timestamp_;
-    double latitude_;
-    char latitudeDirection_;
-    double longitude_;
-    char longitudeDirection_;
-    unsigned int gpsQuality_;
-    unsigned int satellites_;
-    double hdop_;
-    double altitude_;
-    char altitudeUnits_;
-    double geoidalSeparation_;
-    char geoidalSeparationUnits_;
-    double dgpsAge_;
-    std::string dgpsReferenceStationId_;
+    double utcTime_{};
+    double latitude_{};
+    char latitudeDirection_{};
+    double longitude_{};
+    char longitudeDirection_{};
+    unsigned int gpsQuality_{};
+    unsigned int satellites_{};
+    double hdop_{};
+    double altitude_{};
+    char altitudeUnits_{};
+    double geoidalSeparation_{};
+    char geoidalSeparationUnits_{};
+    double dgpsAge_{};
+    std::string dgpsReferenceStationId_{};
 
     GGA() = default;
 
@@ -103,7 +103,7 @@ private:
 
     // Private internal factory
     static std::unique_ptr<GGA> create(std::unique_ptr<Message0183> baseMessage);
-    static std::string composeRaw(std::string talkerId,
+    static std::string composeRaw(const std::string& talkerId,
                                   double timestamp,
                                   double latitude,
                                   char latitudeDirection,
@@ -117,7 +117,7 @@ private:
                                   double geoidalSeparation,
                                   char geoidalSeparationUnits,
                                   double dgpsAge,
-                                  std::string dgpsReferenceStationId);
+                                  const std::string& dgpsReferenceStationId);
 
     friend class Nmea0183Factory;
     friend class MessageRegistry;
