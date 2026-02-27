@@ -50,16 +50,16 @@ public:
     bool hasEqualContent(const VTG& other) const noexcept;
 
 private:
-    double courseOverGroundTrue_;
-    char courseOverGroundTrueType_;
-    double courseOverGroundMagnetic_;
-    char courseOverGroundMagneticType_;
-    double speedOverGroundKnots_;
-    char speedOverGroundKnotsType_;
-    double speedOverGroundKph_;
-    char speedOverGroundKphType_;
-    std::optional<char> faaModeIndicator_;
-    bool legacyFormat_;
+    double courseOverGroundTrue_{};
+    char courseOverGroundTrueType_{};
+    double courseOverGroundMagnetic_{};
+    char courseOverGroundMagneticType_{};
+    double speedOverGroundKnots_{};
+    char speedOverGroundKnotsType_{};
+    double speedOverGroundKph_{};
+    char speedOverGroundKphType_{};
+    std::optional<char> faaModeIndicator_{};
+    bool legacyFormat_{};
 
     VTG() = default;
 
@@ -77,7 +77,7 @@ private:
     ) noexcept;
 
     static std::unique_ptr<VTG> create(std::unique_ptr<Message0183> baseMessage);
-    static std::string composeRaw(std::string talkerId,
+    static std::string composeRaw(const std::string& talkerId,
                                   double courseOverGroundTrue,
                                   double courseOverGroundMagnetic,
                                   double speedOverGroundKnots,

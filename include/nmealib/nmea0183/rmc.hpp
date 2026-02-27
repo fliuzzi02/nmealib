@@ -82,19 +82,19 @@ public:
     bool hasEqualContent(const RMC& other) const noexcept;
 
 private:
-    unsigned int utcFix_;
-    char status_;
-    double latitude_;
-    char latitudeDirection_;
-    double longitude_;
-    char longitudeDirection_;
-    double speedOverGround_;
-    double courseOverGround_;
-    unsigned int date_;
-    double magneticVariation_;
-    char magneticVariationDirection_;
-    char modeIndicator_;
-    char navigationStatus_;
+    unsigned int utcFix_{};
+    char status_{};
+    double latitude_{};
+    char latitudeDirection_{};
+    double longitude_{};
+    char longitudeDirection_{};
+    double speedOverGround_{};
+    double courseOverGround_{};
+    unsigned int date_{};
+    double magneticVariation_{};
+    char magneticVariationDirection_{};
+    char modeIndicator_{};
+    char navigationStatus_{};
 
     RMC() = default;
 
@@ -117,7 +117,7 @@ private:
 
     // Private internal factory
     static std::unique_ptr<RMC> create(std::unique_ptr<Message0183> baseMessage);
-    static std::string composeRaw(std::string talkerId, unsigned int utcFix, 
+    static std::string composeRaw(const std::string& talkerId, unsigned int utcFix, 
                             char status, 
                             double latitude,
                             char latitudeDirection, 

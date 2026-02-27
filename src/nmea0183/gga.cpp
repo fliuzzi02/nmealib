@@ -90,7 +90,7 @@ GGA::GGA(Message0183 baseMessage,
          double dgpsAge,
          std::string dgpsReferenceStationId) noexcept
     : Message0183(std::move(baseMessage)),
-      timestamp_(timestamp),
+            utcTime_(timestamp),
       latitude_(latitude),
       latitudeDirection_(latitudeDirection),
       longitude_(longitude),
@@ -135,7 +135,7 @@ GGA::GGA(std::string talkerId,
                                                   geoidalSeparationUnits,
                                                   dgpsAge,
                                                   dgpsReferenceStationId))),
-      timestamp_(timestamp),
+                    utcTime_(timestamp),
       latitude_(latitude),
       latitudeDirection_(latitudeDirection),
       longitude_(longitude),
@@ -175,7 +175,7 @@ std::string GGA::getStringContent(bool verbose) const noexcept {
         ss << "Sentence Type: " << getSentenceType() << "\n";
         ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
         ss << "Fields:\n";
-        ss << "\tTimestamp: " << timestamp_ << "\n";
+        ss << "\tTimestamp: " << utcTime_ << "\n";
         ss << "\tLatitude: " << latitudeStr << "\n";
         ss << "\tLatitude Direction: " << latitudeDirection_ << "\n";
         ss << "\tLongitude: " << longitudeStr << "\n";
@@ -191,7 +191,7 @@ std::string GGA::getStringContent(bool verbose) const noexcept {
         ss << "\tDGPS Ref: " << dgpsReferenceStationId_;
     } else {
         ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
-           << "Time=" << timestamp_
+              << "Time=" << utcTime_
               << ", Lat=" << latitudeStr << latitudeDirection_
               << ", Lon=" << longitudeStr << longitudeDirection_
            << ", Qual=" << gpsQuality_
@@ -205,7 +205,7 @@ std::string GGA::getStringContent(bool verbose) const noexcept {
     return ss.str();
 }
 
-std::string GGA::composeRaw(std::string talkerId,
+std::string GGA::composeRaw(const std::string& talkerId,
                             double timestamp,
                             double latitude,
                             char latitudeDirection,
@@ -219,7 +219,7 @@ std::string GGA::composeRaw(std::string talkerId,
                             double geoidalSeparation,
                             char geoidalSeparationUnits,
                             double dgpsAge,
-                            std::string dgpsReferenceStationId) {
+                            const std::string& dgpsReferenceStationId) {
     std::ostringstream payloadStream;
     payloadStream << talkerId << "GGA,";
     payloadStream << std::fixed << std::setprecision(2) << std::setw(9) << std::setfill('0') << timestamp << ",";
@@ -262,8 +262,8 @@ std::string GGA::composeRaw(std::string talkerId,
     return "$" + payload + "\r\n";
 }
 
-double GGA::getTimestamp() const noexcept {
-    return timestamp_;
+double GGA::getUtcTime() const noexcept {
+    return utcTime_;
 }
 
 double GGA::getLatitude() const noexcept {

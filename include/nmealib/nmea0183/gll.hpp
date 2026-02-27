@@ -41,7 +41,7 @@ public:
     char getLatitudeDirection() const noexcept;
     double getLongitude() const noexcept;
     char getLongitudeDirection() const noexcept;
-    double getTimestamp() const noexcept;
+    double getUtcTime() const noexcept;
     char getStatus() const noexcept;
     char getModeIndicator() const noexcept;
 
@@ -51,13 +51,13 @@ public:
     bool hasEqualContent(const GLL& other) const noexcept;
 
 private:
-    double latitude_;
-    char latitudeDirection_;
-    double longitude_;
-    char longitudeDirection_;
-    double timestamp_;
-    char status_;
-    char modeIndicator_;
+    double latitude_{};
+    char latitudeDirection_{};
+    double longitude_{};
+    char longitudeDirection_{};
+    double utcTime_{};
+    char status_{};
+    char modeIndicator_{};
 
     GLL() = default;
 
@@ -74,7 +74,7 @@ private:
 
     // Private internal factory
     static std::unique_ptr<GLL> create(std::unique_ptr<Message0183> baseMessage);
-    static std::string composeRaw(std::string talkerId,
+    static std::string composeRaw(const std::string& talkerId,
                                   double latitude,
                                   char latitudeDirection,
                                   double longitude,

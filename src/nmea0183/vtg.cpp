@@ -198,7 +198,7 @@ std::string VTG::getStringContent(bool verbose) const noexcept {
     return ss.str();
 }
 
-std::string VTG::composeRaw(std::string talkerId,
+std::string VTG::composeRaw(const std::string& talkerId,
                             double courseOverGroundTrue,
                             double courseOverGroundMagnetic,
                             double speedOverGroundKnots,

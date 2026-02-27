@@ -41,7 +41,7 @@ Message0183::Message0183(std::string raw,
     calculatedChecksumStr_ = computeChecksum(payload_);
 }
 
-std::unique_ptr<Message0183> Message0183::create(std::string raw, TimePoint ts) {
+std::unique_ptr<Message0183> Message0183::create(const std::string& raw, TimePoint ts) {
     std::string context = "Message0183::create";
     validateFormat(context, raw);
 
@@ -147,11 +147,17 @@ std::string Message0183::serialize() const {
     return rawData_;
 }
 
-bool Message0183::validate() const {
-    if (checksumStr_.empty()) {
-        return true; // No checksum means we consider it valid by default
+bool Message0183::validate() const noexcept{
+    bool hasChecksum = true;
+    bool valid = true;
+    // Try to get checksum, if i get an exception it does not have one
+    try {
+        valid = getChecksumStr() == getCalculatedChecksumStr();
+    } catch (const NoChecksumException&) {
+        hasChecksum = false;
     }
-    return getChecksumStr() == getCalculatedChecksumStr();
+    
+    return !hasChecksum || valid;
 }
 
 std::string Message0183::computeChecksum(const std::string& payload) noexcept {

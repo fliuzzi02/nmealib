@@ -29,7 +29,7 @@ TEST(GLL, CreateFromMessage0183Factory)
     EXPECT_EQ(gllMsg->getLatitudeDirection(), 'N');
     EXPECT_NEAR(gllMsg->getLongitude(), 117.1987063833, 1e-9);
     EXPECT_EQ(gllMsg->getLongitudeDirection(), 'E');
-    EXPECT_DOUBLE_EQ(gllMsg->getTimestamp(), 62735.0);
+    EXPECT_DOUBLE_EQ(gllMsg->getUtcTime(), 62735.0);
     EXPECT_EQ(gllMsg->getStatus(), 'A');
     EXPECT_EQ(gllMsg->getModeIndicator(), 'A');
 
@@ -44,7 +44,7 @@ TEST(GLL, CreateFromMessage0183Factory)
     EXPECT_EQ(gllMsg->getLatitudeDirection(), 'N');
     EXPECT_NEAR(gllMsg->getLongitude(), 117.1987063833, 1e-9);
     EXPECT_EQ(gllMsg->getLongitudeDirection(), 'E');
-    EXPECT_DOUBLE_EQ(gllMsg->getTimestamp(), 62735.0);
+    EXPECT_DOUBLE_EQ(gllMsg->getUtcTime(), 62735.0);
     EXPECT_EQ(gllMsg->getStatus(), 'A');
     EXPECT_EQ(gllMsg->getModeIndicator(), 'A');
 }
@@ -59,7 +59,7 @@ TEST(GLL, CreateFromFields)
     EXPECT_EQ(gll.getLatitudeDirection(), 'N');
     EXPECT_NEAR(gll.getLongitude(), 117.1987063833, 1e-9);
     EXPECT_EQ(gll.getLongitudeDirection(), 'E');
-    EXPECT_DOUBLE_EQ(gll.getTimestamp(), 62735.0);
+    EXPECT_DOUBLE_EQ(gll.getUtcTime(), 62735.0);
     EXPECT_EQ(gll.getStatus(), 'A');
     EXPECT_EQ(gll.getModeIndicator(), 'A');
 }
@@ -77,7 +77,7 @@ TEST(GLL, SerializeRoundTripFromFields)
     EXPECT_EQ(parsed->getLatitudeDirection(), 'N');
     EXPECT_NEAR(parsed->getLongitude(), 117.1987063833, 1e-6);
     EXPECT_EQ(parsed->getLongitudeDirection(), 'E');
-    EXPECT_DOUBLE_EQ(parsed->getTimestamp(), 62735.0);
+    EXPECT_DOUBLE_EQ(parsed->getUtcTime(), 62735.0);
     EXPECT_EQ(parsed->getStatus(), 'A');
     EXPECT_EQ(parsed->getModeIndicator(), 'A');
 
@@ -96,7 +96,7 @@ TEST(GLL, CreateFromMessageFactoryWithIncompleteFieldsDefaults)
     EXPECT_EQ(gllMsg->getLatitudeDirection(), 'N');
     EXPECT_NEAR(gllMsg->getLongitude(), 117.1987063833, 1e-9);
     EXPECT_EQ(gllMsg->getLongitudeDirection(), 'E');
-    EXPECT_DOUBLE_EQ(gllMsg->getTimestamp(), 0.0);
+    EXPECT_DOUBLE_EQ(gllMsg->getUtcTime(), 0.0);
     EXPECT_EQ(gllMsg->getStatus(), 'V');
     EXPECT_EQ(gllMsg->getModeIndicator(), 'N');
 }
