@@ -143,7 +143,7 @@ std::string VHW::getStringContent(bool verbose) const noexcept {
     return ss.str();
 }
 
-std::string VHW::composeRaw(std::string talkerId,
+std::string VHW::composeRaw(const std::string& talkerId,
                             double headingTrue,
                             double headingMagnetic,
                             double speedKnots,

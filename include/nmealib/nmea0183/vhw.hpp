@@ -66,7 +66,7 @@ private:
     ) noexcept;
 
     static std::unique_ptr<VHW> create(std::unique_ptr<Message0183> baseMessage);
-    static std::string composeRaw(std::string talkerId,
+    static std::string composeRaw(const std::string& talkerId,
                                   double headingTrue,
                                   double headingMagnetic,
                                   double speedKnots,
