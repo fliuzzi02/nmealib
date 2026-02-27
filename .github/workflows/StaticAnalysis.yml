@@ -13,6 +13,9 @@ on:
         description: "Absolute path of the generated cppcheck XML report"
         value: ${{ jobs.static-analysis.outputs.report_file }}
 
+permissions:
+  contents: read
+
 jobs:
   static-analysis:
     runs-on: ubuntu-latest
