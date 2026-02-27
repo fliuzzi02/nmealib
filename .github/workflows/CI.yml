@@ -9,9 +9,48 @@ on:
 permissions:
   contents: write
   issues: write
+  pull-requests: write
 
 jobs:
+  static-analysis:
+    uses: ./.github/workflows/StaticAnalysis.yml
+
+  handle-static-analysis-failure:
+    runs-on: ubuntu-latest
+    needs: static-analysis
+    if: ${{ always() && github.event_name == 'pull_request' && needs.static-analysis.outputs.cppcheck_exit_code != '0' }}
+    steps:
+    - name: Post dummy static analysis comment
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const pr = context.payload.pull_request;
+          if (!pr) {
+            core.info('No pull request context available; skipping comment.');
+            return;
+          }
+
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: pr.number,
+            body: '⚠️ Dummy comment: static analysis failed in CI, later on here you will find details on why it failed.',
+          });
+
+  static-analysis-gate:
+    runs-on: ubuntu-latest
+    needs: static-analysis
+    if: ${{ always() }}
+    steps:
+    - name: Fail workflow when static analysis fails
+      run: |
+        if [ "${{ needs.static-analysis.outputs.cppcheck_exit_code }}" != "0" ]; then
+          echo "Static analysis failed."
+          exit 1
+        fi
+
   test:
+    needs: static-analysis-gate
     uses: ./.github/workflows/Test.yml
 
   handle-release-test-failure:
@@ -46,11 +85,13 @@ jobs:
             labels: ['release', 'ci', 'failure']
           });
 
-  build:
-    needs: test
-    if: ${{ needs.test.result == 'success' }}
-    uses: ./.github/workflows/Build.yml
+  # Only build the cross platforms if tests are passed, for now it will be disabled
+  # build:
+  #   needs: test
+  #   if: ${{ needs.test.result == 'success' }}
+  #   uses: ./.github/workflows/Build.yml
 
+  # Run release only if we are in a release/ branch and all tests passed
   release:
     needs: test
     if: ${{ needs.test.result == 'success' && (startsWith(github.ref_name, 'release/') || startsWith(github.head_ref, 'release/')) }}
