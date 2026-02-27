@@ -143,19 +143,21 @@ For full official and compliant NMEA 2000 support, you must obtain the appropria
 
 ## Roadmap
 
-- [x] NMEA0183 Support:
-    - [x] Depth transducers sentencies
-    - [x] Autopilot sentencies
-    - [x] Water speed sentencies
+- [ ] NMEA0183 Support:
+    - [x] GPS/GNSS sentencies
     - [x] Wind sentencies
-    - [x] Cross track error sentencies
-- [x] NMEA2000 Support:
-    - [x] TBD, possibly all sentencies that can be translated to/from supported N0183 ones
-- [x] Documentation
-- [x] PlatformIO Release
-- [x] Windows support
-- [x] MAcOS support
-- [x] Full linux support across distros
+    - [ ] Depth transducers sentencies
+    - [ ] Autopilot sentencies
+    - [ ] Water speed sentencies
+    - [ ] Wind sentencies
+    - [ ] Cross track error sentencies
+- [ ] NMEA2000 Support:
+    - [ ] TBD, possibly all sentencies that can be translated to/from supported N0183 ones
+- [ ] Documentation
+- [ ] PlatformIO Release
+- [ ] Windows support
+- [ ] MAcOS support
+- [ ] Full linux support across distros
 
 
 ## Contributing
