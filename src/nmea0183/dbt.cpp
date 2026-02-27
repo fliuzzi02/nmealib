@@ -123,7 +123,7 @@ std::string DBT::getStringContent(bool verbose) const noexcept {
     return ss.str();
 }
 
-std::string DBT::composeRaw(std::string talkerId,
+std::string DBT::composeRaw(const std::string& talkerId,
                              double depthFeet,
                              char feetUnit,
                              double depthMeters,

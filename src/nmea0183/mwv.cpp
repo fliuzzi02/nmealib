@@ -116,7 +116,7 @@ std::string MWV::getStringContent(bool verbose) const noexcept {
     return ss.str();
 }
 
-std::string MWV::composeRaw(std::string talkerId,
+std::string MWV::composeRaw(const std::string& talkerId,
                             double windAngle,
                             char reference,
                             double windSpeed,

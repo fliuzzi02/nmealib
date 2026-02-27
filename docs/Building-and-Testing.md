@@ -49,6 +49,8 @@ cmake -B build -DENABLE_TESTS=ON -DENABLE_STATIC_ANALYSIS=ON
 cmake --build build --target static-analysis
 ```
 
+`cppcheck` XML reports are written to `build/reports/` with a timestamped filename, for example: `cppcheck-20260227-153045.xml`.
+
 ## CLI
 
 

@@ -43,12 +43,12 @@ public:
     bool hasEqualContent(const ZDA& other) const noexcept;
 
 private:
-    double utcTime_;
-    unsigned int day_;
-    unsigned int month_;
-    unsigned int year_;
-    int localZoneHours_;
-    int localZoneMinutes_;
+    double utcTime_{};
+    unsigned int day_{};
+    unsigned int month_{};
+    unsigned int year_{};
+    int localZoneHours_{};
+    int localZoneMinutes_{};
 
     ZDA() = default;
 
@@ -62,7 +62,7 @@ private:
     ) noexcept;
 
     static std::unique_ptr<ZDA> create(std::unique_ptr<Message0183> baseMessage);
-    static std::string composeRaw(std::string talkerId,
+    static std::string composeRaw(const std::string& talkerId,
                                   double utcTime,
                                   unsigned int day,
                                   unsigned int month,

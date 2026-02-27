@@ -48,6 +48,7 @@ option(ENABLE_STATIC_ANALYSIS "Enable static analysis (clang-tidy and cppcheck)"
 
 if(ENABLE_STATIC_ANALYSIS)
     message(STATUS "Static analysis enabled (ENABLE_STATIC_ANALYSIS=ON)")
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "Export compile commands for static analysis tools" FORCE)
 
     find_program(CLANG_TIDY_EXE NAMES clang-tidy clang-tidy-14 clang-tidy-13)
     if(CLANG_TIDY_EXE)
@@ -65,15 +66,31 @@ if(ENABLE_STATIC_ANALYSIS)
         message(WARNING "cppcheck not found; cppcheck will be skipped")
     endif()
 
-    # Create a helper target that runs cppcheck (if available) and then triggers a build (so clang-tidy runs)
     if(CPPCHECK_EXE)
+        set(CPPCHECK_REPORTS_DIR "${CMAKE_BINARY_DIR}/reports")
+        file(MAKE_DIRECTORY "${CPPCHECK_REPORTS_DIR}")
+        file(WRITE "${CMAKE_BINARY_DIR}/run_cppcheck.cmake"
+            "string(TIMESTAMP NOW \"%Y%m%d-%H%M%S\")\n"
+                "set(REPORT_FILE \"${CPPCHECK_REPORTS_DIR}/cppcheck-\${NOW}.xml\")\n"
+                "set(COMPILE_COMMANDS_FILE \"${CMAKE_BINARY_DIR}/compile_commands.json\")\n"
+                "message(STATUS \"Running cppcheck; report: \${REPORT_FILE}\")\n"
+            "if(NOT EXISTS \"\${COMPILE_COMMANDS_FILE}\")\n"
+                "    message(FATAL_ERROR \"compile_commands.json not found at \${COMPILE_COMMANDS_FILE}\")\n"
+            "endif()\n"
+            "execute_process(\n"
+                "    COMMAND \"${CPPCHECK_EXE}\" --project=\${COMPILE_COMMANDS_FILE} --enable=all --inconclusive --std=c++20 --suppress=missingIncludeSystem --suppress=unusedFunction --error-exitcode=1 --xml --xml-version=2 --output-file=\${REPORT_FILE}\n"
+            "    RESULT_VARIABLE CPPCHECK_RESULT\n"
+            ")\n"
+            "if(NOT CPPCHECK_RESULT EQUAL 0)\n"
+                "    message(FATAL_ERROR \"cppcheck failed with exit code \${CPPCHECK_RESULT}\")\n"
+            "endif()\n"
+        )
+
         add_custom_target(static-analysis
-            COMMAND ${CPPCHECK_EXE} --enable=all --inconclusive --std=c++20 --suppress=missingIncludeSystem --suppress=unusedFunction
-                            --error-exitcode=1
-                            ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/app
+            COMMAND ${CMAKE_COMMAND} -P "${CMAKE_BINARY_DIR}/run_cppcheck.cmake"
             COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            COMMENT "Run cppcheck and build (clang-tidy will run during build if configured)" VERBATIM)
+            COMMENT "Run cppcheck (timestamped report) and build (clang-tidy will run during build if configured)" VERBATIM)
     else()
         add_custom_target(static-analysis
             COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}

@@ -50,13 +50,13 @@ public:
     bool hasEqualContent(const GSA& other) const noexcept;
 
 private:
-    char selectionMode_;
-    unsigned int mode_;
-    std::array<unsigned int, 12> satelliteIds_;
-    double pdop_;
-    double hdop_;
-    double vdop_;
-    std::optional<unsigned int> systemId_;
+    char selectionMode_{};
+    unsigned int mode_{};
+    std::array<unsigned int, 12> satelliteIds_{};
+    double pdop_{};
+    double hdop_{};
+    double vdop_{};
+    std::optional<unsigned int> systemId_{};
 
     GSA() = default;
 
@@ -71,7 +71,7 @@ private:
     ) noexcept;
 
     static std::unique_ptr<GSA> create(std::unique_ptr<Message0183> baseMessage);
-    static std::string composeRaw(std::string talkerId,
+    static std::string composeRaw(const std::string& talkerId,
                                   char selectionMode,
                                   unsigned int mode,
                                   std::array<unsigned int, 12> satelliteIds,

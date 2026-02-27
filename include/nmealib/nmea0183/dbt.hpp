@@ -43,12 +43,12 @@ public:
     bool hasEqualContent(const DBT& other) const noexcept;
 
 private:
-    double depthFeet_;
-    char feetUnit_;
-    double depthMeters_;
-    char metersUnit_;
-    double depthFathoms_;
-    char fathomsUnit_;
+    double depthFeet_{};
+    char feetUnit_{};
+    double depthMeters_{};
+    char metersUnit_{};
+    double depthFathoms_{};
+    char fathomsUnit_{};
 
     DBT() = default;
 
@@ -62,7 +62,7 @@ private:
     ) noexcept;
 
     static std::unique_ptr<DBT> create(std::unique_ptr<Message0183> baseMessage);
-    static std::string composeRaw(std::string talkerId,
+    static std::string composeRaw(const std::string& talkerId,
                                   double depthFeet,
                                   char feetUnit,
                                   double depthMeters,

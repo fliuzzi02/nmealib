@@ -72,7 +72,7 @@ GLL::GLL(Message0183 baseMessage,
       latitudeDirection_(latitudeDirection),
       longitude_(longitude),
       longitudeDirection_(longitudeDirection),
-      timestamp_(timestamp),
+            utcTime_(timestamp),
       status_(status),
       modeIndicator_(modeIndicator) {}
 
@@ -96,7 +96,7 @@ GLL::GLL(std::string talkerId,
       latitudeDirection_(latitudeDirection),
       longitude_(longitude),
       longitudeDirection_(longitudeDirection),
-      timestamp_(timestamp),
+    utcTime_(timestamp),
       status_(status),
       modeIndicator_(modeIndicator) {}
 
@@ -129,21 +129,21 @@ std::string GLL::getStringContent(bool verbose) const noexcept {
         ss << "\tLatitude Direction: " << latitudeDirection_ << "\n";
         ss << "\tLongitude: " << longitudeStr << "\n";
         ss << "\tLongitude Direction: " << longitudeDirection_ << "\n";
-        ss << "\tTimestamp: " << timestamp_ << "\n";
+        ss << "\tTimestamp: " << utcTime_ << "\n";
         ss << "\tStatus: " << status_ << "\n";
         ss << "\tMode Indicator: " << modeIndicator_;
     } else {
         ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
               << "Lat=" << latitudeStr << latitudeDirection_
               << ", Lon=" << longitudeStr << longitudeDirection_
-           << ", Time=" << timestamp_
+           << ", Time=" << utcTime_
            << ", Status=" << status_
            << ", Mode=" << modeIndicator_;
     }
     return ss.str();
 }
 
-std::string GLL::composeRaw(std::string talkerId,
+std::string GLL::composeRaw(const std::string& talkerId,
                             double latitude,
                             char latitudeDirection,
                             double longitude,
@@ -190,8 +190,8 @@ char GLL::getLongitudeDirection() const noexcept {
     return longitudeDirection_;
 }
 
-double GLL::getTimestamp() const noexcept {
-    return timestamp_;
+double GLL::getUtcTime() const noexcept {
+    return utcTime_;
 }
 
 char GLL::getStatus() const noexcept {

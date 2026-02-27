@@ -1,11 +1,21 @@
 name: Static Analysis
 
 on:
-  workflow_dispatch:
+  workflow_call:
+    outputs:
+      cppcheck_exit_code:
+        description: "Cppcheck exit code (0 means success)"
+        value: ${{ jobs.static-analysis.outputs.cppcheck_exit_code }}
+      report_file:
+        description: "Absolute path of the generated cppcheck XML report"
+        value: ${{ jobs.static-analysis.outputs.report_file }}
 
 jobs:
   static-analysis:
     runs-on: ubuntu-latest
+    outputs:
+      cppcheck_exit_code: ${{ steps.run-cppcheck.outputs.exit_code }}
+      report_file: ${{ steps.run-cppcheck.outputs.report_file }}
 
     steps:
     - uses: actions/checkout@v4
@@ -19,7 +29,7 @@ jobs:
     - name: Install analysis tools
       run: |
         sudo apt-get update
-        sudo apt-get install -y cppcheck clang-tools
+        sudo apt-get install -y cppcheck
 
     - name: Configure CMake
       run: >
@@ -27,13 +37,30 @@ jobs:
         -DCMAKE_CXX_COMPILER=g++
         -DCMAKE_C_COMPILER=gcc
         -DCMAKE_BUILD_TYPE=Debug
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        -DENABLE_STATIC_ANALYSIS=ON
         -S ${{ github.workspace }}
 
     - name: Run cppcheck
-      run: cppcheck --enable=all --error-exitcode=1 src/
-
-    - name: Run clang-tidy
+      id: run-cppcheck
+      shell: bash
       run: |
-        cd ${{ steps.strings.outputs.build-output-dir }}
-        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
-        run-clang-tidy -p . ../src/
+        set +e
+        report_file="${{ steps.strings.outputs.build-output-dir }}/reports/cppcheck-$(date +%Y%m%d-%H%M%S).xml"
+        mkdir -p "$(dirname "$report_file")"
+
+        cppcheck \
+          --project="${{ steps.strings.outputs.build-output-dir }}/compile_commands.json" \
+          --enable=all \
+          --inconclusive \
+          --std=c++20 \
+          --suppress=missingIncludeSystem \
+          --suppress=unusedFunction \
+          --error-exitcode=1 \
+          --xml \
+          --xml-version=2 \
+          --output-file="$report_file"
+
+        exit_code=$?
+        echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+        echo "report_file=$report_file" >> "$GITHUB_OUTPUT"

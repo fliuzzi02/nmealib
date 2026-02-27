@@ -215,7 +215,7 @@ public:
      * @return true If there is no checksum or if the checksum matches the calculated checksum for the payload
      * @return false If there is a checksum and it does not match the calculated checksum for the payload
      */
-    bool validate() const override;
+    bool validate() const noexcept override;
 
     /**
      * @brief Converts an NMEA coordinate in ddmm.mmmm / dddmm.mmmm format to decimal degrees.
@@ -245,7 +245,7 @@ protected:
      * @throws TooLongSentenceException If the input string exceeds the maximum allowed length of 82 characters.
      * @throws InvalidStartCharacterException If the input string does not start with either '$' or '!'.
      */
-    static std::unique_ptr<Message0183> create(std::string raw, TimePoint ts = std::chrono::system_clock::now());
+    static std::unique_ptr<Message0183> create(const std::string& raw, TimePoint ts = std::chrono::system_clock::now());
 
 private:
     explicit Message0183(std::string raw,
