@@ -6,6 +6,9 @@ on:
       cppcheck_exit_code:
         description: "Cppcheck exit code (0 means success)"
         value: ${{ jobs.static-analysis.outputs.cppcheck_exit_code }}
+      cppcheck_summary:
+        description: "Cppcheck grouped counts by error id"
+        value: ${{ jobs.static-analysis.outputs.cppcheck_summary }}
       report_file:
         description: "Absolute path of the generated cppcheck XML report"
         value: ${{ jobs.static-analysis.outputs.report_file }}
@@ -15,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       cppcheck_exit_code: ${{ steps.run-cppcheck.outputs.exit_code }}
+      cppcheck_summary: ${{ steps.summarize.outputs.summary }}
       report_file: ${{ steps.run-cppcheck.outputs.report_file }}
 
     steps:
@@ -64,3 +68,25 @@ jobs:
         exit_code=$?
         echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
         echo "report_file=$report_file" >> "$GITHUB_OUTPUT"
+
+    - name: Summarize cppcheck report
+      id: summarize
+      if: ${{ always() }}
+      shell: bash
+      run: |
+        report_file="${{ steps.run-cppcheck.outputs.report_file }}"
+        if [[ -z "$report_file" || ! -f "$report_file" ]]; then
+          {
+            echo "summary<<EOF"
+            echo "report_not_found: 1"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        summary=$(python3 scripts/cppcheck_summary.py "$report_file")
+        {
+          echo "summary<<EOF"
+          echo "$summary"
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"

@@ -9,7 +9,7 @@
  *  - nmealib::Message              (base message class)
  *  - nmealib::NmeaException        (base exception class)
  *  - nmealib::nmea0183::Message0183 and its associated exceptions
- *  - nmealib::nmea0183::DBT, GGA, GLL, GSA, MWV, RMC, VTG, ZDA (typed sentence classes)
+ *  - nmealib::nmea0183::DBT, GGA, GLL, GSA, MWV, RMC, VHW, VTG, ZDA (typed sentence classes)
  *  - nmealib::nmea0183::Nmea0183Factory (factory for creating typed messages)
  *  - nmealib::nmea2000::Message2000 and its associated exceptions
  *  - nmealib::nmea2000::PGN129029 (typed PGN class)
@@ -33,6 +33,7 @@
 #include "nmea0183/gll.hpp"
 #include "nmea0183/gsa.hpp"
 #include "nmea0183/mwv.hpp"
+#include "nmea0183/vhw.hpp"
 #include "nmea0183/vtg.hpp"
 #include "nmea0183/zda.hpp"
 #include "nmea2000/nmea2000Factory.hpp"

@@ -18,6 +18,7 @@ This page summarizes the public API surface. It is organized for GitHub Pages na
 - `nmealib/nmea0183/gll.hpp`
 - `nmealib/nmea0183/gsa.hpp`
 - `nmealib/nmea0183/mwv.hpp`
+- `nmealib/nmea0183/vhw.hpp`
 - `nmealib/nmea0183/vtg.hpp`
 - `nmealib/nmea0183/zda.hpp`
 
@@ -57,6 +58,7 @@ This page summarizes the public API surface. It is organized for GitHub Pages na
 - `GLL`
 - `GSA`
 - `MWV`
+- `VHW`
 - `VTG`
 - `ZDA`
 
@@ -95,6 +97,7 @@ This page summarizes the public API surface. It is organized for GitHub Pages na
 - `NotGLLException`
 - `NotGSAException`
 - `NotMWVException`
+- `NotVHWException`
 - `NotVTGException`
 - `NotZDAException`
 - `InvalidPgnException`
