@@ -39,6 +39,7 @@ add_library(nmealib_nmea0183_gga STATIC gga.cpp)
 add_library(nmealib_nmea0183_gsa STATIC gsa.cpp)
 add_library(nmealib_nmea0183_gll STATIC gll.cpp)
 add_library(nmealib_nmea0183_mwv STATIC mwv.cpp)
+add_library(nmealib_nmea0183_vhw STATIC vhw.cpp)
 add_library(nmealib_nmea0183_rmc STATIC rmc.cpp)
 add_library(nmealib_nmea0183_vtg STATIC vtg.cpp)
 add_library(nmealib_nmea0183_zda STATIC zda.cpp)
@@ -49,6 +50,7 @@ set(NMEALIB_NMEA0183_MESSAGE_TARGETS
     nmealib_nmea0183_gsa
     nmealib_nmea0183_gll
     nmealib_nmea0183_mwv
+    nmealib_nmea0183_vhw
     nmealib_nmea0183_rmc
     nmealib_nmea0183_vtg
     nmealib_nmea0183_zda

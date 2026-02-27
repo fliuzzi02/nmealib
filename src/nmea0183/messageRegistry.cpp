@@ -5,6 +5,7 @@
 #include "nmealib/nmea0183/gsa.hpp"
 #include "nmealib/nmea0183/mwv.hpp"
 #include "nmealib/nmea0183/rmc.hpp"
+#include "nmealib/nmea0183/vhw.hpp"
 #include "nmealib/nmea0183/vtg.hpp"
 #include "nmealib/nmea0183/zda.hpp"
 
@@ -31,6 +32,8 @@ std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentence
         return createGLL(std::move(baseMessage));
     } else if (sentenceType == "MWV") {
         return createMWV(std::move(baseMessage));
+    } else if (sentenceType == "VHW") {
+        return createVHW(std::move(baseMessage));
     } else if (sentenceType == "VTG") {
         return createVTG(std::move(baseMessage));
     } else if (sentenceType == "ZDA") {
@@ -63,6 +66,10 @@ std::unique_ptr<Message0183> MessageRegistry::createGLL(std::unique_ptr<Message0
 
 std::unique_ptr<Message0183> MessageRegistry::createMWV(std::unique_ptr<Message0183> baseMessage) {
     return MWV::create(std::move(baseMessage));
+}
+
+std::unique_ptr<Message0183> MessageRegistry::createVHW(std::unique_ptr<Message0183> baseMessage) {
+    return VHW::create(std::move(baseMessage));
 }
 
 std::unique_ptr<Message0183> MessageRegistry::createVTG(std::unique_ptr<Message0183> baseMessage) {

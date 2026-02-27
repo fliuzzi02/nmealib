@@ -52,6 +52,7 @@ private:
     std::unique_ptr<Message0183> createGSA(std::unique_ptr<Message0183> baseMessage);
     std::unique_ptr<Message0183> createGLL(std::unique_ptr<Message0183> baseMessage);
     std::unique_ptr<Message0183> createMWV(std::unique_ptr<Message0183> baseMessage);
+    std::unique_ptr<Message0183> createVHW(std::unique_ptr<Message0183> baseMessage);
     std::unique_ptr<Message0183> createVTG(std::unique_ptr<Message0183> baseMessage);
     std::unique_ptr<Message0183> createZDA(std::unique_ptr<Message0183> baseMessage);
 
@@ -62,6 +63,7 @@ private:
     friend class GSA;
     friend class GLL;
     friend class MWV;
+    friend class VHW;
     friend class VTG;
     friend class ZDA;
 };

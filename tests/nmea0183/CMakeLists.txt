@@ -6,6 +6,7 @@ add_executable(nmea0183_tests
     test_GSA.cpp
     test_GLL.cpp
     test_MWV.cpp
+    test_VHW.cpp
     test_VTG.cpp
     test_ZDA.cpp
 )

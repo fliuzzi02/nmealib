@@ -31,6 +31,7 @@ auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
 - `GLL`
 - `GSA`
 - `MWV`
+- `VHW`
 - `VTG`
 - `ZDA`
 
