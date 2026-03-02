@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nmealib/nmea0183.hpp>
+#include <nmealib/nmea0183.h>
 #include <chrono>
 #include <memory>
 #include <string>

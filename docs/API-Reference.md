@@ -4,23 +4,22 @@ This page summarizes the public API surface. It is organized for GitHub Pages na
 
 ## Public headers
 
-- `nmealib.h`
-- `nmealib/nmealib.hpp`
-- `nmealib/message.hpp`
-- `nmealib/nmeaException.hpp`
-- `nmealib/nmea0183.hpp`
-- `nmealib/nmea2000.hpp`
-- `nmealib/nmea0183/nmea0183Factory.hpp`
-- `nmealib/nmea2000/nmea2000Factory.hpp`
-- `nmealib/nmea2000/pgn129029.hpp`
-- `nmealib/nmea0183/rmc.hpp`
-- `nmealib/nmea0183/gga.hpp`
-- `nmealib/nmea0183/gll.hpp`
-- `nmealib/nmea0183/gsa.hpp`
-- `nmealib/nmea0183/mwv.hpp`
-- `nmealib/nmea0183/vhw.hpp`
-- `nmealib/nmea0183/vtg.hpp`
-- `nmealib/nmea0183/zda.hpp`
+- `nmealib.h` - Umbrella header including all features
+- `nmealib/message.h` - Base message class
+- `nmealib/nmeaException.h` - Exception classes
+- `nmealib/nmea0183.h` - NMEA 0183 base message and exceptions
+- `nmealib/nmea2000.h` - NMEA 2000 base message and exceptions
+- `nmealib/nmea0183/nmea0183Factory.h` - Factory for creating NMEA 0183 messages
+- `nmealib/nmea2000/nmea2000Factory.h` - Factory for creating NMEA 2000 messages
+- `nmealib/nmea0183/dbt.h` - DBT sentence message
+- `nmealib/nmea0183/rmc.h` - RMC sentence message
+- `nmealib/nmea0183/gga.h` - GGA sentence message
+- `nmealib/nmea0183/gll.h` - GLL sentence message
+- `nmealib/nmea0183/gsa.h` - GSA sentence message
+- `nmealib/nmea0183/mwv.h` - MWV sentence message
+- `nmealib/nmea0183/vhw.h` - VHW sentence message
+- `nmealib/nmea0183/vtg.h` - VTG sentence message
+- `nmealib/nmea0183/zda.h` - ZDA sentence message
 
 ## Namespaces
 

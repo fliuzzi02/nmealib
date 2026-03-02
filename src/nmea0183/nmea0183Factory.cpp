@@ -1,5 +1,5 @@
-#include "nmealib/nmea0183/nmea0183Factory.hpp"
-#include "nmealib/nmea0183/messageRegistry.hpp"
+#include "nmealib/nmea0183/nmea0183Factory.h"
+#include "messageRegistry.hpp"
 
 namespace nmealib {
 namespace nmea0183 {

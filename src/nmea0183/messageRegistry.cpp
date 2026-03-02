@@ -1,13 +1,13 @@
-#include "nmealib/nmea0183/messageRegistry.hpp"
-#include "nmealib/nmea0183/dbt.hpp"
-#include "nmealib/nmea0183/gga.hpp"
-#include "nmealib/nmea0183/gll.hpp"
-#include "nmealib/nmea0183/gsa.hpp"
-#include "nmealib/nmea0183/mwv.hpp"
-#include "nmealib/nmea0183/rmc.hpp"
-#include "nmealib/nmea0183/vhw.hpp"
-#include "nmealib/nmea0183/vtg.hpp"
-#include "nmealib/nmea0183/zda.hpp"
+#include "messageRegistry.hpp"
+#include "nmealib/nmea0183/dbt.h"
+#include "nmealib/nmea0183/gga.h"
+#include "nmealib/nmea0183/gll.h"
+#include "nmealib/nmea0183/gsa.h"
+#include "nmealib/nmea0183/mwv.h"
+#include "nmealib/nmea0183/rmc.h"
+#include "nmealib/nmea0183/vhw.h"
+#include "nmealib/nmea0183/vtg.h"
+#include "nmealib/nmea0183/zda.h"
 
 namespace nmealib {
 namespace nmea0183 {

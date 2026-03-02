@@ -58,7 +58,7 @@ target_link_libraries(your_app PRIVATE
 ### NMEA 0183
 
 ```cpp
-#include <nmealib/nmea0183/nmea0183Factory.hpp>
+#include <nmealib/nmea0183/nmea0183Factory.h>
 
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(
     "$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A\r\n");
@@ -69,7 +69,7 @@ auto msg = nmealib::nmea0183::Nmea0183Factory::create(
 Raw frame with CAN ID + payload bytes:
 
 ```cpp
-#include <nmealib/nmea2000/nmea2000Factory.hpp>
+#include <nmealib/nmea2000/nmea2000Factory.h>
 
 auto msg2000 = nmealib::nmea2000::Nmea2000Factory::create(
     "18F80523 1D 01 23 45 67 FE DC BA 98 00 01 86 A0 12 00 04 E2 0C");

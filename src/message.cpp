@@ -1,4 +1,4 @@
-#include "nmealib/message.hpp"
+#include "nmealib/message.h"
 
 namespace nmealib {
 

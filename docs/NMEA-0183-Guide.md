@@ -19,7 +19,7 @@ $TTXXX,field1,field2,...*CS\r\n
 ## Parsing with nmealib
 
 ```cpp
-#include <nmealib/nmea0183/nmea0183Factory.hpp>
+#include <nmealib/nmea0183/nmea0183Factory.h>
 
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
 ```

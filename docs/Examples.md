@@ -5,7 +5,7 @@ Practical usage patterns for nmealib.
 ## Parse a sentence
 
 ```cpp
-#include <nmealib/nmea0183/nmea0183Factory.hpp>
+#include <nmealib/nmea0183/nmea0183Factory.h>
 
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(
     "$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A\r\n");
@@ -17,7 +17,7 @@ All of these formats are supported and produce the same result:
 
 **Canonical format (CANID:data):**
 ```cpp
-#include <nmealib/nmea2000/nmea2000Factory.hpp>
+#include <nmealib/nmea2000/nmea2000Factory.h>
 
 auto msg = nmealib::nmea2000::Nmea2000Factory::create(
     "18FD1234:0102030405060708");

@@ -1,4 +1,4 @@
-#include "nmealib/nmea0183/mwv.hpp"
+#include "nmealib/nmea0183/mwv.h"
 
 #include <iomanip>
 #include <sstream>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "message.hpp"
-#include "nmeaException.hpp"
+#include "message.h"
+#include "nmeaException.h"
 
 #include <chrono>
 #include <cstdint>

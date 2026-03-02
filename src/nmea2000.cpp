@@ -1,4 +1,4 @@
-#include "nmealib/nmea2000.hpp"
+#include "nmealib/nmea2000.h"
 
 #include <cctype>
 #include <iomanip>

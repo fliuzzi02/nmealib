@@ -1,4 +1,4 @@
-#include "nmealib/nmea0183.hpp"
+#include "nmealib/nmea0183.h"
 
 #include <sstream>
 #include <iomanip>

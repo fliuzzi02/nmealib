@@ -1,4 +1,4 @@
-#include "nmealib/nmea0183/vhw.hpp"
+#include "nmealib/nmea0183/vhw.h"
 
 #include <iomanip>
 #include <sstream>

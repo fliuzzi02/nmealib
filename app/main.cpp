@@ -8,7 +8,7 @@
 #include <unistd.h>
 #endif
 
-#include <nmealib/nmealib.hpp>
+#include <nmealib.h>
 
 void print_usage() {
     std::cout << "Usage: nmealib-cli [options] [-m \"<nmea_sentence>\" | -m -]\n";

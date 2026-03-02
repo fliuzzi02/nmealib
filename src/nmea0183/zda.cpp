@@ -1,4 +1,4 @@
-#include "nmealib/nmea0183/zda.hpp"
+#include "nmealib/nmea0183/zda.h"
 
 #include <cmath>
 #include <iomanip>

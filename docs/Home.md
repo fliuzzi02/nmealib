@@ -15,14 +15,14 @@ Modern C++ library for working with NMEA messages.
 ## Quick start
 
 ```cpp
-#include <nmealib/nmea0183/nmea0183Factory.hpp>
+#include <nmealib/nmea0183/nmea0183Factory.h>
 
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(
     "$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A\r\n");
 ```
 
 ```cpp
-#include <nmealib/nmea2000/nmea2000Factory.hpp>
+#include <nmealib/nmea2000/nmea2000Factory.h>
 
 // Multiple NMEA 2000 formats supported:
 auto msg2000 = nmealib::nmea2000::Nmea2000Factory::create(

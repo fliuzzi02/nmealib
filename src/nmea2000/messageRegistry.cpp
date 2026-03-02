@@ -1,4 +1,4 @@
-#include "nmealib/nmea2000/messageRegistry.hpp"
+#include "messageRegistry.hpp"
 
 
 namespace nmealib {
