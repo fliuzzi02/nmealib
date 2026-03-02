@@ -14,10 +14,3 @@ set(NMEALIB_NMEA2000_SOURCES
     nmea2000/nmea2000Factory.cpp
     PARENT_SCOPE
 )
-
-install(TARGETS
-    nmealib2000
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    COMPONENT library
-)

@@ -155,29 +155,54 @@ jobs:
     - name: Build release (library + cli)
       run: cmake --build ${{ steps.strings.outputs.build-cli-dir }} --config Release
 
-    - name: Package library release
+    - name: Prepare library package
       working-directory: ${{ steps.strings.outputs.build-lib-dir }}
       run: |
-        cmake --install . --prefix nmealib
-        tar -czf nmealib-linux64.tar.gz nmealib/
+        # Install library to dist directory
+        cmake --install . --prefix dist --component library
+        
+        # Create versioned package directory with proper structure
+        mkdir -p nmealib-${{ needs.prepare.outputs.version }}/{lib/cmake/nmealib,include}
+        
+        # Copy library files
+        cp -r dist/lib/libnmealib.a nmealib-${{ needs.prepare.outputs.version }}/lib/
+        
+        # Copy headers
+        cp -r dist/include/* nmealib-${{ needs.prepare.outputs.version }}/include/
+        
+        # Copy cmake config file
+        cp dist/lib/cmake/nmealib/nmealibConfig.cmake nmealib-${{ needs.prepare.outputs.version }}/lib/cmake/nmealib/
+        
+        # Copy documentation and license
+        cp ${{ github.workspace }}/README.md nmealib-${{ needs.prepare.outputs.version }}/
+        cp ${{ github.workspace }}/LICENSE nmealib-${{ needs.prepare.outputs.version }}/
+        
+        # Create tarball
+        tar -czf nmealib-${{ needs.prepare.outputs.version }}-linux64.tar.gz nmealib-${{ needs.prepare.outputs.version }}/
 
     - name: Package cli release
       working-directory: ${{ steps.strings.outputs.build-cli-dir }}
       run: |
-        cmake --install . --prefix nmealib-cli
-        tar -czf nmealib-cli-linux64.tar.gz nmealib-cli/
+        cmake --install . --prefix nmealib-cli-dist
+        mkdir -p nmealib-cli-${{ needs.prepare.outputs.version }}
+        cp -r nmealib-cli-dist/lib nmealib-cli-${{ needs.prepare.outputs.version }}/
+        cp -r nmealib-cli-dist/include nmealib-cli-${{ needs.prepare.outputs.version }}/
+        cp -r nmealib-cli-dist/bin nmealib-cli-${{ needs.prepare.outputs.version }}/
+        cp ${{ github.workspace }}/README.md nmealib-cli-${{ needs.prepare.outputs.version }}/
+        cp ${{ github.workspace }}/LICENSE nmealib-cli-${{ needs.prepare.outputs.version }}/
+        tar -czf nmealib-cli-${{ needs.prepare.outputs.version }}-linux64.tar.gz nmealib-cli-${{ needs.prepare.outputs.version }}/
 
     - name: Upload library artifact
       uses: actions/upload-artifact@v4
       with:
         name: nmealib-linux64
-        path: ${{ steps.strings.outputs.build-lib-dir }}/nmealib-linux64.tar.gz
+        path: ${{ steps.strings.outputs.build-lib-dir }}/nmealib-${{ needs.prepare.outputs.version }}-linux64.tar.gz
 
     - name: Upload cli artifact
       uses: actions/upload-artifact@v4
       with:
         name: nmealib-cli-linux64
-        path: ${{ steps.strings.outputs.build-cli-dir }}/nmealib-cli-linux64.tar.gz
+        path: ${{ steps.strings.outputs.build-cli-dir }}/nmealib-cli-${{ needs.prepare.outputs.version }}-linux64.tar.gz
 
   publish:
     runs-on: ubuntu-latest
@@ -197,5 +222,4 @@ jobs:
         name: ${{ needs.prepare.outputs.tag }}
         generate_release_notes: true
         files: |
-          dist/**/nmealib-linux64.tar.gz
-          dist/**/nmealib-cli-linux64.tar.gz
+          dist/**/*-linux64.tar.gz
