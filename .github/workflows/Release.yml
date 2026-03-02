@@ -158,14 +158,22 @@ jobs:
     - name: Prepare library package
       working-directory: ${{ steps.strings.outputs.build-lib-dir }}
       run: |
-        # Install library to dist directory
-        cmake --install . --prefix dist --component library
+        # Install library to dist directory (no component filter since CLI is not built)
+        cmake --install . --prefix dist
+        
+        # Verify library was installed
+        if [ ! -f "dist/lib/libnmealib.a" ]; then
+          echo "ERROR: libnmealib.a was not installed!"
+          echo "Contents of dist/lib:"
+          ls -la dist/lib/ || echo "dist/lib/ does not exist"
+          exit 1
+        fi
         
         # Create versioned package directory with proper structure
         mkdir -p nmealib-${{ needs.prepare.outputs.version }}/{lib/cmake/nmealib,include}
         
         # Copy library files
-        cp -r dist/lib/libnmealib.a nmealib-${{ needs.prepare.outputs.version }}/lib/
+        cp dist/lib/libnmealib.a nmealib-${{ needs.prepare.outputs.version }}/lib/
         
         # Copy headers
         cp -r dist/include/* nmealib-${{ needs.prepare.outputs.version }}/include/

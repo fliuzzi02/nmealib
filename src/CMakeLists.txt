@@ -12,7 +12,6 @@ add_library(nmealib STATIC
 target_include_directories(nmealib PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 install(TARGETS nmealib
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    COMPONENT library
+    ARCHIVE DESTINATION lib COMPONENT library
+    LIBRARY DESTINATION lib COMPONENT library
 )
