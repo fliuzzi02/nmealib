@@ -158,8 +158,8 @@ jobs:
     - name: Prepare library package
       working-directory: ${{ steps.strings.outputs.build-lib-dir }}
       run: |
-        # Install library to dist directory
-        cmake --install . --prefix dist --component library
+        # Install library to dist directory (no component filter since CLI is not built)
+        cmake --install . --prefix dist
         
         # Verify library was installed
         if [ ! -f "dist/lib/libnmealib.a" ]; then
