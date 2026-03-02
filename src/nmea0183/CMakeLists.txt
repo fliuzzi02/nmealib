@@ -60,19 +60,3 @@ set(NMEALIB_NMEA0183_SOURCES
     nmea0183/zda.cpp
     PARENT_SCOPE
 )
-
-install(TARGETS
-    nmealib0183
-    nmealib0183_dbt
-    nmealib0183_gga
-    nmealib0183_gll
-    nmealib0183_gsa
-    nmealib0183_mwv
-    nmealib0183_rmc
-    nmealib0183_vhw
-    nmealib0183_vtg
-    nmealib0183_zda
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    COMPONENT library
-)

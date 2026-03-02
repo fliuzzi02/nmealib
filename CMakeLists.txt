@@ -23,6 +23,18 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
     COMPONENT library
 )
 
+# Install CMake config file for find_package(nmealib) support
+install(FILES ${PROJECT_SOURCE_DIR}/scripts/nmealibConfig.cmake
+    DESTINATION lib/cmake/nmealib
+    COMPONENT library
+)
+
+# Install license and readme
+install(FILES ${PROJECT_SOURCE_DIR}/LICENSE ${PROJECT_SOURCE_DIR}/README.md
+    DESTINATION .
+    COMPONENT library
+)
+
 if(BUILD_CLI)
     # Install cli application
     install(TARGETS nmealib-cli
