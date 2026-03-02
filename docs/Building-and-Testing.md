@@ -16,9 +16,20 @@ cmake --build build
 
 ## Run tests
 
+First, build with tests enabled:
+
 ```bash
-ctest --test-dir out/build/gcc-full --output-on-failure
+cmake --preset gcc-debug-tests
+cmake --build out/build/gcc-debug-tests
 ```
+
+Then run the test suite:
+
+```bash
+ctest --test-dir out/build/gcc-debug-tests --output-on-failure
+```
+
+All 106 tests should pass.
 
 ## Run labeled tests
 

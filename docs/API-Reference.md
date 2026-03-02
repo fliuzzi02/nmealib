@@ -21,6 +21,21 @@ This page summarizes the public API surface. It is organized for GitHub Pages na
 - `nmealib/nmea0183/vtg.h` - VTG sentence message
 - `nmealib/nmea0183/zda.h` - ZDA sentence message
 
+## CMake targets / Archives
+
+Libraries are built and installed as static archives:
+
+- **Monolithic:** `libnmealib.a` (all features), `libnmealib0183.a` (NMEA0183 only), `libnmealib2000.a` (NMEA2000 only)
+- **Per-message:** `libnmealib0183_<msg>.a` for each supported sentence type (dbt, gga, gll, gsa, mwv, rmc, vhw, vtg, zda)
+
+In CMakeLists.txt, reference them by target name (without `lib` prefix and `.a` suffix):
+
+```cmake
+target_link_libraries(your_app PRIVATE nmealib)        # Full library
+target_link_libraries(your_app PRIVATE nmealib0183)    # NMEA0183 only
+target_link_libraries(your_app PRIVATE nmealib0183_gga) # GGA sentence only
+```
+
 ## Namespaces
 
 - `nmealib`

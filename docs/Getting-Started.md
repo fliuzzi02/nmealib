@@ -17,38 +17,35 @@ cmake --build out/build/gcc-full
 
 ## Link in your project (CMake)
 
+### Full library (recommended)
+
 ```cmake
 add_subdirectory(path/to/nmealib)
 target_link_libraries(your_app PRIVATE nmealib)
 ```
 
-Or link only required message libraries:
+### Specific messages only (GGA + RMC)
 
 ```cmake
 add_subdirectory(path/to/nmealib)
 target_link_libraries(your_app PRIVATE
-    nmealib_core
-    nmealib_nmea0183_base
-    nmealib_nmea0183_gga
-    nmealib_nmea0183_rmc
+    nmealib0183_gga
+    nmealib0183_rmc
 )
 ```
 
-NMEA 2000 only:
+### All NMEA0183 messages
 
 ```cmake
 add_subdirectory(path/to/nmealib)
-target_link_libraries(your_app PRIVATE
-    nmealib_core
-    nmealib_nmea2000_base
-    nmealib_nmea2000_pgn129029
-)
+target_link_libraries(your_app PRIVATE nmealib0183)
 ```
 
-To force full NMEA 0183 coverage without using umbrella target:
+### NMEA2000 only
 
 ```cmake
-target_link_libraries(your_app PRIVATE nmealib_nmea0183_all)
+add_subdirectory(path/to/nmealib)
+target_link_libraries(your_app PRIVATE nmealib2000)
 ```
 
 ## First parse
