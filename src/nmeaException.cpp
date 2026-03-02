@@ -1,4 +1,4 @@
-#include "nmealib/nmeaException.hpp"
+#include "nmealib/nmeaException.h"
 
 namespace nmealib {
 

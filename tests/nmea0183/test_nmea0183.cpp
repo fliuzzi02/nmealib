@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 
-#include <nmealib/nmealib.hpp>
+#include <nmealib.h>
 
 using namespace nmealib::nmea0183;
 

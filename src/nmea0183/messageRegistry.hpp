@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nmealib/nmea0183.hpp>
+#include <nmealib/nmea0183.h>
 #include <map>
 #include <memory>
 #include <string>

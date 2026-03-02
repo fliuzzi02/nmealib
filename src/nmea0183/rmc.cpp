@@ -1,10 +1,10 @@
-#include "nmealib/nmea0183/rmc.hpp"
+#include "nmealib/nmea0183/rmc.h"
 #include <cmath>
 #include <iomanip>
 #include <sstream>
 #include <vector>
 
-#include "nmealib/nmea0183/nmea0183Factory.hpp"
+#include "nmealib/nmea0183/nmea0183Factory.h"
 
 namespace nmealib {
 namespace nmea0183 {

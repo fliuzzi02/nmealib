@@ -1,4 +1,4 @@
-#include "nmealib/nmea0183/dbt.hpp"
+#include "nmealib/nmea0183/dbt.h"
 
 #include <iomanip>
 #include <sstream>

@@ -1,4 +1,4 @@
-#include "nmealib/nmea0183/gll.hpp"
+#include "nmealib/nmea0183/gll.h"
 
 #include <cmath>
 #include <iomanip>

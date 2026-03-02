@@ -1,4 +1,4 @@
-#include "nmealib/nmea0183/vtg.hpp"
+#include "nmealib/nmea0183/vtg.h"
 
 #include <iomanip>
 #include <sstream>

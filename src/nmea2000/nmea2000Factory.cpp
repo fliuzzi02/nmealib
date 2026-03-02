@@ -1,6 +1,6 @@
-#include "nmealib/nmea2000/nmea2000Factory.hpp"
+#include "nmealib/nmea2000/nmea2000Factory.h"
 
-#include "nmealib/nmea2000/messageRegistry.hpp"
+#include "messageRegistry.hpp"
 
 namespace nmealib {
 namespace nmea2000 {

@@ -24,33 +24,45 @@ cmake --preset gcc-full
 cmake --build out/build/gcc-full
 ```
 
-## Link options (CMake)
+## Build targets
 
-- `nmealib`: umbrella target (core + all NMEA0183 + NMEA2000 messages)
-- `nmealib_nmea0183_all`: all NMEA0183 message libraries
-- `nmealib_nmea0183_<msg>`: single-message libraries (`dbt`, `gga`, `gsa`, `gll`, `mwv`, `vhw`, `rmc`, `vtg`, `zda`)
-- `nmealib_nmea2000_all`: all NMEA2000 message libraries
-- `nmealib_nmea2000_pgn129029`: single PGN library
+### Monolithic archives
 
-Example (only GGA + RMC):
+- `nmealib`: Contains core + all NMEA0183 messages + NMEA2000 messages (recommended for most users)
+- `nmealib0183`: Contains core + all NMEA0183 messages
+- `nmealib2000`: Contains core + all NMEA2000 messages
+
+### Per-message archives
+
+- `nmealib0183_dbt`, `nmealib0183_gga`, `nmealib0183_gll`, `nmealib0183_gsa`, `nmealib0183_mwv`, `nmealib0183_rmc`, `nmealib0183_vhw`, `nmealib0183_vtg`, `nmealib0183_zda`: Individual NMEA0183 sentence types
+
+### Usage examples
+
+Link entire library:
+
+```cmake
+target_link_libraries(your_app PRIVATE nmealib)
+```
+
+Link only NMEA0183 support:
+
+```cmake
+target_link_libraries(your_app PRIVATE nmealib0183)
+```
+
+Link specific messages (GGA + RMC):
 
 ```cmake
 target_link_libraries(your_app PRIVATE
-    nmealib_core
-    nmealib_nmea0183_base
-    nmealib_nmea0183_gga
-    nmealib_nmea0183_rmc
+    nmealib0183_gga
+    nmealib0183_rmc
 )
 ```
 
-Example (only PGN129029):
+Link only NMEA2000 support:
 
 ```cmake
-target_link_libraries(your_app PRIVATE
-    nmealib_core
-    nmealib_nmea2000_base
-    nmealib_nmea2000_pgn129029
-)
+target_link_libraries(your_app PRIVATE nmealib2000)
 ```
 
 ## Library usage
@@ -58,7 +70,7 @@ target_link_libraries(your_app PRIVATE
 ### NMEA 0183
 
 ```cpp
-#include <nmealib/nmea0183/nmea0183Factory.hpp>
+#include <nmealib/nmea0183/nmea0183Factory.h>
 
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(
     "$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A\r\n");
@@ -69,7 +81,7 @@ auto msg = nmealib::nmea0183::Nmea0183Factory::create(
 Raw frame with CAN ID + payload bytes:
 
 ```cpp
-#include <nmealib/nmea2000/nmea2000Factory.hpp>
+#include <nmealib/nmea2000/nmea2000Factory.h>
 
 auto msg2000 = nmealib::nmea2000::Nmea2000Factory::create(
     "18F80523 1D 01 23 45 67 FE DC BA 98 00 01 86 A0 12 00 04 E2 0C");

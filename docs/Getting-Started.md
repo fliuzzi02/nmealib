@@ -17,44 +17,41 @@ cmake --build out/build/gcc-full
 
 ## Link in your project (CMake)
 
+### Full library (recommended)
+
 ```cmake
 add_subdirectory(path/to/nmealib)
 target_link_libraries(your_app PRIVATE nmealib)
 ```
 
-Or link only required message libraries:
+### Specific messages only (GGA + RMC)
 
 ```cmake
 add_subdirectory(path/to/nmealib)
 target_link_libraries(your_app PRIVATE
-    nmealib_core
-    nmealib_nmea0183_base
-    nmealib_nmea0183_gga
-    nmealib_nmea0183_rmc
+    nmealib0183_gga
+    nmealib0183_rmc
 )
 ```
 
-NMEA 2000 only:
+### All NMEA0183 messages
 
 ```cmake
 add_subdirectory(path/to/nmealib)
-target_link_libraries(your_app PRIVATE
-    nmealib_core
-    nmealib_nmea2000_base
-    nmealib_nmea2000_pgn129029
-)
+target_link_libraries(your_app PRIVATE nmealib0183)
 ```
 
-To force full NMEA 0183 coverage without using umbrella target:
+### NMEA2000 only
 
 ```cmake
-target_link_libraries(your_app PRIVATE nmealib_nmea0183_all)
+add_subdirectory(path/to/nmealib)
+target_link_libraries(your_app PRIVATE nmealib2000)
 ```
 
 ## First parse
 
 ```cpp
-#include <nmealib/nmea0183/nmea0183Factory.hpp>
+#include <nmealib/nmea0183/nmea0183Factory.h>
 
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(
     "$GNGLL,3150.788156,N,11711.922383,E,062735.00,A,A*76\r\n");
@@ -66,7 +63,7 @@ All of these formats are equivalent:
 
 **Canonical format:**
 ```cpp
-#include <nmealib/nmea2000/nmea2000Factory.hpp>
+#include <nmealib/nmea2000/nmea2000Factory.h>
 
 auto msg2000 = nmealib::nmea2000::Nmea2000Factory::create(
     "18FD1234:0102030405060708");

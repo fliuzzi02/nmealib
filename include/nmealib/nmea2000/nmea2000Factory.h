@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nmealib/nmea2000.hpp>
+#include <nmealib/nmea2000.h>
 #include <chrono>
 #include <memory>
 #include <string>

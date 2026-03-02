@@ -4,23 +4,37 @@ This page summarizes the public API surface. It is organized for GitHub Pages na
 
 ## Public headers
 
-- `nmealib.h`
-- `nmealib/nmealib.hpp`
-- `nmealib/message.hpp`
-- `nmealib/nmeaException.hpp`
-- `nmealib/nmea0183.hpp`
-- `nmealib/nmea2000.hpp`
-- `nmealib/nmea0183/nmea0183Factory.hpp`
-- `nmealib/nmea2000/nmea2000Factory.hpp`
-- `nmealib/nmea2000/pgn129029.hpp`
-- `nmealib/nmea0183/rmc.hpp`
-- `nmealib/nmea0183/gga.hpp`
-- `nmealib/nmea0183/gll.hpp`
-- `nmealib/nmea0183/gsa.hpp`
-- `nmealib/nmea0183/mwv.hpp`
-- `nmealib/nmea0183/vhw.hpp`
-- `nmealib/nmea0183/vtg.hpp`
-- `nmealib/nmea0183/zda.hpp`
+- `nmealib.h` - Umbrella header including all features
+- `nmealib/message.h` - Base message class
+- `nmealib/nmeaException.h` - Exception classes
+- `nmealib/nmea0183.h` - NMEA 0183 base message and exceptions
+- `nmealib/nmea2000.h` - NMEA 2000 base message and exceptions
+- `nmealib/nmea0183/nmea0183Factory.h` - Factory for creating NMEA 0183 messages
+- `nmealib/nmea2000/nmea2000Factory.h` - Factory for creating NMEA 2000 messages
+- `nmealib/nmea0183/dbt.h` - DBT sentence message
+- `nmealib/nmea0183/rmc.h` - RMC sentence message
+- `nmealib/nmea0183/gga.h` - GGA sentence message
+- `nmealib/nmea0183/gll.h` - GLL sentence message
+- `nmealib/nmea0183/gsa.h` - GSA sentence message
+- `nmealib/nmea0183/mwv.h` - MWV sentence message
+- `nmealib/nmea0183/vhw.h` - VHW sentence message
+- `nmealib/nmea0183/vtg.h` - VTG sentence message
+- `nmealib/nmea0183/zda.h` - ZDA sentence message
+
+## CMake targets / Archives
+
+Libraries are built and installed as static archives:
+
+- **Monolithic:** `libnmealib.a` (all features), `libnmealib0183.a` (NMEA0183 only), `libnmealib2000.a` (NMEA2000 only)
+- **Per-message:** `libnmealib0183_<msg>.a` for each supported sentence type (dbt, gga, gll, gsa, mwv, rmc, vhw, vtg, zda)
+
+In CMakeLists.txt, reference them by target name (without `lib` prefix and `.a` suffix):
+
+```cmake
+target_link_libraries(your_app PRIVATE nmealib)        # Full library
+target_link_libraries(your_app PRIVATE nmealib0183)    # NMEA0183 only
+target_link_libraries(your_app PRIVATE nmealib0183_gga) # GGA sentence only
+```
 
 ## Namespaces
 
