@@ -12,23 +12,7 @@
 
 ## NMEA 0183 Messages
 
-### DBT - Depth Below Transducer
-
-### GGA - Global Positioning System Fix Data
-
-### GLL - Geographic Position
-
-### GSA - GPS DOP and Active Satellites
-
-### MWV - Wind Speed and Angle
-
-### RMC - Recommended Minimum Navigation Information
-
-### VHW - Water Speed and Heading
-
-### VTG - Track Made Good and Ground Speed
-
-### ZDA - Time and Date
+Here a table of contents that then redirects to nmea0183/XXX.md
 
 ## NMEA 2000 Messages
 

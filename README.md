@@ -24,42 +24,26 @@ The library provides comprehensive support for two major NMEA standards:
 
 ## Quick Start
 
-Add nmealib to your CMakeLists.txt using FetchContent to download the pre-compiled release:
+To quickly get started with **nmealib**, you can use the provided CLI application for parsing NMEA messages without needing to integrate the library into your project. This is ideal for testing and quick parsing tasks.
 
-```cmake
-include(FetchContent)
-
-# Fetch the pre-compiled nmealib binary release
-set(NMEALIB_VERSION "0.3.1")
-FetchContent_Declare(
-    nmealib
-    URL "https://github.com/fliuzzi02/nmealib/releases/download/v${NMEALIB_VERSION}/nmealib-${NMEALIB_VERSION}-linux64.tar.gz"
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-)
-FetchContent_MakeAvailable(nmealib)
-
-# Add the nmealib cmake directory to the prefix path so find_package can locate it
-list(APPEND CMAKE_PREFIX_PATH "${nmealib_SOURCE_DIR}/lib/cmake")
-
-find_package(nmealib REQUIRED)
-target_link_libraries(your_target PRIVATE nmealib::nmealib)
+Download the latest release from [GitHub Releases](../../releases) and run the CLI application to parse NMEA sentences directly from the command line.
 ```
+./nmealib-cli "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47"
 
-Then include and use the library:
+cat nmea_sentences.txt | ./nmealib-cli
+``` 
 
-```cpp
-#include <nmealib.h>
+To use the library in your project, refer to the [Installation Guide](docs/INSTALLATION.md) for detailed instructions on how to build and integrate **nmealib** into your C++ projects.
 
-auto msg = nmealib::nmea0183::Nmea0183Factory::create("$GPGGA,...*47\r\n");
-```
-
-For detailed integration examples, see the [using-nmealib](https://github.com/fliuzzi02/using-nmealib) repository.
-
-Alternatively, a CLI application binary is provided for quick message parsing without integration into your project.
-
-Releases are available on [GitHub Releases](../../releases).
+You can also find usage examples in the [Examples](docs/EXAMPLES.md) section, or go to the [using-nmealib](https://github.com/fliuzzi02/using-nmealib) repository.
 
 ### Prerequisites
+
+To build this library from source, you will need the following tools and dependencies:
+- CMake 3.20+
+- C++20 compatible compiler (GCC 10+, Clang 12+, MSVC 2019+)
+- Build tools (GNU Make, Ninja, or Visual Studio)
+- Optional tools for development (Google Test, clang-tidy, cppcheck)
 
 ### Installation
 To use this library you can either build it from source or use the provided binaries. For detailed installation instructions, please refer to the [Installation Guide](docs/INSTALLATION.md).
@@ -80,7 +64,11 @@ To use this library you can either build it from source or use the provided bina
 
 ## API Documentation
 
+You can find fully documented API reference in the [API Reference](docs/API.md) section.
+
 ## Examples
+
+Once included in your project, you can find usage examples in the [Usage Guide](docs/USAGE.md) section, or go to the [using-nmealib](https://github.com/fliuzzi02/using-nmealib) repository.
 
 ## Contributing
 
