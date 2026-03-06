@@ -3,6 +3,7 @@
 #include "nmealib/nmea0183/gga.h"
 #include "nmealib/nmea0183/gll.h"
 #include "nmealib/nmea0183/gsa.h"
+#include "nmealib/nmea0183/mtw.h"
 #include "nmealib/nmea0183/mwv.h"
 #include "nmealib/nmea0183/rmc.h"
 #include "nmealib/nmea0183/vhw.h"
@@ -31,6 +32,8 @@ std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentence
         return createGSA(std::move(baseMessage));
     } else if (sentenceType == "GLL") {
         return createGLL(std::move(baseMessage));
+    } else if (sentenceType == "MTW") {
+        return createMTW(std::move(baseMessage));
     } else if (sentenceType == "MWV") {
         return createMWV(std::move(baseMessage));
     } else if (sentenceType == "VHW") {
@@ -65,6 +68,10 @@ std::unique_ptr<Message0183> MessageRegistry::createGSA(std::unique_ptr<Message0
 
 std::unique_ptr<Message0183> MessageRegistry::createGLL(std::unique_ptr<Message0183> baseMessage) {
     return GLL::create(std::move(baseMessage));
+}
+
+std::unique_ptr<Message0183> MessageRegistry::createMTW(std::unique_ptr<Message0183> baseMessage) {
+    return MTW::create(std::move(baseMessage));
 }
 
 std::unique_ptr<Message0183> MessageRegistry::createMWV(std::unique_ptr<Message0183> baseMessage) {

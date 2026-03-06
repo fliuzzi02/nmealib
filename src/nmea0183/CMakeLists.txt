@@ -11,6 +11,9 @@ target_include_directories(nmealib0183_gll PUBLIC ${PROJECT_SOURCE_DIR}/include)
 add_library(nmealib0183_gsa STATIC gsa.cpp)
 target_include_directories(nmealib0183_gsa PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
+add_library(nmealib0183_mtw STATIC mtw.cpp)
+target_include_directories(nmealib0183_mtw PUBLIC ${PROJECT_SOURCE_DIR}/include)
+
 add_library(nmealib0183_mwv STATIC mwv.cpp)
 target_include_directories(nmealib0183_mwv PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
@@ -39,6 +42,7 @@ add_library(nmealib0183 STATIC
     gll.cpp
     gsa.cpp
     mwv.cpp
+    mtw.cpp
     rmc.cpp
     vhw.cpp
     vtg.cpp
@@ -58,6 +62,7 @@ set(NMEALIB_NMEA0183_SOURCES
     nmea0183/gll.cpp
     nmea0183/gsa.cpp
     nmea0183/mwv.cpp
+    nmea0183/mtw.cpp
     nmea0183/rmc.cpp
     nmea0183/vhw.cpp
     nmea0183/vtg.cpp
