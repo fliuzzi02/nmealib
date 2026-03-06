@@ -100,6 +100,7 @@ std::string DBT::getStringContent(bool verbose) const noexcept {
     if (validate()) {
         validity = "OK";
     }
+    ss << std::setprecision(2);
 
     if (verbose) {
         ss << "Protocol: " << typeToString(type_) << "\n";
