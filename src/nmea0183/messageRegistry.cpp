@@ -7,6 +7,7 @@
 #include "nmealib/nmea0183/rmc.h"
 #include "nmealib/nmea0183/vhw.h"
 #include "nmealib/nmea0183/vtg.h"
+#include "nmealib/nmea0183/vwr.h"
 #include "nmealib/nmea0183/zda.h"
 
 namespace nmealib {
@@ -36,6 +37,8 @@ std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentence
         return createVHW(std::move(baseMessage));
     } else if (sentenceType == "VTG") {
         return createVTG(std::move(baseMessage));
+    } else if (sentenceType == "VWR") {
+        return createVWR(std::move(baseMessage));
     } else if (sentenceType == "ZDA") {
         return createZDA(std::move(baseMessage));
     } else {
@@ -74,6 +77,10 @@ std::unique_ptr<Message0183> MessageRegistry::createVHW(std::unique_ptr<Message0
 
 std::unique_ptr<Message0183> MessageRegistry::createVTG(std::unique_ptr<Message0183> baseMessage) {
     return VTG::create(std::move(baseMessage));
+}
+
+std::unique_ptr<Message0183> MessageRegistry::createVWR(std::unique_ptr<Message0183> baseMessage) {
+    return VWR::create(std::move(baseMessage));
 }
 
 std::unique_ptr<Message0183> MessageRegistry::createZDA(std::unique_ptr<Message0183> baseMessage) {
