@@ -70,7 +70,7 @@ std::string MTW::getStringContent(bool verbose) const noexcept {
     if (validate()) {
         validity = "OK";
     }
-    ss << std::setprecision(2);
+    ss << std::fixed << std::setprecision(2);
 
     if (verbose) {
         ss << "Protocol: " << typeToString(type_) << "\n";
