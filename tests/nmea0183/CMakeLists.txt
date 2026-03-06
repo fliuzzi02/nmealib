@@ -1,6 +1,7 @@
 add_executable(nmea0183_tests
     test_nmea0183.cpp
     test_DBT.cpp
+    test_MTW.cpp
     test_RMC.cpp
     test_GGA.cpp
     test_GSA.cpp
@@ -8,6 +9,7 @@ add_executable(nmea0183_tests
     test_MWV.cpp
     test_VHW.cpp
     test_VTG.cpp
+    test_VWR.cpp
     test_ZDA.cpp
 )
 

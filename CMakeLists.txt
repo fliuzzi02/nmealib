@@ -10,6 +10,19 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Code coverage options
+option(ENABLE_COVERAGE "Enable code coverage instrumentation" OFF)
+
+if(ENABLE_COVERAGE)
+    message(STATUS "Code coverage enabled (ENABLE_COVERAGE=ON)")
+    
+    # Coverage flags for GCC/Clang - applied to all build types
+    add_compile_options(-fprofile-arcs -ftest-coverage)
+    add_link_options(--coverage)
+    
+    message(STATUS "Coverage flags added via add_compile_options and add_link_options")
+endif()
+
 add_subdirectory(src)
 
 option(BUILD_CLI "Build the CLI app" ON)

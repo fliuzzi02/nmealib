@@ -3,10 +3,12 @@
 #include "nmealib/nmea0183/gga.h"
 #include "nmealib/nmea0183/gll.h"
 #include "nmealib/nmea0183/gsa.h"
+#include "nmealib/nmea0183/mtw.h"
 #include "nmealib/nmea0183/mwv.h"
 #include "nmealib/nmea0183/rmc.h"
 #include "nmealib/nmea0183/vhw.h"
 #include "nmealib/nmea0183/vtg.h"
+#include "nmealib/nmea0183/vwr.h"
 #include "nmealib/nmea0183/zda.h"
 
 namespace nmealib {
@@ -30,12 +32,16 @@ std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentence
         return createGSA(std::move(baseMessage));
     } else if (sentenceType == "GLL") {
         return createGLL(std::move(baseMessage));
+    } else if (sentenceType == "MTW") {
+        return createMTW(std::move(baseMessage));
     } else if (sentenceType == "MWV") {
         return createMWV(std::move(baseMessage));
     } else if (sentenceType == "VHW") {
         return createVHW(std::move(baseMessage));
     } else if (sentenceType == "VTG") {
         return createVTG(std::move(baseMessage));
+    } else if (sentenceType == "VWR") {
+        return createVWR(std::move(baseMessage));
     } else if (sentenceType == "ZDA") {
         return createZDA(std::move(baseMessage));
     } else {
@@ -64,6 +70,10 @@ std::unique_ptr<Message0183> MessageRegistry::createGLL(std::unique_ptr<Message0
     return GLL::create(std::move(baseMessage));
 }
 
+std::unique_ptr<Message0183> MessageRegistry::createMTW(std::unique_ptr<Message0183> baseMessage) {
+    return MTW::create(std::move(baseMessage));
+}
+
 std::unique_ptr<Message0183> MessageRegistry::createMWV(std::unique_ptr<Message0183> baseMessage) {
     return MWV::create(std::move(baseMessage));
 }
@@ -74,6 +84,10 @@ std::unique_ptr<Message0183> MessageRegistry::createVHW(std::unique_ptr<Message0
 
 std::unique_ptr<Message0183> MessageRegistry::createVTG(std::unique_ptr<Message0183> baseMessage) {
     return VTG::create(std::move(baseMessage));
+}
+
+std::unique_ptr<Message0183> MessageRegistry::createVWR(std::unique_ptr<Message0183> baseMessage) {
+    return VWR::create(std::move(baseMessage));
 }
 
 std::unique_ptr<Message0183> MessageRegistry::createZDA(std::unique_ptr<Message0183> baseMessage) {

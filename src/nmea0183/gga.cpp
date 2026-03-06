@@ -33,9 +33,9 @@ std::unique_ptr<GGA> GGA::create(std::unique_ptr<Message0183> baseMessage) {
     if (!fields.empty()) {
         fields.erase(fields.begin());
     }
-
-    if (fields.size() != 14) {
-        throw NotGGAException(context, "Insufficient fields in GGA payload: expected 14, got " + std::to_string(fields.size()) + ". Payload: " + payload);
+    size_t messageSize = fields.size();
+    if (messageSize != 14 && messageSize != 12) {
+        throw NotGGAException(context, "Insufficient fields in GGA payload: expected 14 or 12, got " + std::to_string(fields.size()) + ". Payload: " + payload);
     }
 
     try {
@@ -51,8 +51,13 @@ std::unique_ptr<GGA> GGA::create(std::unique_ptr<Message0183> baseMessage) {
         char altitudeUnits = fields[9].empty() ? '\0' : fields[9][0];
         double geoidalSeparation = fields[10].empty() ? 0.0 : std::stod(fields[10]);
         char geoidalSeparationUnits = fields[11].empty() ? '\0' : fields[11][0];
-        double dgpsAge = fields[12].empty() ? 0.0 : std::stod(fields[12]);
-        std::string dgpsReferenceStationId = fields[13].empty() ? "" : fields[13];
+        double dgpsAge = -1;
+        std::string dgpsReferenceStationId = "";
+
+        if(messageSize == 14) {
+            dgpsAge = fields[12].empty() ? 0.0 : std::stod(fields[12]);
+            dgpsReferenceStationId = fields[13].empty() ? "" : fields[13];
+        }
 
         return std::unique_ptr<GGA>(new GGA(std::move(*baseMessage),
                                             timestamp,
