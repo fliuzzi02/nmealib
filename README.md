@@ -23,22 +23,25 @@ Modern C++20 library for parsing **NMEA 0183** sentences and **NMEA 2000** CAN m
 ## Supported Protocols
 
 ### NMEA 0183
-| Message | Tested | Details |
-|---|---|---|
-| [GGA](docs/PROTOCOL_SUPPORT.md#nmea-0183-gga) | ✅ Yes | Global Positioning System Fix Data |
-| [GLL](docs/PROTOCOL_SUPPORT.md#nmea-0183-gll) | ✅ Yes | Geographic Position - Latitude/Longitude |
-| [RMC](docs/PROTOCOL_SUPPORT.md#nmea-0183-rmc) | ✅ Yes | Recommended Minimum Specific GNSS Data |
-| [VTG](docs/PROTOCOL_SUPPORT.md#nmea-0183-vtg) | ✅ Yes | Track Made Good and Ground Speed |
-| [VHW](docs/PROTOCOL_SUPPORT.md#nmea-0183-vhw) | ✅ Yes | Water Speed and Heading |
-| [DBT](docs/PROTOCOL_SUPPORT.md#nmea-0183-dbt) | ✅ Yes | Depth Below Transducer |
-| [MWV](docs/PROTOCOL_SUPPORT.md#nmea-0183-mwv) | ✅ Yes | Wind Speed and Angle |
+| Message | Implemented | Tested| Notes |
+|---|---|---|---|
+| [DBT](docs/PROTOCOL_SUPPORT.md#dbt--depth-below-transducer) | ✅ Yes | ✅ Yes | Depth Below Transducer |
+| [GGA](docs/PROTOCOL_SUPPORT.md#gga--global-positioning-system-fix-data) | ✅ Yes | ✅ Yes | Global Positioning System Fix Data |
+| [GLL](docs/PROTOCOL_SUPPORT.md#gll--geographic-position---latitudelongitude) | ✅ Yes | ✅ Yes | Geographic Position |
+| [GSA](docs/PROTOCOL_SUPPORT.md#gsa--gps-dop-and-active-satellites) | ✅ Yes | ✅ Yes | GPS DOP and Active Satellites |
+| [MTW](docs/PROTOCOL_SUPPORT.md#mtw--mean-temperature-of-water) | ✅ Yes | ✅ Yes | Mean Temperature of Water |
+| [MWV](docs/PROTOCOL_SUPPORT.md#mwv--wind-speed-and-angle) | ✅ Yes | ✅ Yes | Wind Speed and Angle |
+| [RMC](docs/PROTOCOL_SUPPORT.md#rmc--recommended-minimum-navigation-information) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Data |
+| [VHW](docs/PROTOCOL_SUPPORT.md#vhw--water-speed-and-heading) | ✅ Yes | ✅ Yes | Water Speed and Heading |
+| [VTG](docs/PROTOCOL_SUPPORT.md#vtg--track-made-good-and-ground-speed) | ✅ Yes | ✅ Yes | Course Over Ground and Ground Speed |
+| [VWR](docs/PROTOCOL_SUPPORT.md#vwr--relative-wind-speed-and-angle) | ✅ Yes | ✅ Yes | Relative Wind Speed and Angle |
+| [ZDA](docs/PROTOCOL_SUPPORT.md#zda--time--date-utc-day-month-year-local-time-zone) | ✅ Yes | ✅ Yes | Time and Date |
 
 ### NMEA 2000
-
-| PGN | Tested | Details |
-|---|---|---|
-| [Single-frame messages](docs/PROTOCOL_SUPPORT.md#nmea-2000-single-frame-messages) | ❌ No | Standard one-frame CAN payloads |
-| [Fast-packet transport](docs/PROTOCOL_SUPPORT.md#nmea-2000-fast-packet-transport) | ❌ No | Multi-frame transport handling |
+| Message / Transport | Implemented | Tested | Notes |
+|---|---|---|---|
+| [Single-frame messages](docs/PROTOCOL_SUPPORT.md#nmea-2000-single-frame-messages) | ✅ Yes | ❌ No | Standard one-frame CAN payloads |
+| [Fast-packet transport](docs/PROTOCOL_SUPPORT.md#nmea-2000-fast-packet-transport) | ✅ Yes | ❌ No | Multi-frame transport handling ||
 
 > Messages/PGNs not listed are currently considered **not implemented**.
 

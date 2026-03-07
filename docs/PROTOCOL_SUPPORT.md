@@ -18,8 +18,6 @@ This page tracks message/PGN support and implementation details.
 | [VWR](#vwr--relative-wind-speed-and-angle) | ✅ Yes | ✅ Yes | Relative Wind Speed and Angle |
 | [ZDA](#zda--time--date-utc-day-month-year-local-time-zone) | ✅ Yes | ✅ Yes | Time and Date |
 
-
-
 ## NMEA 2000
 
 | Message / Transport | Implemented | Tested | Notes |
