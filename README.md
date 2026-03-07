@@ -1,186 +1,176 @@
 # nmealib
 
-C++ library for working with NMEA messages.
+[![License: GPL-3.0](https://img.shields.io/github/license/fliuzzi02/nmealib)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/fliuzzi02/nmealib)](https://github.com/fliuzzi02/nmealib/releases)
+![C++20](https://img.shields.io/badge/C%2B%2B-20-blue)
+[![Coverage Status](https://coveralls.io/repos/github/fliuzzi02/nmealib/badge.svg?branch=feature/CI-test-coverage-integration)](https://coveralls.io/github/fliuzzi02/nmealib?branch=feature/CI-test-coverage-integration)
 
-## Highlights
+Modern C++20 library for parsing **NMEA 0183** sentences and **NMEA 2000** CAN messages, with typed models, validation, and extensible message handling.
 
-- NMEA 0183 parsing and validation
-- Typed sentence classes (`RMC`, `GGA`, `GLL`, `GSA`, `MWV`, `VHW`, `VTG`, `ZDA`)
-- Factory-based parsing with `Nmea0183Factory`
-- NMEA 2000 single-frame and fast-packet message support (up to 223 bytes)
-- Flexible input format parsing for NMEA 2000 (multiple formats supported)
-- Typed PGN classes (e.g., `PGN129029`) via `Nmea2000Factory`
-- CMake build, tests, and CLI
+---
 
-## Requirements
+## Why nmealib
 
-- C++20 compiler
-- CMake 3.20+
+- Unified parsing for **NMEA 0183** and **NMEA 2000**
+- Typed message classes for safer integrations
+- Built-in validation (including NMEA 0183 checksum handling)
+- Extensible architecture for new sentence/PGN support
+- CLI tool for quick parsing and debugging
+- Unit-tested codebase
 
-## Build
+---
 
-```bash
-cmake --preset gcc-full
-cmake --build out/build/gcc-full
-```
-
-## Build targets
-
-### Monolithic archives
-
-- `nmealib`: Contains core + all NMEA0183 messages + NMEA2000 messages (recommended for most users)
-- `nmealib0183`: Contains core + all NMEA0183 messages
-- `nmealib2000`: Contains core + all NMEA2000 messages
-
-### Per-message archives
-
-- `nmealib0183_dbt`, `nmealib0183_gga`, `nmealib0183_gll`, `nmealib0183_gsa`, `nmealib0183_mwv`, `nmealib0183_rmc`, `nmealib0183_vhw`, `nmealib0183_vtg`, `nmealib0183_zda`: Individual NMEA0183 sentence types
-
-### Usage examples
-
-Link entire library:
-
-```cmake
-target_link_libraries(your_app PRIVATE nmealib)
-```
-
-Link only NMEA0183 support:
-
-```cmake
-target_link_libraries(your_app PRIVATE nmealib0183)
-```
-
-Link specific messages (GGA + RMC):
-
-```cmake
-target_link_libraries(your_app PRIVATE
-    nmealib0183_gga
-    nmealib0183_rmc
-)
-```
-
-Link only NMEA2000 support:
-
-```cmake
-target_link_libraries(your_app PRIVATE nmealib2000)
-```
-
-## Library usage
+## Supported Protocols
 
 ### NMEA 0183
-
-```cpp
-#include <nmealib/nmea0183/nmea0183Factory.h>
-
-auto msg = nmealib::nmea0183::Nmea0183Factory::create(
-    "$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A\r\n");
-```
+| Message | Implemented | Tested| Notes |
+|---|---|---|---|
+| [DBT](docs/PROTOCOL_SUPPORT.md#dbt--depth-below-transducer) | ✅ Yes | ✅ Yes | Depth Below Transducer |
+| [GGA](docs/PROTOCOL_SUPPORT.md#gga--global-positioning-system-fix-data) | ✅ Yes | ✅ Yes | Global Positioning System Fix Data |
+| [GLL](docs/PROTOCOL_SUPPORT.md#gll--geographic-position---latitudelongitude) | ✅ Yes | ✅ Yes | Geographic Position |
+| [GSA](docs/PROTOCOL_SUPPORT.md#gsa--gps-dop-and-active-satellites) | ✅ Yes | ✅ Yes | GPS DOP and Active Satellites |
+| [MTW](docs/PROTOCOL_SUPPORT.md#mtw--mean-temperature-of-water) | ✅ Yes | ✅ Yes | Mean Temperature of Water |
+| [MWV](docs/PROTOCOL_SUPPORT.md#mwv--wind-speed-and-angle) | ✅ Yes | ✅ Yes | Wind Speed and Angle |
+| [RMC](docs/PROTOCOL_SUPPORT.md#rmc--recommended-minimum-navigation-information) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Data |
+| [VHW](docs/PROTOCOL_SUPPORT.md#vhw--water-speed-and-heading) | ✅ Yes | ✅ Yes | Water Speed and Heading |
+| [VTG](docs/PROTOCOL_SUPPORT.md#vtg--track-made-good-and-ground-speed) | ✅ Yes | ✅ Yes | Course Over Ground and Ground Speed |
+| [VWR](docs/PROTOCOL_SUPPORT.md#vwr--relative-wind-speed-and-angle) | ✅ Yes | ✅ Yes | Relative Wind Speed and Angle |
+| [ZDA](docs/PROTOCOL_SUPPORT.md#zda--time--date-utc-day-month-year-local-time-zone) | ✅ Yes | ✅ Yes | Time and Date |
 
 ### NMEA 2000
+| Message / Transport | Implemented | Tested | Notes |
+|---|---|---|---|
+| [Single-frame messages](docs/PROTOCOL_SUPPORT.md#nmea-2000-single-frame-messages) | ✅ Yes | ❌ No | Standard one-frame CAN payloads |
+| [Fast-packet transport](docs/PROTOCOL_SUPPORT.md#nmea-2000-fast-packet-transport) | ✅ Yes | ❌ No | Multi-frame transport handling ||
 
-Raw frame with CAN ID + payload bytes:
+> Messages/PGNs not listed are currently considered **not implemented**.
+
+---
+
+## Quick Start
+
+### CLI Usage
+
+Download the latest release from [GitHub Releases](https://github.com/fliuzzi02/nmealib/releases), then parse a sentence:
+
+```bash
+./nmealib-cli '$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47'
+```
+
+Parse from a file/pipe:
+
+```bash
+cat nmea_sentences.txt | ./nmealib-cli
+```
+
+### Use the library in your C++ project
 
 ```cpp
-#include <nmealib/nmea2000/nmea2000Factory.h>
+#include <nmealib.h>
 
-auto msg2000 = nmealib::nmea2000::Nmea2000Factory::create(
-    "18F80523 1D 01 23 45 67 FE DC BA 98 00 01 86 A0 12 00 04 E2 0C");
+int main() {
+    std::string sentence = "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47";
+    try {
+        auto msg = nmealib::NMEA0183::GGA::parse(sentence);
+        std::cout << "Parsed GGA message: " << msg.toString() << std::endl;
+    } catch (const nmealib::ParseException& e) {
+        std::cerr << "Failed to parse sentence: " << e.what() << std::endl;
+    }
+    return 0;
+}
 ```
 
-Compact raw format (no spaces) is also supported:
+See [using-nmealib](https://github.com/fliuzzi02/using-nmealib) for a full example project demonstrating library usage.
 
-```cpp
-auto msg2000Compact = nmealib::nmea2000::Nmea2000Factory::create(
-    "18F805231D01234567FEDCBA98000186A0120004E20C");
-```
+---
 
-## CLI usage
+## Build from Source
 
-### Build CLI
+### Requirements
+
+- CMake 3.20+
+- C++20 compiler:
+  - GCC 10+
+  - Clang 12+
+  - MSVC 2019+
+- Build system: Ninja, GNU Make, or Visual Studio
+- Optional (development): GoogleTest, clang-tidy, cppcheck
+
+### Build
 
 ```bash
-cmake --preset gcc-debug-tests
-cmake --build out/build/gcc-debug-tests --target nmealib-cli
+git clone https://github.com/fliuzzi02/nmealib.git
+cd nmealib
+
+cmake --preset gcc-release
+cmake --build --preset build-release
+cmake --install out/build/gcc-release --prefix out/install/gcc-release
 ```
 
-### Protocol selection
+Artifacts are installed under:
 
-- `-t=<type>` or `--type=<type>`
-- Supported values:
-    - `N0183`
-    - `N2K`
-- If omitted, default protocol is `N0183`.
+`out/install/gcc-release`
 
-### Parse one message
-
-NMEA 0183:
+### Run Tests
 
 ```bash
-./nmealib-cli -t=N0183 -m '$GNGGA,062735.00,3150.788156,N,11711.922383,E,1,12,2.0,90.0,M,,M,,*55\r\n'
+cmake --preset gcc-release-tests
+cmake --build --preset build-release-tests
+ctest --preset build-release-tests
 ```
 
-NMEA 2000 (spaced raw frame):
-
-```bash
-./nmealib-cli -t=N2K -m '18F80523 1D 01 23 45 67 FE DC BA 98 00 01 86 A0 12 00 04 E2 0C'
-```
-
-NMEA 2000 (compact raw frame):
-
-```bash
-./nmealib-cli --type=N2K -m '18F805231D01234567FEDCBA98000186A0120004E20C'
-```
-
-### Parse stream from stdin
-
-```bash
-cat messages.txt | ./nmealib-cli -t=N0183
-cat n2k_frames.txt | ./nmealib-cli -t=N2K
-```
-
-## NMEA 2000 disclaimer
-
-NMEA 2000 support in this project is based on reverse engineering and publicly available field observations.
-For full official and compliant NMEA 2000 support, you must obtain the appropriate license and documentation from the NMEA Association.
+---
 
 ## Documentation
 
-- [Home](docs/Home.md)
-- [Getting Started](docs/Getting-Started.md)
-- [Building and Testing](docs/Building-and-Testing.md)
-- [Examples](docs/Examples.md)
-- [API Reference](docs/API-Reference.md)
-- [NMEA 0183 Guide](docs/NMEA-0183-Guide.md)
-- [Contributing](docs/Contributing.md)
+- [Installation Guide](docs/INSTALLATION.md)
+- [API Reference](docs/API.md)
+- [Examples](docs/EXAMPLES.md)
+- [Contributing](docs/CONTRIBUTING.md)
 
-## Roadmap
+Companion usage repository: [using-nmealib](https://github.com/fliuzzi02/using-nmealib)
 
-- [ ] NMEA0183 Support:
-    - [x] GPS/GNSS sentencies
-    - [x] Wind sentencies
-    - [ ] Depth transducers sentencies
-    - [ ] Autopilot sentencies
-    - [ ] Water speed sentencies
-    - [ ] Wind sentencies
-    - [ ] Cross track error sentencies
-- [ ] NMEA2000 Support:
-    - [ ] TBD, possibly all sentencies that can be translated to/from supported N0183 ones
-- [ ] Documentation
-- [ ] PlatformIO Release
-- [ ] Windows support
-- [ ] MAcOS support
-- [ ] Full linux support across distros
+---
 
+## Project Structure
 
-## Contributing
+```text
+nmealib/
+├── .github/                  # CI workflow files
+├── include/
+│   ├── nmealib.h             # Main umbrella header
+│   └── nmealib/
+│       ├── nmeaExceptions.h  # Custom exception classes
+│       ├── message.h         # Base Message class and utilities
+│       ├── nmea0183.h        # Base NMEA 0183 class and utilities
+│       ├── nmea2000.h        # Base NMEA 2000 class and utilities
+│       ├── nmea0183/         # NMEA 0183 message type headers
+│       └── nmea2000/         # NMEA 2000 message type headers
+├── src/                      # Library implementation and parsing logic
+├── tests/                    # Unit tests
+├── scripts/                  # CI/dev utility scripts
+└── docs/                     # Documentation
+```
 
-See [Contributing](docs/Contributing.md).
+---
+
+## Compatibility
+
+| Platform | Compiler | Standard |
+|---|---|---|
+| Linux | GCC 10+, Clang 12+ | C++20 |
+| Windows | MSVC 2019+ | C++20 |
+| macOS | Clang 12+ | C++20 |
+
+---
 
 ## License
 
-This project is licensed under the GNU GPLv3 (or later). See [LICENSE](LICENSE).
+Licensed under **GPL-3.0**. See [LICENSE](LICENSE).
 
+---
 
 ## Support
 
-
+- Open an issue in this repository for bugs/feature requests.
+- For usage questions, include sample input data and expected output.
