@@ -32,6 +32,7 @@
 #include "nmealib/nmea0183/gga.h"
 #include "nmealib/nmea0183/gll.h"
 #include "nmealib/nmea0183/gsa.h"
+#include "nmealib/nmea0183/hdm.h"
 #include "nmealib/nmea0183/mwv.h"
 #include "nmealib/nmea0183/mtw.h"
 #include "nmealib/nmea0183/vhw.h"
