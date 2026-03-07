@@ -12,8 +12,6 @@
 
 ## NMEA 0183 Messages
 
-Here a table of contents that then redirects to nmea0183/XXX.md
-
 ## NMEA 2000 Messages
 
 ## Utility Functions

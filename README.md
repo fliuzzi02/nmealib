@@ -25,7 +25,7 @@ Modern C++20 library for parsing **NMEA 0183** sentences and **NMEA 2000** CAN m
 ### NMEA 0183
 | Message | Tested | Details |
 |---|---|---|
-| [GGA](docs/PROTOCOL_SUPPORT.md#nmea-0183-gga) |  ✅ Yes | Global Positioning System Fix Data |
+| [GGA](docs/PROTOCOL_SUPPORT.md#nmea-0183-gga) | ✅ Yes | Global Positioning System Fix Data |
 | [GLL](docs/PROTOCOL_SUPPORT.md#nmea-0183-gll) | ✅ Yes | Geographic Position - Latitude/Longitude |
 | [RMC](docs/PROTOCOL_SUPPORT.md#nmea-0183-rmc) | ✅ Yes | Recommended Minimum Specific GNSS Data |
 | [VTG](docs/PROTOCOL_SUPPORT.md#nmea-0183-vtg) | ✅ Yes | Track Made Good and Ground Speed |

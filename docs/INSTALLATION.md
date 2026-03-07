@@ -2,15 +2,72 @@
 
 ## Prerequisites
 
+- **Git** (to clone the repository).
+- **CMake 3.20 or newer**.
+- **C++20-compatible compiler**:
+    - GCC 10+
+    - Clang 12+
+    - MSVC 2019+
+- **A supported CMake generator/build backend**:
+    - Ninja
+    - GNU Make
+    - Visual Studio
+
 ## Build Requirements
+
+- The project is configured with **C++20** (`CMAKE_CXX_STANDARD 20`).
+- Tests are optional and enabled by preset/option (`ENABLE_TESTS=ON`); test dependencies are fetched automatically via CMake `FetchContent`.
+- Running tests requires **CTest** (provided by CMake) and first-time network access to download GoogleTest (`v1.14.0`).
+- Static analysis is optional and enabled by preset/option (`ENABLE_STATIC_ANALYSIS=ON`):
+    - `cppcheck` is used by the `static-analysis` target.
+    - `clang-tidy` is used when available (build continues with warning if not installed).
+    - `compile_commands.json` must be available (`-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`).
 
 ## Installation from Source
 
 ### Cloning the Repository
 
+```bash
+git clone https://github.com/fliuzzi02/nmealib.git
+cd nmealib
+```
+
 ### Building
 
+Multiple CMake presets are available for different build configurations.
+
+To build the library for use in your project, use the Library Only release preset:
+
+```bash
+cmake --preset=gcc-release-lib-only
+cmake --build --preset=build-release-lib-only
+cmake --install out/build/gcc-release-lib-only --prefix out/install/gcc-release-lib-only
+```
+
+If you need also the CLI application, use the full release preset:
+
+```bash
+cmake --preset gcc-release
+cmake --build --preset build-release
+cmake --install out/build/gcc-release --prefix out/install/gcc-release
+```
+
 ### Testing the Build
+
+If you want to run the tests or the static analysis, you can use the test preset:
+
+```bash
+cmake --preset gcc-release-tests
+cmake --build --preset build-release-tests
+ctest --test-dir out/build/gcc-release-tests --output-on-failure --no-tests=error
+```
+
+or
+
+```bash
+cmake --preset gcc-release-static -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+cmake --build --preset build-release-static --target static-analysis
+```
 
 ## Installation as a Library
 
@@ -41,9 +98,5 @@ Then include and use the library:
 #include <nmealib.h>
 
 auto msg = nmealib::nmea0183::Nmea0183Factory::create("$GPGGA,...*47\r\n");
-```s
-
-## Verifying Installation
-
-## Troubleshooting
+```
 
