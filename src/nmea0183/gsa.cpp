@@ -162,7 +162,6 @@ std::string GSA::getStringContent(bool verbose) const noexcept {
         if (systemId_.has_value()) {
             ss << ", SystemID=" << systemId_.value();
         }
-        ss << ")";
     }
 
     return ss.str();

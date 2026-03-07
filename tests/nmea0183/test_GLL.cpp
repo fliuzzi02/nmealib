@@ -140,3 +140,15 @@ TEST(GLL, ConvertsCoordinatesWithHighPrecision)
     EXPECT_NEAR(gllMsg->getLatitude(), expectedLatitude, 1e-12);
     EXPECT_NEAR(gllMsg->getLongitude(), expectedLongitude, 1e-12);
 }
+
+// Additional tests for full coverage
+TEST(GLL, GetStringContent)
+{
+    GLL gll("GN", 31.8464692667, 'N', 117.1987063833, 'E', 62735.0, 'A', 'A');
+    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: GN\nSentence Type: GLL\nChecksum: None\nFields:\n\tLatitude: 31.84646927\n\tLatitude Direction: N\n\tLongitude: 117.1987064\n\tLongitude Direction: E\n\tTimestamp: 62735\n\tStatus: A\n\tMode Indicator: A";
+    std::string expectedOneLiner = "[OK] NMEA0183 GN GLL: Lat=31.84646927N, Lon=117.1987064E, Time=62735, Status=A, Mode=A";
+    std::string actualVerbose = gll.getStringContent(true);
+    std::string actualOneLiner = gll.getStringContent(false);
+    EXPECT_EQ(actualVerbose, expectedVerbose);
+    EXPECT_EQ(actualOneLiner, expectedOneLiner);
+}

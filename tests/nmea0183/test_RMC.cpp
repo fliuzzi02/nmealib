@@ -202,3 +202,15 @@ TEST(RMC, ConvertsCoordinatesWithHighPrecision)
     EXPECT_NEAR(rmcMsg->getLatitude(), expectedLatitude, 1e-12);
     EXPECT_NEAR(rmcMsg->getLongitude(), expectedLongitude, 1e-12);
 }
+
+// Additional tests for full coverage
+TEST(RMC, GetStringContent)
+{
+    RMC rmc("GP", 123519, 'A', 48.1173, 'N', 11.5166, 'E', 22.4, 84.4, 230394, 3.1, 'W', 'A', 'V');
+    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: GP\nSentence Type: RMC\nChecksum: None\nFields:\n\tUTC Fix: 123519\n\tStatus: A\n\tLatitude: 48.1173\n\tLatitude Direction: N\n\tLongitude: 11.5166\n\tLongitude Direction: E\n\tSpeed Over Ground: 22.4\n\tCourse Over Ground: 84.4\n\tDate: 230394\n\tMagnetic Variation: 3.1\n\tMagnetic Variation Direction: W\n\tMode Indicator: A\n\tNavigation Status: V";
+    std::string expectedOneLiner = "[OK] NMEA0183 GP RMC: UTC Fix=123519, Status=A, Lat=48.1173N, Lon=11.5166E, SOG=22.4, COG=84.4, Date=230394, MagVar=3.1W, Mode=A, NavStatus=V";
+    std::string actualVerbose = rmc.getStringContent(true);
+    std::string actualOneLiner = rmc.getStringContent(false);
+    EXPECT_EQ(actualVerbose, expectedVerbose);
+    EXPECT_EQ(actualOneLiner, expectedOneLiner);
+}

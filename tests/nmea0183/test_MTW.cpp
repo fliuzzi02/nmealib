@@ -97,3 +97,15 @@ TEST(MTW, FactoryThrowsOnMalformedMtwSentence)
 {
     EXPECT_THROW(Nmea0183Factory::create(MALFORMED_MTW_SENTENCE), NotMTWException);
 }
+
+// Additional tests for full coverage
+TEST(MTW, GetStringContent)
+{
+    MTW mtw("II", 23.5, 'C');
+    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: II\nSentence Type: MTW\nChecksum: None\nFields:\n\tTemperature: 23.50\n\tUnit: C";
+    std::string expectedOneLiner = "[OK] NMEA0183 II MTW: Temperature=23.50C";
+    std::string actualVerbose = mtw.getStringContent(true);
+    std::string actualOneLiner = mtw.getStringContent(false);
+    EXPECT_EQ(actualVerbose, expectedVerbose);
+    EXPECT_EQ(actualOneLiner, expectedOneLiner);
+}

@@ -113,3 +113,15 @@ TEST(MWV, FactoryThrowsOnMalformedMwvSentence)
 {
     EXPECT_THROW(Nmea0183Factory::create(MALFORMED_MWV_SENTENCE), NotMWVException);
 }
+
+// Additional tests for full coverage
+TEST(MWV, GetStringContent)
+{
+    MWV mwv("II", 45.0, 'R', 10.5, 'N', 'A');
+    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: II\nSentence Type: MWV\nChecksum: None\nFields:\n\tWind Angle: 45.00\n\tReference: R\n\tWind Speed: 10.50\n\tWind Speed Units: N\n\tStatus: A";
+    std::string expectedOneLiner = "[OK] NMEA0183 II MWV: Angle=45.00, Ref=R, Speed=10.50N, Status=A";
+    std::string actualVerbose = mwv.getStringContent(true);
+    std::string actualOneLiner = mwv.getStringContent(false);
+    EXPECT_EQ(actualVerbose, expectedVerbose);
+    EXPECT_EQ(actualOneLiner, expectedOneLiner);
+}

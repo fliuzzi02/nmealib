@@ -184,3 +184,15 @@ TEST(VTG, FactoryThrowsOnMalformedVtgSentence)
 {
     EXPECT_THROW(Nmea0183Factory::create(MALFORMED_VTG_SENTENCE), NotVTGException);
 }
+
+// Additional tests for full coverage
+TEST(VTG, GetStringContent)
+{
+    VTG vtg("GP", 220.86, 218.90, 2.55, 4.724, 'A', false);
+    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: GP\nSentence Type: VTG\nChecksum: None\nFields:\n\tLegacy Format: No\n\tCourse Over Ground (True): 220.86 T\n\tCourse Over Ground (Magnetic): 218.90 M\n\tSpeed Over Ground (Knots): 2.55 N\n\tSpeed Over Ground (KPH): 4.72 K\n\tFAA Mode Indicator: A";
+    std::string expectedOneLiner = "[OK] NMEA0183 GP VTG: True=220.86, Magnetic=218.90, Knots=2.55, KPH=4.72, FAA=A, Legacy=N";
+    std::string actualVerbose = vtg.getStringContent(true);
+    std::string actualOneLiner = vtg.getStringContent(false);
+    EXPECT_EQ(actualVerbose, expectedVerbose);
+    EXPECT_EQ(actualOneLiner, expectedOneLiner);
+}
