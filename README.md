@@ -1,8 +1,9 @@
 # nmealib
 
 [![License: GPL-3.0](https://img.shields.io/github/license/fliuzzi02/nmealib)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/fliuzzi02/nmealib)](../../releases)
+[![Release](https://img.shields.io/github/v/release/fliuzzi02/nmealib)](https://github.com/fliuzzi02/nmealib/releases)
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-blue)
+[![Coverage Status](https://coveralls.io/repos/github/fliuzzi02/nmealib/badge.svg?branch=feature/CI-test-coverage-integration)](https://coveralls.io/github/fliuzzi02/nmealib?branch=feature/CI-test-coverage-integration)
 
 Modern C++20 library for parsing **NMEA 0183** sentences and **NMEA 2000** CAN messages, with typed models, validation, and extensible message handling.
 
@@ -47,7 +48,7 @@ Modern C++20 library for parsing **NMEA 0183** sentences and **NMEA 2000** CAN m
 
 ### CLI Usage
 
-Download the latest release from [GitHub Releases](../../releases), then parse a sentence:
+Download the latest release from [GitHub Releases](https://github.com/fliuzzi02/nmealib/releases), then parse a sentence:
 
 ```bash
 ./nmealib-cli '$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47'
