@@ -18,6 +18,7 @@ void print_usage() {
     std::cout << "  -V, --verbose                   Enable verbose output\n";
     std::cout << "  -t=<type>, --type=<type>        Protocol type: N0183 (default) or N2K\n";
     std::cout << "  -m, --message                   Parse a single NMEA sentence (use '-' for stdin)\n";
+    std::cout << "  -c, --candump                   Enable candump mode for NMEA 2000 input (raw CAN frames)\n";
     std::cout << "Example:\n";
     std::cout << "  nmealib-cli -V -t=N0183 -m \"$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47\"\n";
     std::cout << "  nmealib-cli -t=N2K -m \"18F80523 1D 01 23 45 67 FE DC BA 98 00 01 86 A0 12 00 04 E2 0C\"\n";
@@ -45,12 +46,52 @@ bool parse_protocol(const std::string& arg, ProtocolType& protocol) {
     return false;
 }
 
-std::size_t process_stream_from_stdin(bool verbose, ProtocolType protocol) {
+std::size_t process_stream_from_stdin(bool verbose, ProtocolType protocol, bool candump_mode = false) {
     std::string line;
     std::size_t error_count = 0;
     while (std::getline(std::cin, line)) {
         if (line.empty()) {
             continue;
+        }
+
+        // If in candump mode convert line from
+        // "(timestamp) canX CANID#data" or "can0  09F8027F   [8]  00 FC FF FF 00 00 FF FF"
+        // to "CANID:data"
+        if(candump_mode) {
+            // In candump mode, we expect lines in the format: "(timestamp) canX CANID#data"
+            // or "can0  09F8027F   [8]  00 FC FF FF 00 00 FF FF"
+            // We need to extract the CANID and data parts to create a valid NMEA 2000 message string
+            
+            std::string canid, data;
+            size_t hash_pos = line.find('#');
+            
+            if (hash_pos != std::string::npos) {
+                // Format: "(timestamp) canX CANID#data"
+                size_t space_before_canid = line.rfind(' ', hash_pos);
+                if (space_before_canid != std::string::npos) {
+                    canid = line.substr(space_before_canid + 1, hash_pos - space_before_canid - 1);
+                    data = line.substr(hash_pos + 1);
+                }
+            } else {
+                // Format: "can0  09F8027F   [8]  00 FC FF FF 00 00 FF FF"
+                std::istringstream iss(line);
+                std::string token;
+                int token_count = 0;
+                
+                while (iss >> token) {
+                    if (token_count == 1) {
+                        canid = token;
+                    } else if (token_count >= 3 && token != "[8]" && token.find('[') == std::string::npos) {
+                        if (!data.empty()) data += " ";
+                        data += token;
+                    }
+                    token_count++;
+                }
+            }
+            
+            if (!canid.empty() && !data.empty()) {
+                line = canid + ":" + data;
+            }
         }
 
         try {
@@ -91,6 +132,7 @@ int main(int argc, char** argv) {
     std::string nmea_sentence;
     bool expect_message = false;
     bool use_stdin_stream = false;
+    bool candump_mode = false;
     ProtocolType protocol = ProtocolType::N0183;
 
     for (int i = 1; i < argc; ++i) {
@@ -129,6 +171,10 @@ int main(int argc, char** argv) {
                 else
                     nmea_sentence = arg;
             }
+        } else if (arg == "-c" || arg == "--candump") {
+            candump_mode = true;
+            protocol = ProtocolType::N2K;
+            use_stdin_stream = true;
         } else if (arg[0] == '-') {
             std::cerr << "Unknown option: " << arg << "\n";
             print_usage();
@@ -151,7 +197,7 @@ int main(int argc, char** argv) {
     }
 
     if (use_stdin_stream) {
-        const auto error_count = process_stream_from_stdin(verbose, protocol);
+        const auto error_count = process_stream_from_stdin(verbose, protocol, candump_mode);
         return error_count == 0 ? 0 : 1;
     }
 
