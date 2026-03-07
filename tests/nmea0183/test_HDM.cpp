@@ -108,3 +108,15 @@ TEST(HDM, BoundaryHeadingValues)
     EXPECT_DOUBLE_EQ(hdmMax.getHeading(), 359.9);
     EXPECT_EQ(hdmMax.getIndicator(), 'M');
 }
+
+// Additional tests for full coverage
+TEST(HDM, GetStringContent)
+{
+    HDM hdm("II", 45.0, 'M');
+    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: II\nSentence Type: HDM\nChecksum: None\nFields:\n\tHeading (Magnetic): 45.0\n\tIndicator: M";
+    std::string expectedOneLiner = "[OK] NMEA0183 II HDM: Heading=45.0M";
+    std::string actualVerbose = hdm.getStringContent(true);
+    std::string actualOneLiner = hdm.getStringContent(false);
+    EXPECT_EQ(actualVerbose, expectedVerbose);
+    EXPECT_EQ(actualOneLiner, expectedOneLiner);
+}

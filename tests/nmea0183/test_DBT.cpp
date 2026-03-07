@@ -117,3 +117,15 @@ TEST(DBT, FactoryThrowsOnMalformedDbtSentence)
 {
     EXPECT_THROW(Nmea0183Factory::create(MALFORMED_DBT_SENTENCE), NotDBTException);
 }
+
+// Additional tests for full coverage
+TEST(DBT, GetStringContent)
+{
+    DBT dbt("SD", 15.5, 'f', 4.7, 'M', 2.6, 'F');
+    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: SD\nSentence Type: DBT\nChecksum: None\nFields:\n\tDepth (feet): 15.50\n\tFeet Unit: f\n\tDepth (meters): 4.70\n\tMeters Unit: M\n\tDepth (fathoms): 2.60\n\tFathoms Unit: F";
+    std::string expectedOneLiner = "[OK] NMEA0183 SD DBT: Depth=15.50f, 4.70M, 2.60F";
+    std::string actualVerbose = dbt.getStringContent(true);
+    std::string actualOneLiner = dbt.getStringContent(false);
+    EXPECT_EQ(actualVerbose, expectedVerbose);
+    EXPECT_EQ(actualOneLiner, expectedOneLiner);
+}

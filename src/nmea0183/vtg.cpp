@@ -192,8 +192,7 @@ std::string VTG::getStringContent(bool verbose) const noexcept {
         if (faaModeIndicator_.has_value()) {
             ss << ", FAA=" << faaModeIndicator_.value();
         }
-        ss << ", Legacy=" << (legacyFormat_ ? "Y" : "N")
-           << ")";
+        ss << ", Legacy=" << (legacyFormat_ ? "Y" : "N");
     }
 
     return ss.str();

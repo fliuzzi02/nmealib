@@ -118,3 +118,15 @@ TEST(ZDA, FactoryThrowsOnMalformedZdaSentence)
 {
     EXPECT_THROW(Nmea0183Factory::create(MALFORMED_ZDA_SENTENCE), NotZDAException);
 }
+
+// Additional tests for full coverage
+TEST(ZDA, GetStringContent)
+{
+    ZDA zda("GP", 160012.71, 11u, 3u, 2004u, -1, 0);
+    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: GP\nSentence Type: ZDA\nChecksum: None\nFields:\n\tUTC Time: 160013\n\tDay: 11\n\tMonth: 3\n\tYear: 2004\n\tLocal Zone Hours: -1\n\tLocal Zone Minutes: 0";
+    std::string expectedOneLiner = "[OK] NMEA0183 GP ZDA: UTC=160013, Date=11/3/2004, Zone=-1:00";
+    std::string actualVerbose = zda.getStringContent(true);
+    std::string actualOneLiner = zda.getStringContent(false);
+    EXPECT_EQ(actualVerbose, expectedVerbose);
+    EXPECT_EQ(actualOneLiner, expectedOneLiner);
+}
