@@ -15,6 +15,7 @@ namespace nmea2000 {
  * 
  * Supports multiple input formats:
  * - "CANID:data" (already canonical, returned as-is)
+ * - "CANID#data" (alternative separator)
  * - "0xCANID, 0xBB 0xCC 0xDD ..." (comma-separated with 0x prefix)
  * - "0xCANID 0xBB 0xCC 0xDD ..." (space-separated with 0x prefix)
  * - "CANID BB CC DD ..." (space-separated without prefix)
@@ -26,6 +27,13 @@ static std::string normalizeRawFormat(const std::string& raw) {
     // If already in CANID:data format, use as-is
     if (raw.find(':') != std::string::npos) {
         return raw;
+    }
+
+    // Check for alternative separator (e.g., "CANID#data")
+    if (raw.find('#') != std::string::npos) {
+        std::string normalized = raw;
+        std::replace(normalized.begin(), normalized.end(), '#', ':');
+        return normalized;
     }
     
     // Check for comma-separated format (e.g., "0x1CFF63CC, 0x3B 0x9F ...")
@@ -103,7 +111,7 @@ std::unique_ptr<Message2000> Message2000::create(std::string raw, TimePoint ts) 
     // Parse raw string in format "CANID:data"
     size_t colonPos = normalizedRaw.find(':');
     if (colonPos == std::string::npos) {
-        throw InvalidCanFrameException(context, "Raw CAN frame must be in format 'CANID:data'");
+        throw InvalidCanFrameException(context, "This formatting is not supported");
     }
 
     // Extract and parse CAN ID
