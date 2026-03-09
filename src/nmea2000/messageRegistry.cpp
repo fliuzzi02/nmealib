@@ -1,5 +1,7 @@
 #include "messageRegistry.hpp"
 
+#include "nmealib/nmea2000/PGN128259.h"
+
 
 namespace nmealib {
 namespace nmea2000 {
@@ -11,11 +13,11 @@ MessageRegistry& MessageRegistry::instance() {
 
 std::unique_ptr<Message2000> MessageRegistry::create(std::uint32_t pgn,
                                                       std::unique_ptr<Message2000> baseMessage) {
-    //if (pgn == 129029) {
-    //    return createPGN129029(std::move(baseMessage));
-    //}
-
-    return baseMessage;
+    if (pgn == 128259) {
+        return PGN128259::create(std::move(baseMessage));
+    } else {
+        return baseMessage;
+    }
 }
 
 } // namespace nmea2000
