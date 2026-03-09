@@ -11,22 +11,24 @@ std::unique_ptr<PGN128259> PGN128259::create(std::unique_ptr<Message2000> baseMe
             throw InvalidCanFrameException(context, "CAN frame must be 8 bytes for PGN128259");
         }
 
-        uint8_t sequenceId_ = baseMessage->getCanFrame()[0];
-        Speed speedWaterReferenced_ = Speed::fromRaw(baseMessage->getCanFrame()[1] | (baseMessage->getCanFrame()[2] << 8));
-        Speed speedGroundReferenced_ = Speed::fromRaw(baseMessage->getCanFrame()[3] | (baseMessage->getCanFrame()[4] << 8));
-        Byte speedWaterReferencedType_ = Byte::fromRaw(baseMessage->getCanFrame()[5]);
-        HalfByte speedGroundReferencedType_ = HalfByte::fromRaw(baseMessage->getCanFrame()[6]);
-        Byte reserved1_ = Byte::fromRaw(baseMessage->getCanFrame()[7]);
-        HalfByte reserved2_ = HalfByte::fromRaw(baseMessage->getCanFrame()[8]);
+        uint8_t sequenceId = baseMessage->getCanFrame()[0];
+        Speed speedWaterReferenced = Speed::fromRaw(baseMessage->getCanFrame()[1] | (baseMessage->getCanFrame()[2] << 8));
+        Speed speedGroundReferenced = Speed::fromRaw(baseMessage->getCanFrame()[3] | (baseMessage->getCanFrame()[4] << 8));
+        Byte speedWaterReferencedType = Byte::fromRaw(baseMessage->getCanFrame()[5]);
+        // Byte 6: lower nibble = speedDirection, upper nibble = reserved2
+        HalfByte speedDirection = HalfByte::fromRaw(baseMessage->getCanFrame()[6] & 0x0F);
+        HalfByte reserved2 = HalfByte::fromRaw((baseMessage->getCanFrame()[6] >> 4) & 0x0F);
+        // Byte 7: full byte = reserved1
+        Byte reserved1 = Byte::fromRaw(baseMessage->getCanFrame()[7]);
 
         return std::unique_ptr<PGN128259>(new PGN128259(std::move(*baseMessage),
-                                                        sequenceId_,
-                                                        speedWaterReferenced_,
-                                                        speedGroundReferenced_,
-                                                        speedWaterReferencedType_,
-                                                        speedGroundReferencedType_,
-                                                        reserved1_,
-                                                        reserved2_));
+                                                        sequenceId,
+                                                        speedWaterReferenced,
+                                                        speedGroundReferenced,
+                                                        speedWaterReferencedType,
+                                                        speedDirection,
+                                                        reserved1,
+                                                        reserved2));
     } catch (const std::exception& e) {
         throw NmeaException(context, "Error creating PGN128259 message: " + std::string(e.what()));
     }
@@ -37,7 +39,7 @@ PGN128259::PGN128259(Message2000 baseMessage,
                     Speed speedWaterReferenced,
                     Speed speedGroundReferenced,
                     Byte speedWaterReferencedType,
-                    HalfByte speedGroundReferencedType,
+                    HalfByte speedDirection,
                     Byte reserved1,
                     HalfByte reserved2) noexcept : 
                     Message2000(std::move(baseMessage)),
@@ -45,7 +47,7 @@ PGN128259::PGN128259(Message2000 baseMessage,
                     speedWaterReferenced_(speedWaterReferenced),
                     speedGroundReferenced_(speedGroundReferenced),
                     speedWaterReferencedType_(speedWaterReferencedType),
-                    speedDirection_(speedGroundReferencedType),
+                    speedDirection_(speedDirection),
                     reserved1_(reserved1),
                     reserved2_(reserved2) {}
 
@@ -53,21 +55,21 @@ PGN128259::PGN128259(uint8_t sequenceId,
                     Speed speedWaterReferenced,
                     Speed speedGroundReferenced,
                     Byte speedWaterReferencedType,
-                    HalfByte speedGroundReferencedType,
+                    HalfByte speedDirection,
                     Byte reserved1,
                     HalfByte reserved2) : 
                     Message2000(*Message2000::create(rawPayload(sequenceId, 
                         speedWaterReferenced, 
                         speedGroundReferenced, 
                         speedWaterReferencedType, 
-                        speedGroundReferencedType, 
+                        speedDirection, 
                         reserved1, 
                         reserved2))),
                     sequenceId_(sequenceId),
                     speedWaterReferenced_(speedWaterReferenced),
                     speedGroundReferenced_(speedGroundReferenced),
                     speedWaterReferencedType_(speedWaterReferencedType),
-                    speedDirection_(speedGroundReferencedType),
+                    speedDirection_(speedDirection),
                     reserved1_(reserved1),
                     reserved2_(reserved2) {}
 
@@ -118,7 +120,7 @@ std::string PGN128259::rawPayload(uint8_t sequenceId,
                                   Speed speedWaterReferenced,
                                   Speed speedGroundReferenced,
                                   Byte speedWaterReferencedType,
-                                  HalfByte speedGroundReferencedType,
+                                  HalfByte speedDirection,
                                   Byte reserved1,
                                   HalfByte reserved2) {
     std::vector<uint8_t> canFrame(8, 0);
@@ -128,10 +130,21 @@ std::string PGN128259::rawPayload(uint8_t sequenceId,
     canFrame[3] = speedGroundReferenced.getRaw() & 0xFF;
     canFrame[4] = (speedGroundReferenced.getRaw() >> 8) & 0xFF;
     canFrame[5] = speedWaterReferencedType.getRaw();
-    canFrame[6] = (speedGroundReferencedType.getRaw() << 4) | (reserved1.getRaw() & 0x0F);
-    canFrame[7] = (reserved2.getRaw() << 4);
+    // Byte 6: upper nibble = reserved2, lower nibble = speedDirection
+    canFrame[6] = (reserved2.getRaw() << 4) | (speedDirection.getRaw() & 0x0F);
+    // Byte 7: full 8-bit reserved field
+    canFrame[7] = reserved1.getRaw();
 
-    return std::string(reinterpret_cast<const char*>(canFrame.data()), canFrame.size());
+    // Produce the "CANID:data" hex string expected by Message2000::create()
+    // CAN ID encodes PGN 128259 (0x1F503) in bits [24:8], source address 0
+    const uint32_t canId = (128259U << 8U);  // 0x01F50300
+    std::ostringstream oss;
+    oss << std::hex << std::uppercase << std::setfill('0');
+    oss << std::setw(8) << canId << ":";
+    for (uint8_t b : canFrame) {
+        oss << std::setw(2) << static_cast<int>(b);
+    }
+    return oss.str();
 }
 
 uint8_t PGN128259::getSequenceId() const noexcept {

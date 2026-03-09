@@ -36,7 +36,7 @@ public:
               Speed speedWaterReferenced,
               Speed speedGroundReferenced,
               Byte speedWaterReferencedType,
-              HalfByte speedGroundReferencedType,
+              HalfByte speedDirection,
               Byte reserved1,
               HalfByte reserved2);
 
@@ -88,7 +88,7 @@ private:
               Speed speedWaterReferenced,
               Speed speedGroundReferenced,
               Byte speedWaterReferencedType,
-              HalfByte speedGroundReferencedType,
+              HalfByte speedDirection,
               Byte reserved1,
               HalfByte reserved2) noexcept;
 
@@ -98,7 +98,7 @@ private:
                                   Speed speedWaterReferenced,
                                   Speed speedGroundReferenced,
                                   Byte speedWaterReferencedType,
-                                  HalfByte speedGroundReferencedType,
+                                  HalfByte speedDirection,
                                   Byte reserved1,
                                   HalfByte reserved2);
 
