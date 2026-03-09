@@ -40,3 +40,4 @@
 #include "nmealib/nmea0183/vwr.h"
 #include "nmealib/nmea0183/zda.h"
 #include "nmealib/nmea2000/nmea2000Factory.h"
+#include "nmealib/nmea2000/PGN128259.h"
