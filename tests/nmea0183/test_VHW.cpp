@@ -132,7 +132,7 @@ TEST(VHW, FactoryThrowsOnMalformedVhwSentence)
 TEST(VHW, GetStringContent)
 {
     VHW vhw("II", 220.86, 218.90, 2.55, 4.724);
-    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: II\nSentence Type: VHW\nChecksum: None\nFields:\n\tHeading (True): 220.86 T\n\tHeading (Magnetic): 218.90 M\n\tSpeed (Knots): 2.55 N\n\tSpeed (KPH): 4.72 K";
+    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: II\nSentence Type: VHW\nChecksum: None\nFields:\n\tHeading: 220.86 T\n\tHeading: 218.90 M\n\tSpeed: 2.55kts\n\tSpeed: 4.72kph";
     std::string expectedOneLiner = "[OK] NMEA0183 II VHW: True=220.86, Magnetic=218.90, Knots=2.55, KPH=4.72";
     std::string actualVerbose = vhw.getStringContent(true);
     std::string actualOneLiner = vhw.getStringContent(false);

@@ -181,17 +181,13 @@ std::string GGA::getStringContent(bool verbose) const noexcept {
         ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
         ss << "Fields:\n";
         ss << "\tTimestamp: " << utcTime_ << "\n";
-        ss << "\tLatitude: " << latitudeStr << "\n";
-        ss << "\tLatitude Direction: " << latitudeDirection_ << "\n";
-        ss << "\tLongitude: " << longitudeStr << "\n";
-        ss << "\tLongitude Direction: " << longitudeDirection_ << "\n";
+        ss << "\tLatitude: " << latitudeStr << " " << latitudeDirection_ << "\n";
+        ss << "\tLongitude: " << longitudeStr << " " << longitudeDirection_ << "\n";
         ss << "\tGPS Quality: " << gpsQuality_ << "\n";
         ss << "\tSatellites: " << satellites_ << "\n";
         ss << "\tHDOP: " << hdop_ << "\n";
-        ss << "\tAltitude: " << altitude_ << "\n";
-        ss << "\tAltitude Units: " << altitudeUnits_ << "\n";
-        ss << "\tGeoidal Separation: " << geoidalSeparation_ << "\n";
-        ss << "\tGeoidal Separation Units: " << geoidalSeparationUnits_ << "\n";
+        ss << "\tAltitude: " << altitude_ << " " << altitudeUnits_ << "\n";
+        ss << "\tGeoidal Separation: " << geoidalSeparation_ << " " << geoidalSeparationUnits_ << "\n";
         ss << "\tDGPS Age: " << dgpsAge_ << "\n";
         ss << "\tDGPS Ref: " << dgpsReferenceStationId_;
     } else {

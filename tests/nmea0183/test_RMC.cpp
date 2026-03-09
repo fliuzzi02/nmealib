@@ -160,22 +160,6 @@ TEST(RMC, ClonePreservesRmcContent)
     EXPECT_TRUE(source == *cloned);
 }
 
-TEST(RMC, StringContentFormatsAreStable)
-{
-    RMC rmc("GP", 123519, 'A', 48.1173, 'N', 11.5166, 'E', 22.4, 84.4, 230394, 3.1, 'W', 'A', 'V');
-
-    const std::string compact = rmc.getStringContent(false);
-    EXPECT_NE(compact.find("GP RMC: UTC Fix=123519"), std::string::npos);
-    EXPECT_NE(compact.find("Lat=48.1173N"), std::string::npos);
-    EXPECT_NE(compact.find("NavStatus=V"), std::string::npos);
-
-    const std::string verbose = rmc.getStringContent(true);
-    EXPECT_NE(verbose.find("Protocol: NMEA0183"), std::string::npos);
-    EXPECT_NE(verbose.find("UTC Fix: 123519"), std::string::npos);
-    EXPECT_NE(verbose.find("Latitude Direction: N"), std::string::npos);
-    EXPECT_NE(verbose.find("Navigation Status: V"), std::string::npos);
-}
-
 TEST(RMC, FactoryDoesNotPromoteNonRmcSentence)
 {
     auto base = Nmea0183Factory::create(NOT_RMC_SENTENCE);
@@ -207,7 +191,7 @@ TEST(RMC, ConvertsCoordinatesWithHighPrecision)
 TEST(RMC, GetStringContent)
 {
     RMC rmc("GP", 123519, 'A', 48.1173, 'N', 11.5166, 'E', 22.4, 84.4, 230394, 3.1, 'W', 'A', 'V');
-    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: GP\nSentence Type: RMC\nChecksum: None\nFields:\n\tUTC Fix: 123519\n\tStatus: A\n\tLatitude: 48.1173\n\tLatitude Direction: N\n\tLongitude: 11.5166\n\tLongitude Direction: E\n\tSpeed Over Ground: 22.4\n\tCourse Over Ground: 84.4\n\tDate: 230394\n\tMagnetic Variation: 3.1\n\tMagnetic Variation Direction: W\n\tMode Indicator: A\n\tNavigation Status: V";
+    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: GP\nSentence Type: RMC\nChecksum: None\nFields:\n\tUTC Fix: 123519\n\tStatus: A\n\tLatitude: 48.1173 N\n\tLongitude: 11.5166 E\n\tSpeed Over Ground: 22.4\n\tCourse Over Ground: 84.4\n\tDate: 230394\n\tMagnetic Variation: 3.1 W\n\tMode Indicator: A\n\tNavigation Status: V";
     std::string expectedOneLiner = "[OK] NMEA0183 GP RMC: UTC Fix=123519, Status=A, Lat=48.1173N, Lon=11.5166E, SOG=22.4, COG=84.4, Date=230394, MagVar=3.1W, Mode=A, NavStatus=V";
     std::string actualVerbose = rmc.getStringContent(true);
     std::string actualOneLiner = rmc.getStringContent(false);

@@ -78,8 +78,7 @@ std::string HDM::getStringContent(bool verbose) const noexcept {
         ss << "Sentence Type: " << getSentenceType() << "\n";
         ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
         ss << "Fields:\n";
-        ss << "\tHeading (Magnetic): " << heading_ << "\n";
-        ss << "\tIndicator: " << indicator_;
+        ss << "\tHeading: " << heading_ << " " << indicator_ << "\n";
     } else {
         ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
            << "Heading=" << heading_ << indicator_;

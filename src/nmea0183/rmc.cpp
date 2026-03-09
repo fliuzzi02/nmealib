@@ -150,15 +150,12 @@ std::string RMC::getStringContent(bool verbose) const noexcept {
         ss << "Fields:\n";
         ss << "\tUTC Fix: " << utcFix_ << "\n";
         ss << "\tStatus: " << status_ << "\n";
-        ss << "\tLatitude: " << latitudeStr << "\n";
-        ss << "\tLatitude Direction: " << latitudeDirection_ << "\n";
-        ss << "\tLongitude: " << longitudeStr << "\n";
-        ss << "\tLongitude Direction: " << longitudeDirection_ << "\n";
+        ss << "\tLatitude: " << latitudeStr << " " << latitudeDirection_ << "\n";
+        ss << "\tLongitude: " << longitudeStr << " " << longitudeDirection_ << "\n";
         ss << "\tSpeed Over Ground: " << speedOverGround_ << "\n";
         ss << "\tCourse Over Ground: " << courseOverGround_ << "\n";
         ss << "\tDate: " << date_ << "\n";
-        ss << "\tMagnetic Variation: " << magneticVariation_ << "\n";
-        ss << "\tMagnetic Variation Direction: " << magneticVariationDirection_ << "\n";
+        ss << "\tMagnetic Variation: " << magneticVariation_ << " " << magneticVariationDirection_ << "\n";
         ss << "\tMode Indicator: " << modeIndicator_ << "\n";
         ss << "\tNavigation Status: " << navigationStatus_;
 

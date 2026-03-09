@@ -114,25 +114,10 @@ std::string VHW::getStringContent(bool verbose) const noexcept {
         ss << "Sentence Type: " << getSentenceType() << "\n";
         ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
         ss << "Fields:\n";
-        ss << "\tHeading (True): " << headingTrue_;
-        if (headingTrueType_ != '\0') {
-            ss << " " << headingTrueType_;
-        }
-        ss << "\n"
-           << "\tHeading (Magnetic): " << headingMagnetic_;
-        if (headingMagneticType_ != '\0') {
-            ss << " " << headingMagneticType_;
-        }
-        ss << "\n"
-           << "\tSpeed (Knots): " << speedKnots_;
-        if (speedKnotsType_ != '\0') {
-            ss << " " << speedKnotsType_;
-        }
-        ss << "\n"
-           << "\tSpeed (KPH): " << speedKph_;
-        if (speedKphType_ != '\0') {
-            ss << " " << speedKphType_;
-        }
+        ss << "\tHeading: " << headingTrue_ << " " << headingTrueType_ << "\n";
+        ss << "\tHeading: " << headingMagnetic_ << " " << headingMagneticType_ << "\n";
+        ss << "\tSpeed: " << speedKnots_ << "kts\n"
+           << "\tSpeed: " << speedKph_ << "kph";
     } else {
         ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
            << "True=" << headingTrue_

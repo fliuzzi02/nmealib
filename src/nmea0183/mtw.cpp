@@ -78,8 +78,7 @@ std::string MTW::getStringContent(bool verbose) const noexcept {
         ss << "Sentence Type: " << getSentenceType() << "\n";
         ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
         ss << "Fields:\n";
-        ss << "\tTemperature: " << temperature_ << "\n";
-        ss << "\tUnit: " << unit_;
+        ss << "\tTemperature: " << temperature_ << " " << unit_ << "\n";
     } else {
         ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
            << "Temperature=" << temperature_ << unit_;
