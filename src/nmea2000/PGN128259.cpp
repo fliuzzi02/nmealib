@@ -6,11 +6,11 @@ namespace nmea2000 {
 std::unique_ptr<PGN128259> PGN128259::create(std::unique_ptr<Message2000> baseMessage) {
     std::string context = "PGN128259::create()";
 
-    try {
-        if (baseMessage->getCanFrameLength() != 8) {
-            throw InvalidCanFrameException(context, "CAN frame must be 8 bytes for PGN128259");
-        }
+    if (baseMessage->getCanFrameLength() != 8) {
+        throw InvalidCanFrameException(context, "CAN frame must be 8 bytes for PGN128259");
+    }
 
+    try {
         uint8_t sequenceId = baseMessage->getCanFrame()[0];
         Speed speedWaterReferenced = Speed::fromRaw(baseMessage->getCanFrame()[1] | (baseMessage->getCanFrame()[2] << 8));
         Speed speedGroundReferenced = Speed::fromRaw(baseMessage->getCanFrame()[3] | (baseMessage->getCanFrame()[4] << 8));
