@@ -157,6 +157,28 @@ protected:
      */
     static std::unique_ptr<Message2000> create(std::string raw, 
                                                TimePoint ts = std::chrono::system_clock::now());
+    
+    /**
+    * @brief Returns the base stringyfied common for all PGNs
+    * 
+    * Depending on the verbose value, it will return:
+    * ```text
+    * --------------------------------
+    * Protocol: NMEA2000
+    * PGN: NNNNNN(0xXXXXX)
+    * Frame Length: N bytes
+    * Frame Data: XX XX XX ...
+    * ```
+    * 
+    * or
+    * 
+    * ```text
+    * [OK] NMEA2000 PGNNNNN:
+    * ```
+    * @param verbose Selects whether to print a one-liner or a more detailed multi-line string.
+    * @return std::string The stringyfied common content
+    */
+    std::string toString(bool verbose) const noexcept;
 
 private:
     explicit Message2000(std::string raw,

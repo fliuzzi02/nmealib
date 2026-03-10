@@ -82,8 +82,7 @@ std::string PGN128259::getStringContent(bool verbose) const noexcept {
     std::ostringstream oss;
 
     if (verbose) {
-        oss << "Protocol: " << typeToString(type_) << "\n";
-        oss << "PGN: " << pgn_ << "(0x" << std::hex << pgn_ << std::dec << ")\n";
+        oss << this->toString(true);
         oss << "Fields:\n";
         oss << "\tSequence ID: " << static_cast<int>(sequenceId_) << "\n";
         oss << "\tSpeed Water Referenced: " << speedWaterReferenced_.toString() << " m/s\n";
@@ -102,9 +101,10 @@ std::string PGN128259::getStringContent(bool verbose) const noexcept {
             if (speedDirection_.getValue() == 0b00) oss << "Forward";
             else if (speedDirection_.getValue() == 0b01) oss << "Reverse";
             else oss << "Unavailable/Reserved";
+        oss << "\n";
     } else {
-        oss << "[OK] " << typeToString(type_)  << " PGN" << pgn_ << ": "
-            << "SeqID=" << static_cast<int>(sequenceId_)
+        oss << this->toString(false);
+        oss << "SeqID=" << static_cast<int>(sequenceId_)
             << " SpeedWater=" << speedWaterReferenced_.toString() << "m/s"
             << " SpeedGround=" << speedGroundReferenced_.toString() << "m/s"
             << " WaterRefType=" << static_cast<int>(speedWaterReferencedType_.getValue())

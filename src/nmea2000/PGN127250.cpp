@@ -74,8 +74,7 @@ std::string PGN127250::getStringContent(bool verbose) const noexcept {
     std::ostringstream oss;
 
     if (verbose) {
-        oss << "Protocol: " << typeToString(type_) << "\n";
-        oss << "PGN: " << pgn_ << "(0x" << std::hex << pgn_ << std::dec << ")\n";
+        oss << this->toString(true);
         oss << "Fields:\n";
         oss << "\tSequence ID: " << static_cast<int>(sequenceId_) << "\n";
         oss << "\tHeading: " << heading_.toString() << "rad, " << getHeadingDegrees() << "°" << "\n";
@@ -89,9 +88,10 @@ std::string PGN127250::getStringContent(bool verbose) const noexcept {
                 case 3: oss << "Null"; break;
                 default: oss << "Unavailable/Reserved"; break;
             }
+        oss << "\n";
     } else {
-        oss << "[OK] " << typeToString(type_)  << " PGN" << pgn_ << ": "
-            << "SeqID=" << static_cast<int>(sequenceId_)
+        oss << this->toString(false);
+        oss << "SeqID=" << static_cast<int>(sequenceId_)
             << " Heading=" << heading_.toString() << "rad"
             << " Deviation=" << deviation_.toString() << "rad"
             << " Variation=" << variation_.toString() << "rad"
