@@ -194,7 +194,27 @@ std::string Message2000::getStringContent(bool verbose) const noexcept {
     std::ostringstream oss;
 
     if (verbose) {
-        oss << "PGN: 0x" << std::hex << std::setfill('0') << std::setw(5) << pgn_ << std::dec << "\n";
+        oss << this->toString(true);
+        oss << "\n";
+    } else {
+        oss << this->toString(false);
+        oss << "Data=";
+        for (size_t i = 0; i < canFrame_.size(); ++i) {
+            if (i > 0) oss << " ";
+            oss << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(canFrame_[i]);
+        }
+        oss << std::dec;
+    }
+    return oss.str();
+}
+
+std::string Message2000::toString(bool verbose) const noexcept {
+    std::ostringstream oss;
+
+    if (verbose) {
+        oss << "--------------------------------\n";
+        oss << "Protocol: " << typeToString(type_) << "\n";
+        oss << "PGN: " << pgn_ << "(0x" << std::hex << pgn_ << std::dec << ")\n";
         oss << "Frame Length: " << static_cast<int>(getCanFrameLength()) << " bytes\n";
         oss << "Frame Data: ";
         for (size_t i = 0; i < canFrame_.size(); ++i) {
@@ -203,12 +223,7 @@ std::string Message2000::getStringContent(bool verbose) const noexcept {
         }
         oss << std::dec;
     } else {
-        oss << "PGN=0x" << std::hex << std::setfill('0') << std::setw(5) << pgn_ 
-            << " Len=" << static_cast<int>(getCanFrameLength()) << " Data=";
-        for (size_t i = 0; i < canFrame_.size(); ++i) {
-            if (i > 0) oss << " ";
-            oss << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(canFrame_[i]);
-        }
+        oss << "[OK] " << typeToString(type_)  << " PGN" << pgn_ << ": ";
         oss << std::dec;
     }
 
@@ -231,11 +246,7 @@ std::string Message2000::serialize() const {
 }
 
 bool Message2000::operator==(const Message2000& other) const noexcept {
-    return Message::operator==(other) && hasEqualContent(other);
-}
-
-bool Message2000::hasEqualContent(const Message2000& other) const noexcept {
-    return pgn_ == other.pgn_ && canFrame_ == other.canFrame_;
+    return Message::operator==(other) && pgn_ == other.pgn_ && canFrame_ == other.canFrame_;
 }
 
 bool Message2000::validate() const {

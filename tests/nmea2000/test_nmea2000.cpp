@@ -153,23 +153,6 @@ TEST(Message2000, EqualityComparison)
     EXPECT_NE(*msg1, *msg3);
 }
 
-TEST(Message2000, HasEqualContentComparison)
-{
-    auto msg1 = Nmea2000Factory::create(VALID_FRAME_1);
-    auto msg2 = Nmea2000Factory::create(VALID_FRAME_1);
-    auto msg3 = Nmea2000Factory::create(VALID_FRAME_2);
-    
-    ASSERT_NE(msg1, nullptr);
-    ASSERT_NE(msg2, nullptr);
-    ASSERT_NE(msg3, nullptr);
-    
-    // Same content should have equal content
-    EXPECT_TRUE(msg1->hasEqualContent(*msg2));
-    
-    // Different content should not have equal content
-    EXPECT_FALSE(msg1->hasEqualContent(*msg3));
-}
-
 // Test validation
 TEST(Message2000, ValidateReturnsTrueForValidMessage)
 {
@@ -196,7 +179,6 @@ TEST(Message2000, GetStringContentConcise)
     
     std::string concise = msg->getStringContent(false);
     EXPECT_NE(concise.find("PGN"), std::string::npos);
-    EXPECT_NE(concise.find("Len"), std::string::npos);
 }
 
 // Test message type

@@ -45,20 +45,6 @@ private:
      */
     MessageRegistry() = default;
 
-    // Creator methods that have access to private create() functions through friendship
-    std::unique_ptr<Message0183> createDBT(std::unique_ptr<Message0183> baseMessage);
-    std::unique_ptr<Message0183> createGGA(std::unique_ptr<Message0183> baseMessage);
-    std::unique_ptr<Message0183> createGLL(std::unique_ptr<Message0183> baseMessage);
-    std::unique_ptr<Message0183> createGSA(std::unique_ptr<Message0183> baseMessage);
-    std::unique_ptr<Message0183> createHDM(std::unique_ptr<Message0183> baseMessage);
-    std::unique_ptr<Message0183> createMTW(std::unique_ptr<Message0183> baseMessage);
-    std::unique_ptr<Message0183> createMWV(std::unique_ptr<Message0183> baseMessage);
-    std::unique_ptr<Message0183> createRMC(std::unique_ptr<Message0183> baseMessage);
-    std::unique_ptr<Message0183> createVHW(std::unique_ptr<Message0183> baseMessage);
-    std::unique_ptr<Message0183> createVTG(std::unique_ptr<Message0183> baseMessage);
-    std::unique_ptr<Message0183> createVWR(std::unique_ptr<Message0183> baseMessage);
-    std::unique_ptr<Message0183> createZDA(std::unique_ptr<Message0183> baseMessage);
-
     // Forward declarations for friend declarations in message classes
     friend class DBT;
     friend class GGA;

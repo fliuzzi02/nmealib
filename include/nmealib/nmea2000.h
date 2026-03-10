@@ -126,16 +126,7 @@ public:
      * @return true  If all fields and the base Message data are equal.
      * @return false Otherwise.
      */
-    bool operator==(const Message2000& other) const noexcept;
-
-    /**
-     * @brief Compares the content of the message only, ignoring the timestamp.
-     *
-     * @param other The other Message2000 object to compare with.
-     * @return true if the content of both messages is equal, regardless of timestamp.
-     * @return false otherwise.
-     */
-    virtual bool hasEqualContent(const Message2000& other) const noexcept;
+    virtual bool operator==(const Message2000& other) const noexcept;
 
     /**
      * @brief Returns whether the message is valid.
@@ -166,6 +157,28 @@ protected:
      */
     static std::unique_ptr<Message2000> create(std::string raw, 
                                                TimePoint ts = std::chrono::system_clock::now());
+    
+    /**
+    * @brief Returns the base stringyfied common for all PGNs
+    * 
+    * Depending on the verbose value, it will return:
+    * ```text
+    * --------------------------------
+    * Protocol: NMEA2000
+    * PGN: NNNNNN(0xXXXXX)
+    * Frame Length: N bytes
+    * Frame Data: XX XX XX ...
+    * ```
+    * 
+    * or
+    * 
+    * ```text
+    * [OK] NMEA2000 PGNNNNN:
+    * ```
+    * @param verbose Selects whether to print a one-liner or a more detailed multi-line string.
+    * @return std::string The stringyfied common content
+    */
+    std::string toString(bool verbose) const noexcept;
 
 private:
     explicit Message2000(std::string raw,

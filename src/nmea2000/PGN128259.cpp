@@ -82,8 +82,8 @@ std::string PGN128259::getStringContent(bool verbose) const noexcept {
     std::ostringstream oss;
 
     if (verbose) {
-        oss << "Protocol: " << typeToString(type_) << "\n";
-        oss << "PGN: " << pgn_ << "(0x" << std::hex << pgn_ << std::dec << ")\n";
+        oss << this->toString(true);
+        oss << "\n";
         oss << "Fields:\n";
         oss << "\tSequence ID: " << static_cast<int>(sequenceId_) << "\n";
         oss << "\tSpeed Water Referenced: " << speedWaterReferenced_.toString() << " m/s\n";
@@ -102,9 +102,10 @@ std::string PGN128259::getStringContent(bool verbose) const noexcept {
             if (speedDirection_.getValue() == 0b00) oss << "Forward";
             else if (speedDirection_.getValue() == 0b01) oss << "Reverse";
             else oss << "Unavailable/Reserved";
+        oss << "\n";
     } else {
-        oss << "[OK] " << typeToString(type_)  << " PGN" << pgn_ << ": "
-            << "SeqID=" << static_cast<int>(sequenceId_)
+        oss << this->toString(false);
+        oss << "SeqID=" << static_cast<int>(sequenceId_)
             << " SpeedWater=" << speedWaterReferenced_.toString() << "m/s"
             << " SpeedGround=" << speedGroundReferenced_.toString() << "m/s"
             << " WaterRefType=" << static_cast<int>(speedWaterReferencedType_.getValue())
@@ -177,17 +178,6 @@ HalfByte PGN128259::getReserved2() const noexcept {
 
 bool PGN128259::operator==(const PGN128259& other) const noexcept {
     return Message2000::operator==(other) &&
-           sequenceId_ == other.sequenceId_ &&
-           speedWaterReferenced_ == other.speedWaterReferenced_ &&
-           speedGroundReferenced_ == other.speedGroundReferenced_ &&
-           speedWaterReferencedType_ == other.speedWaterReferencedType_ &&
-           speedDirection_ == other.speedDirection_ &&
-           reserved1_ == other.reserved1_ &&
-           reserved2_ == other.reserved2_;
-}
-
-bool PGN128259::hasEqualContent(const PGN128259& other) const noexcept {
-    return Message2000::hasEqualContent(other) &&
            sequenceId_ == other.sequenceId_ &&
            speedWaterReferenced_ == other.speedWaterReferenced_ &&
            speedGroundReferenced_ == other.speedGroundReferenced_ &&
