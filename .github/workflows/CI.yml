@@ -21,6 +21,7 @@ jobs:
     if: ${{ always() && github.event_name == 'pull_request' && needs.static-analysis.outputs.cppcheck_exit_code != '0' }}
     permissions:
       issues: write
+      pull-requests: write
       contents: read
     steps:
     - name: Post or update static analysis comment
@@ -107,6 +108,7 @@ jobs:
     if: ${{ always() && needs.test.result == 'failure' && (startsWith(github.ref_name, 'release/') || startsWith(github.head_ref, 'release/')) }}
     permissions:
       issues: write
+      pull-requests: write
       contents: read
     steps:
     - name: Open issue for failed release test
