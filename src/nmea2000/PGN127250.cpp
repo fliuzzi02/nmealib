@@ -164,14 +164,5 @@ bool PGN127250::operator==(const PGN127250& other) const noexcept {
            reserved_ == other.reserved_;
 }
 
-bool PGN127250::hasEqualContent(const PGN127250& other) const noexcept {
-    return Message2000::hasEqualContent(other) &&
-           sequenceId_ == other.sequenceId_ &&
-           heading_ == other.heading_ &&
-           deviation_ == other.deviation_ &&
-           variation_ == other.variation_ &&
-           headingReference_ == other.headingReference_;
-}
-
 } // namespace nmea2000
 } // namespace nmealib

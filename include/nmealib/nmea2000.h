@@ -126,16 +126,7 @@ public:
      * @return true  If all fields and the base Message data are equal.
      * @return false Otherwise.
      */
-    bool operator==(const Message2000& other) const noexcept;
-
-    /**
-     * @brief Compares the content of the message only, ignoring the timestamp.
-     *
-     * @param other The other Message2000 object to compare with.
-     * @return true if the content of both messages is equal, regardless of timestamp.
-     * @return false otherwise.
-     */
-    virtual bool hasEqualContent(const Message2000& other) const noexcept;
+    virtual bool operator==(const Message2000& other) const noexcept;
 
     /**
      * @brief Returns whether the message is valid.

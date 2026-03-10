@@ -32,8 +32,7 @@ Message::TimePoint Message::getTimestamp() const noexcept {
 
 bool Message::operator==(const Message& other) const noexcept {
     return type_ == other.type_ &&
-           rawData_ == other.rawData_ &&
-           timestamp_ == other.timestamp_;
+           rawData_ == other.rawData_;
 }
 
 void Message::setType(Type t) noexcept {

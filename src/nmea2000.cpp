@@ -231,11 +231,7 @@ std::string Message2000::serialize() const {
 }
 
 bool Message2000::operator==(const Message2000& other) const noexcept {
-    return Message::operator==(other) && hasEqualContent(other);
-}
-
-bool Message2000::hasEqualContent(const Message2000& other) const noexcept {
-    return pgn_ == other.pgn_ && canFrame_ == other.canFrame_;
+    return Message::operator==(other) && pgn_ == other.pgn_ && canFrame_ == other.canFrame_;
 }
 
 bool Message2000::validate() const {

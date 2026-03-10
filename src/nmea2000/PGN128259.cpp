@@ -186,16 +186,5 @@ bool PGN128259::operator==(const PGN128259& other) const noexcept {
            reserved2_ == other.reserved2_;
 }
 
-bool PGN128259::hasEqualContent(const PGN128259& other) const noexcept {
-    return Message2000::hasEqualContent(other) &&
-           sequenceId_ == other.sequenceId_ &&
-           speedWaterReferenced_ == other.speedWaterReferenced_ &&
-           speedGroundReferenced_ == other.speedGroundReferenced_ &&
-           speedWaterReferencedType_ == other.speedWaterReferencedType_ &&
-           speedDirection_ == other.speedDirection_ &&
-           reserved1_ == other.reserved1_ &&
-           reserved2_ == other.reserved2_;
-}
-
 } // namespace nmea2000
 } // namespace nmealib

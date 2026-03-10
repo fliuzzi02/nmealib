@@ -67,7 +67,6 @@ public:
     // Overridden methods
     std::string getStringContent(bool verbose) const noexcept override;
     bool operator==(const PGN127250& other) const noexcept;
-    bool hasEqualContent(const PGN127250& other) const noexcept;
 
 private:
     uint8_t sequenceId_{0};

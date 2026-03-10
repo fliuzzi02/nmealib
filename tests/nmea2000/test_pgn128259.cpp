@@ -169,7 +169,7 @@ TEST(PGN128259Factory, ParsedValuesHaveEqualContentToDirectConstruction) {
     ASSERT_NE(pgn, nullptr);
 
     PGN128259 direct = makeTypical();
-    EXPECT_TRUE(pgn->hasEqualContent(direct));
+    EXPECT_EQ(*pgn, direct);
 }
 
 TEST(PGN128259Factory, ThrowsOnFrameTooShort) {
@@ -276,7 +276,7 @@ TEST(PGN128259Clone, ClonedInstanceHasEqualContent) {
 
     auto* clonedPgn = dynamic_cast<PGN128259*>(cloned.get());
     ASSERT_NE(clonedPgn, nullptr);
-    EXPECT_TRUE(original.hasEqualContent(*clonedPgn));
+    EXPECT_EQ(original, *clonedPgn);
 }
 
 TEST(PGN128259Clone, CloneViaFactoryReturnsCorrectType) {
@@ -325,36 +325,6 @@ TEST(PGN128259Equality, OperatorEqual_DifferentContent_ReturnsFalse) {
     ASSERT_NE(p2, nullptr);
 
     EXPECT_FALSE(*p1 == *p2);
-}
-
-TEST(PGN128259Equality, HasEqualContent_SameValues_DifferentTimestamp_ReturnsTrue) {
-    using Clock = std::chrono::system_clock;
-    auto ts1 = Clock::now();
-    auto ts2 = ts1 + std::chrono::seconds(1);
-
-    auto msg1 = Nmea2000Factory::create(FRAME_STANDARD, ts1);
-    auto msg2 = Nmea2000Factory::create(FRAME_STANDARD, ts2);
-
-    auto* p1 = dynamic_cast<PGN128259*>(msg1.get());
-    auto* p2 = dynamic_cast<PGN128259*>(msg2.get());
-    ASSERT_NE(p1, nullptr);
-    ASSERT_NE(p2, nullptr);
-
-    EXPECT_TRUE(p1->hasEqualContent(*p2));
-    // Timestamps differ, so operator== must return false
-    EXPECT_FALSE(*p1 == *p2);
-}
-
-TEST(PGN128259Equality, HasEqualContent_DifferentContent_ReturnsFalse) {
-    auto msg1 = Nmea2000Factory::create(FRAME_STANDARD);
-    auto msg2 = Nmea2000Factory::create(FRAME_DIR_REVERSE);
-
-    auto* p1 = dynamic_cast<PGN128259*>(msg1.get());
-    auto* p2 = dynamic_cast<PGN128259*>(msg2.get());
-    ASSERT_NE(p1, nullptr);
-    ASSERT_NE(p2, nullptr);
-
-    EXPECT_FALSE(p1->hasEqualContent(*p2));
 }
 
 // ============================================================================
