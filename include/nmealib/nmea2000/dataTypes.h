@@ -162,7 +162,7 @@ private:
     TargetType value_;
 
     // Block default construction without parameters to enforce explicit initialization
-    constexpr explicit DataType(TargetType value) noexcept : value_(value) {}
+    constexpr DataType(TargetType value) noexcept : value_(value) {}
 
     /**
      * @brief Computes decimal precision from @ref RESOLUTION.
