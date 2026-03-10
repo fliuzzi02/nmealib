@@ -101,15 +101,12 @@ std::string MWV::getStringContent(bool verbose) const noexcept {
         ss << "Sentence Type: " << getSentenceType() << "\n";
         ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
         ss << "Fields:\n";
-        ss << "\tWind Angle: " << windAngle_ << "\n";
-        ss << "\tReference: " << reference_ << "\n";
-        ss << "\tWind Speed: " << windSpeed_ << "\n";
-        ss << "\tWind Speed Units: " << windSpeedUnits_ << "\n";
+        ss << "\tWind Angle: " << windAngle_ << " " << reference_ << "\n";
+        ss << "\tWind Speed: " << windSpeed_ << " " << windSpeedUnits_ << "\n";
         ss << "\tStatus: " << status_;
     } else {
         ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
-           << "Angle=" << windAngle_
-           << ", Ref=" << reference_
+           << "Angle=" << windAngle_ << reference_
            << ", Speed=" << windSpeed_ << windSpeedUnits_
            << ", Status=" << status_;
     }

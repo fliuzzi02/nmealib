@@ -129,7 +129,7 @@ TEST(VWR, FactoryThrowsOnMalformedVwrSentence)
 TEST(VWR, GetStringContent)
 {
     VWR vwr("II", 45.0, 'R', 10.5, 5.4, 19.4);
-    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: II\nSentence Type: VWR\nChecksum: None\nFields:\n\tWind Angle: 45.00\n\tWind Side: R\n\tSpeed (Knots): 10.50 N\n\tSpeed (m/s): 5.40 M\n\tSpeed (KPH): 19.40 K";
+    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: II\nSentence Type: VWR\nChecksum: None\nFields:\n\tWind Angle: 45.00\n\tWind Side: R\n\tSpeed: 10.50kts\n\tSpeed: 5.40 m/s\n\tSpeed: 19.40 kph";
     std::string expectedOneLiner = "[OK] NMEA0183 II VWR: Angle=45.00R, Knots=10.50, m/s=5.40, KPH=19.40";
     std::string actualVerbose = vwr.getStringContent(true);
     std::string actualOneLiner = vwr.getStringContent(false);

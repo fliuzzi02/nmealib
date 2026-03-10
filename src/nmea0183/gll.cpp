@@ -125,10 +125,8 @@ std::string GLL::getStringContent(bool verbose) const noexcept {
         ss << "Sentence Type: " << getSentenceType() << "\n";
         ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
         ss << "Fields:\n";
-        ss << "\tLatitude: " << latitudeStr << "\n";
-        ss << "\tLatitude Direction: " << latitudeDirection_ << "\n";
-        ss << "\tLongitude: " << longitudeStr << "\n";
-        ss << "\tLongitude Direction: " << longitudeDirection_ << "\n";
+        ss << "\tLatitude: " << latitudeStr << " " << latitudeDirection_ << "\n";
+        ss << "\tLongitude: " << longitudeStr << " " << longitudeDirection_ << "\n";
         ss << "\tTimestamp: " << utcTime_ << "\n";
         ss << "\tStatus: " << status_ << "\n";
         ss << "\tMode Indicator: " << modeIndicator_;

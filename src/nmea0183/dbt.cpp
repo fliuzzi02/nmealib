@@ -55,40 +55,40 @@ std::unique_ptr<DBT> DBT::create(std::unique_ptr<Message0183> baseMessage) {
 }
 
 DBT::DBT(Message0183 baseMessage,
-         double depthFeet,
-         char feetUnit,
-         double depthMeters,
-         char metersUnit,
-         double depthFathoms,
-         char fathomsUnit) noexcept
-    : Message0183(std::move(baseMessage)),
-      depthFeet_(depthFeet),
-      feetUnit_(feetUnit),
-      depthMeters_(depthMeters),
-      metersUnit_(metersUnit),
-      depthFathoms_(depthFathoms),
-      fathomsUnit_(fathomsUnit) {}
+        double depthFeet,
+        char feetUnit,
+        double depthMeters,
+        char metersUnit,
+        double depthFathoms,
+        char fathomsUnit) noexcept : 
+        Message0183(std::move(baseMessage)),
+        depthFeet_(depthFeet),
+        feetUnit_(feetUnit),
+        depthMeters_(depthMeters),
+        metersUnit_(metersUnit),
+        depthFathoms_(depthFathoms),
+        fathomsUnit_(fathomsUnit) {}
 
 DBT::DBT(std::string talkerId,
-         double depthFeet,
-         char feetUnit,
-         double depthMeters,
-         char metersUnit,
-         double depthFathoms,
-         char fathomsUnit)
-    : Message0183(*Message0183::create(composeRaw(talkerId,
-                                                  depthFeet,
-                                                  feetUnit,
-                                                  depthMeters,
-                                                  metersUnit,
-                                                  depthFathoms,
-                                                  fathomsUnit))),
-      depthFeet_(depthFeet),
-      feetUnit_(feetUnit),
-      depthMeters_(depthMeters),
-      metersUnit_(metersUnit),
-      depthFathoms_(depthFathoms),
-      fathomsUnit_(fathomsUnit) {}
+        double depthFeet,
+        char feetUnit,
+        double depthMeters,
+        char metersUnit,
+        double depthFathoms,
+        char fathomsUnit) : 
+        Message0183(*Message0183::create(composeRaw(talkerId,
+                                                depthFeet,
+                                                feetUnit,
+                                                depthMeters,
+                                                metersUnit,
+                                                depthFathoms,
+                                                fathomsUnit))),
+        depthFeet_(depthFeet),
+        feetUnit_(feetUnit),
+        depthMeters_(depthMeters),
+        metersUnit_(metersUnit),
+        depthFathoms_(depthFathoms),
+        fathomsUnit_(fathomsUnit) {}
 
 std::unique_ptr<nmealib::Message> DBT::clone() const {
     return std::unique_ptr<DBT>(new DBT(*this));
@@ -108,12 +108,9 @@ std::string DBT::getStringContent(bool verbose) const noexcept {
         ss << "Sentence Type: " << getSentenceType() << "\n";
         ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
         ss << "Fields:\n";
-        ss << "\tDepth (feet): " << depthFeet_ << "\n";
-        ss << "\tFeet Unit: " << feetUnit_ << "\n";
-        ss << "\tDepth (meters): " << depthMeters_ << "\n";
-        ss << "\tMeters Unit: " << metersUnit_ << "\n";
-        ss << "\tDepth (fathoms): " << depthFathoms_ << "\n";
-        ss << "\tFathoms Unit: " << fathomsUnit_;
+        ss << "\tDepth: " << depthFeet_ << " " << feetUnit_ << "\n";
+        ss << "\tDepth (meters): " << depthMeters_ << " " << metersUnit_ << "\n";
+        ss << "\tDepth (fathoms): " << depthFathoms_ << " " << fathomsUnit_ << "\n";
     } else {
         ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
            << "Depth=" << depthFeet_ << feetUnit_

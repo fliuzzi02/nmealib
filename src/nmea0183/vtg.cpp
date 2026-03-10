@@ -160,25 +160,10 @@ std::string VTG::getStringContent(bool verbose) const noexcept {
         ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
         ss << "Fields:\n";
         ss << "\tLegacy Format: " << (legacyFormat_ ? "Yes" : "No") << "\n";
-        ss << "\tCourse Over Ground (True): " << courseOverGroundTrue_;
-        if (courseOverGroundTrueType_ != '\0') {
-            ss << " " << courseOverGroundTrueType_;
-        }
-        ss << "\n"
-           << "\tCourse Over Ground (Magnetic): " << courseOverGroundMagnetic_;
-        if (courseOverGroundMagneticType_ != '\0') {
-            ss << " " << courseOverGroundMagneticType_;
-        }
-        ss << "\n"
-           << "\tSpeed Over Ground (Knots): " << speedOverGroundKnots_;
-        if (speedOverGroundKnotsType_ != '\0') {
-            ss << " " << speedOverGroundKnotsType_;
-        }
-        ss << "\n"
-           << "\tSpeed Over Ground (KPH): " << speedOverGroundKph_;
-        if (speedOverGroundKphType_ != '\0') {
-            ss << " " << speedOverGroundKphType_;
-        }
+        ss << "\tCourse Over Ground: " << courseOverGroundTrue_ << "T\n";
+        ss << "\tCourse Over Ground: " << courseOverGroundMagnetic_ << "M\n";
+        ss << "\tSpeed Over Ground: " << speedOverGroundKnots_ << "kts\n";
+        ss << "\tSpeed Over Ground: " << speedOverGroundKph_ << "kph";
         if (faaModeIndicator_.has_value()) {
             ss << "\n"
                << "\tFAA Mode Indicator: " << faaModeIndicator_.value();

@@ -118,20 +118,9 @@ std::string VWR::getStringContent(bool verbose) const noexcept {
         ss << "Fields:\n";
         ss << "\tWind Angle: " << windAngle_ << "\n";
         ss << "\tWind Side: " << windSide_ << "\n";
-        ss << "\tSpeed (Knots): " << speedKnots_;
-        if (speedKnotsUnit_ != '\0') {
-            ss << " " << speedKnotsUnit_;
-        }
-        ss << "\n"
-           << "\tSpeed (m/s): " << speedMps_;
-        if (speedMpsUnit_ != '\0') {
-            ss << " " << speedMpsUnit_;
-        }
-        ss << "\n"
-           << "\tSpeed (KPH): " << speedKph_;
-        if (speedKphUnit_ != '\0') {
-            ss << " " << speedKphUnit_;
-        }
+        ss << "\tSpeed: " << speedKnots_ << "kts\n";
+        ss << "\tSpeed: " << speedMps_ << " m/s\n";
+        ss << "\tSpeed: " << speedKph_ << " kph";
     } else {
         ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
            << "Angle=" << windAngle_ << windSide_
