@@ -179,6 +179,8 @@ private:
 
 struct DistanceTraits { static constexpr double MIN = 0, MAX = 4.295e7, RESOLUTION = 1e-2;  using RawType = uint32_t; using TargetType = float;};
 struct SpeedTraits { static constexpr double MIN = 0, MAX = 655.32, RESOLUTION = 1e-2; using RawType = uint16_t; using TargetType = float;};
+struct AngleTraits { static constexpr double MIN = 0, MAX = 2*M_PI, RESOLUTION = 1e-4; using RawType = uint16_t; using TargetType = float;};
+struct SignedAngleTraits { static constexpr double MIN = -M_PI, MAX = M_PI, RESOLUTION = 1e-4; using RawType = uint16_t; using TargetType = float;};
 struct HalfByteTraits { static constexpr double MIN = 0, MAX = 15, RESOLUTION = 1; using RawType = uint8_t; using TargetType = uint8_t;};
 struct ByteTraits { static constexpr double MIN = 0, MAX = 255, RESOLUTION = 1; using RawType = uint8_t; using TargetType = uint8_t; };
 
@@ -233,6 +235,32 @@ using HalfByte = DataType<HalfByteTraits>;
  * - Target type: uint8_t (for use in higher-level fields that expect a byte value)
  */
 using Byte = DataType<ByteTraits>;
+
+/**
+ * @brief Custom type representing angles in radians.
+ * 
+ * - Range: [0, 2π] rad
+ * 
+ * - Resolution: 0.0001 rad
+ * 
+ * - Raw type: uint16_t
+ * 
+ * - Target type: float (for use in higher-level fields that expect an angle value)
+ */
+using Angle = DataType<AngleTraits>;
+
+/**
+ * @brief Custom type representing signed angles in radians.
+ * 
+ * - Range: [-π, π] rad
+ * 
+ * - Resolution: 0.0001 rad
+ * 
+ * - Raw type: uint16_t
+ * 
+ * - Target type: float (for use in higher-level fields that expect a signed angle value)
+ */
+using SignedAngle = DataType<SignedAngleTraits>;
 
 } // namespace nmea2000
 } // namespace nmealib

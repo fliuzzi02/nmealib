@@ -19,6 +19,7 @@ private:
     MessageRegistry() = default;
 
     friend class PGN129029;
+    friend class PGN127250;
 };
 
 } // namespace nmea2000
