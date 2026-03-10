@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches: [ "release/**" ]
-  pull_request:
+  pull_request_target:
     branches: [ "main" ]
 
 permissions:
@@ -18,7 +18,7 @@ jobs:
   handle-static-analysis-failure:
     runs-on: ubuntu-latest
     needs: static-analysis
-    if: ${{ always() && github.event_name == 'pull_request' && needs.static-analysis.outputs.cppcheck_exit_code != '0' }}
+    if: ${{ always() && github.event_name == 'pull_request_target' && needs.static-analysis.outputs.cppcheck_exit_code != '0' }}
     permissions:
       issues: write
       contents: read
