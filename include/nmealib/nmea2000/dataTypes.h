@@ -93,11 +93,10 @@ public:
      * @param raw Raw integer value representing the physical quantity. 
      */
     static constexpr DataType fromRaw(RawType raw) noexcept {
-        // Project raw into MIN-MAX range by rescaling using the min and max of the raw type
-        TargetType projectedValue = ((raw / std::numeric_limits<RawType>::max()) * (MAX - MIN)) + MIN;
-
-        // Approximate to nearest resolution step
-        TargetType normalizedValue = static_cast<TargetType>(std::round(projectedValue / RESOLUTION) * RESOLUTION);
+        // Convert raw value to physical units
+        TargetType physicalValue = static_cast<TargetType>(raw) * RESOLUTION;
+        // Normalize to resolution by rounding to nearest multiple of RESOLUTION
+        TargetType normalizedValue = static_cast<TargetType>(std::round(physicalValue / RESOLUTION) * RESOLUTION);
         return DataType(normalizedValue);
     }
 
