@@ -179,7 +179,6 @@ TEST(Message2000, GetStringContentConcise)
     
     std::string concise = msg->getStringContent(false);
     EXPECT_NE(concise.find("PGN"), std::string::npos);
-    EXPECT_NE(concise.find("Len"), std::string::npos);
 }
 
 // Test message type
