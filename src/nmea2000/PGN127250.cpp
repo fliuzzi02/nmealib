@@ -75,6 +75,7 @@ std::string PGN127250::getStringContent(bool verbose) const noexcept {
 
     if (verbose) {
         oss << this->toString(true);
+        oss << "\n";
         oss << "Fields:\n";
         oss << "\tSequence ID: " << static_cast<int>(sequenceId_) << "\n";
         oss << "\tHeading: " << heading_.toString() << "rad, " << getHeadingDegrees() << "°" << "\n";

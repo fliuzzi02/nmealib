@@ -83,6 +83,7 @@ std::string PGN128259::getStringContent(bool verbose) const noexcept {
 
     if (verbose) {
         oss << this->toString(true);
+        oss << "\n";
         oss << "Fields:\n";
         oss << "\tSequence ID: " << static_cast<int>(sequenceId_) << "\n";
         oss << "\tSpeed Water Referenced: " << speedWaterReferenced_.toString() << " m/s\n";
