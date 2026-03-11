@@ -93,9 +93,9 @@ std::string PGN127250::getStringContent(bool verbose) const noexcept {
     } else {
         oss << this->toString(false);
         oss << "SeqID=" << static_cast<int>(sequenceId_)
-            << " Heading=" << heading_.toString() << "rad"
-            << " Deviation=" << deviation_.toString() << "rad"
-            << " Variation=" << variation_.toString() << "rad"
+            << " Heading=" << getHeadingDegrees() << "°"
+            << " Deviation=" << getDeviationDegrees() << "°"
+            << " Variation=" << getVariationDegrees() << "°"
             << " HeadingRef=" << static_cast<int>(headingReference_.getValue());
     }
     return oss.str();
