@@ -75,6 +75,8 @@ TEST(PGN127250, DataFieldLimits) {
 
 TEST(PGN127250, FactoryConstruction) {
     std::string VALID_MESSAGE = "09F11260:342C71FF7FFF7FFD";
+    std::string WRONG_MESSAGE = "01F50300:01F4012C01000000";
+
     auto msg = nmealib::nmea2000::Nmea2000Factory::create(
         VALID_MESSAGE
     );
@@ -82,7 +84,14 @@ TEST(PGN127250, FactoryConstruction) {
     auto* pgn = dynamic_cast<PGN127250*>(msg.get());
     ASSERT_NE(pgn, nullptr);
 
-    EXPECT_EQ(pgn->getSequenceId(), 4U);
+    auto wrongMsg = nmealib::nmea2000::Nmea2000Factory::create(
+        WRONG_MESSAGE
+    );
+    ASSERT_NE(wrongMsg, nullptr);
+    auto* wrongPgn = dynamic_cast<PGN127250*>(wrongMsg.get());
+    EXPECT_EQ(wrongPgn, nullptr);
+
+    EXPECT_EQ(pgn->getSequenceId(), 52U);
     EXPECT_NEAR(pgn->getHeading().getValue(), 2.7777f, 0.02f);
     EXPECT_NEAR(pgn->getDeviation().getValue(), 0.0f, 0.02f);
     EXPECT_NEAR(pgn->getVariation().getValue(), 0.0f, 0.02f);
