@@ -98,7 +98,7 @@ TEST(PGN127250, FactoryConstruction) {
     auto* wrongPgn = dynamic_cast<PGN127250*>(wrongMsg.get());
     EXPECT_EQ(wrongPgn, nullptr);
 
-    ASSERT_THROW(Nmea2000Factory::create(
+    EXPECT_THROW(Nmea2000Factory::create(
         LONG_MESSAGE
     ), InvalidCanFrameException);
 }

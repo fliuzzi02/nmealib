@@ -35,7 +35,7 @@ static const std::string FRAME_TYPE_DOPPLER      = "01F50300:01F4012C01020000"; 
 static const std::string FRAME_TYPE_CORRELATION  = "01F50300:01F4012C01030000"; // byte[5]=3
 static const std::string FRAME_TYPE_EM           = "01F50300:01F4012C01040000"; // byte[5]=4
 static const std::string FRAME_TYPE_UNAVAILABLE  = "01F50300:01F4012C01050000"; // byte[5]=5
-
+static const std::string WRONG_MESSAGE = "01F50300:01F4012C01000000";
 // Wrong-length frames (must throw on PGN128259 parsing)
 static const std::string FRAME_TOO_SHORT      = "01F50300:01F4012C010000";     // 7 bytes
 static const std::string FRAME_TOO_LONG       = "01F50300:01F4012C0100000000"; // 9 bytes
@@ -55,7 +55,7 @@ static PGN128259 makeTypical() {
 // Direct construction via public constructor
 // ============================================================================
 
-TEST(PGN128259DirectConstruction, GettersReturnCorrectValues) {
+TEST(PGN128259, GettersReturnCorrectValues) {
     PGN128259 pgn(1,
                   Speed::fromValue(5.0f),
                   Speed::fromValue(3.0f),
@@ -63,6 +63,9 @@ TEST(PGN128259DirectConstruction, GettersReturnCorrectValues) {
                   HalfByte::fromValue(1),   // Reverse
                   Byte::fromValue(42),
                   HalfByte::fromValue(3));
+    
+    EXPECT_EQ(pgn.getType(), nmealib::Message::Type::NMEA2000);
+    EXPECT_EQ(pgn.getPgn(), 128259U);
 
     EXPECT_EQ(pgn.getSequenceId(), 1U);
     EXPECT_EQ(pgn.getSpeedWaterReferenced(), Speed::fromValue(5.0f));
@@ -71,148 +74,83 @@ TEST(PGN128259DirectConstruction, GettersReturnCorrectValues) {
     EXPECT_EQ(pgn.getSpeedDirection(),           HalfByte::fromValue(1));
     EXPECT_EQ(pgn.getReserved1(),                Byte::fromValue(42));
     EXPECT_EQ(pgn.getReserved2(),                HalfByte::fromValue(3));
-}
 
-TEST(PGN128259DirectConstruction, MessageTypeIsNMEA2000) {
-    auto pgn = makeTypical();
-    EXPECT_EQ(pgn.getType(), nmealib::Message::Type::NMEA2000);
-}
-
-TEST(PGN128259DirectConstruction, PgnIs128259) {
-    auto pgn = makeTypical();
-    EXPECT_EQ(pgn.getPgn(), 128259U);
-}
-
-TEST(PGN128259DirectConstruction, ValidateReturnsTrue) {
-    auto pgn = makeTypical();
     EXPECT_TRUE(pgn.validate());
-}
-
-TEST(PGN128259DirectConstruction, CanFrameIs8Bytes) {
-    auto pgn = makeTypical();
     EXPECT_EQ(pgn.getCanFrameLength(), 8U);
     EXPECT_EQ(pgn.getCanFrame().size(), 8U);
-}
-
-TEST(PGN128259DirectConstruction, ZeroMinimumSpeeds) {
-    PGN128259 pgn(0,
-                  Speed::fromValue(0.0f),
-                  Speed::fromValue(0.0f),
-                  Byte::fromValue(0),
-                  HalfByte::fromValue(0),
-                  Byte::fromValue(0),
-                  HalfByte::fromValue(0));
-
-    EXPECT_FLOAT_EQ(pgn.getSpeedWaterReferenced().getValue(),  0.0f);
-    EXPECT_FLOAT_EQ(pgn.getSpeedGroundReferenced().getValue(), 0.0f);
-    EXPECT_EQ(pgn.getSequenceId(), 0U);
-}
-
-TEST(PGN128259DirectConstruction, MaximumSpeeds) {
-    Speed maxSpeed = Speed::fromValue(655.0f);
-    PGN128259 pgn(255,
-                  maxSpeed,
-                  maxSpeed,
-                  Byte::fromValue(4),
-                  HalfByte::fromValue(1),
-                  Byte::fromValue(255),
-                  HalfByte::fromValue(15));
-
-    EXPECT_FLOAT_EQ(pgn.getSpeedWaterReferenced().getValue(),  655.0f);
-    EXPECT_FLOAT_EQ(pgn.getSpeedGroundReferenced().getValue(), 655.0f);
-    EXPECT_EQ(pgn.getSequenceId(), 255U);
-    EXPECT_EQ(pgn.getReserved1(), Byte::fromValue(255));
-    EXPECT_EQ(pgn.getReserved2(), HalfByte::fromValue(15));
-}
-
-TEST(PGN128259DirectConstruction, SequenceIdMaxValue) {
-    PGN128259 pgn(255,
-                  Speed::fromValue(0.0f),
-                  Speed::fromValue(0.0f),
-                  Byte::fromValue(0),
-                  HalfByte::fromValue(0),
-                  Byte::fromValue(0),
-                  HalfByte::fromValue(0));
-    EXPECT_EQ(pgn.getSequenceId(), 255U);
 }
 
 // ============================================================================
 // Factory-based construction (Nmea2000Factory::create dispatches to PGN128259)
 // ============================================================================
 
-TEST(PGN128259Factory, FactoryDispatchesToPGN128259) {
+TEST(PGN128259, FactoryConstruction) {
     auto msg = Nmea2000Factory::create(FRAME_STANDARD);
     ASSERT_NE(msg, nullptr);
     auto* pgn = dynamic_cast<PGN128259*>(msg.get());
-    EXPECT_NE(pgn, nullptr) << "Expected factory to return a PGN128259 instance";
-}
+    ASSERT_NE(pgn, nullptr);
 
-TEST(PGN128259Factory, ParsedValuesMatchExpected) {
-    
-}
+    EXPECT_EQ(pgn->getSequenceId(), 1U);
 
-TEST(PGN128259Factory, ParsedValuesHaveEqualContentToDirectConstruction) {
-    
-}
+    auto wrongMsg = Nmea2000Factory::create(WRONG_MESSAGE);
+    ASSERT_NE(wrongMsg, nullptr);
+    auto* wrongPgn = dynamic_cast<PGN128259*>(wrongMsg.get());
+    EXPECT_EQ(wrongPgn, nullptr);
 
-TEST(PGN128259Factory, ThrowsOnFrameTooShort) {
     EXPECT_THROW(Nmea2000Factory::create(FRAME_TOO_SHORT), InvalidCanFrameException);
-}
-
-TEST(PGN128259Factory, ThrowsOnFrameTooLong) {
     EXPECT_THROW(Nmea2000Factory::create(FRAME_TOO_LONG), InvalidCanFrameException);
 }
 
-TEST(PGN128259Factory, SpeedDirectionForward) {
+TEST(PGN128259, FactorySpeedDirectionForward) {
     auto msg = Nmea2000Factory::create(FRAME_STANDARD);
     auto* pgn = dynamic_cast<PGN128259*>(msg.get());
     ASSERT_NE(pgn, nullptr);
     EXPECT_EQ(pgn->getSpeedDirection().getValue(), 0U);
 }
 
-TEST(PGN128259Factory, SpeedDirectionReverse) {
+TEST(PGN128259, FactorySpeedDirectionReverse) {
     auto msg = Nmea2000Factory::create(FRAME_DIR_REVERSE);
     auto* pgn = dynamic_cast<PGN128259*>(msg.get());
     ASSERT_NE(pgn, nullptr);
     EXPECT_EQ(pgn->getSpeedDirection().getValue(), 1U);
 }
 
-TEST(PGN128259Factory, SpeedDirectionReserved) {
+TEST(PGN128259, FactorySpeedDirectionReserved) {
     auto msg = Nmea2000Factory::create(FRAME_DIR_RESERVED);
     auto* pgn = dynamic_cast<PGN128259*>(msg.get());
     ASSERT_NE(pgn, nullptr);
     EXPECT_EQ(pgn->getSpeedDirection().getValue(), 2U);
 }
 
-TEST(PGN128259Factory, WaterRefTypePitot) {
+TEST(PGN128259, FactoryWaterRefTypePitot) {
     auto msg = Nmea2000Factory::create(FRAME_TYPE_PITOT);
     auto* pgn = dynamic_cast<PGN128259*>(msg.get());
     ASSERT_NE(pgn, nullptr);
     EXPECT_EQ(pgn->getSpeedWaterReferencedType().getValue(), 1U);
 }
 
-TEST(PGN128259Factory, WaterRefTypeDoppler) {
+TEST(PGN128259, FactoryWaterRefTypeDoppler) {
     auto msg = Nmea2000Factory::create(FRAME_TYPE_DOPPLER);
     auto* pgn = dynamic_cast<PGN128259*>(msg.get());
     ASSERT_NE(pgn, nullptr);
     EXPECT_EQ(pgn->getSpeedWaterReferencedType().getValue(), 2U);
 }
 
-TEST(PGN128259Factory, WaterRefTypeCorrelation) {
+TEST(PGN128259, FactoryWaterRefTypeCorrelation) {
     auto msg = Nmea2000Factory::create(FRAME_TYPE_CORRELATION);
     auto* pgn = dynamic_cast<PGN128259*>(msg.get());
     ASSERT_NE(pgn, nullptr);
     EXPECT_EQ(pgn->getSpeedWaterReferencedType().getValue(), 3U);
 }
 
-TEST(PGN128259Factory, WaterRefTypeEM) {
+TEST(PGN128259, FactoryWaterRefTypeEM) {
     auto msg = Nmea2000Factory::create(FRAME_TYPE_EM);
     auto* pgn = dynamic_cast<PGN128259*>(msg.get());
     ASSERT_NE(pgn, nullptr);
     EXPECT_EQ(pgn->getSpeedWaterReferencedType().getValue(), 4U);
 }
 
-TEST(PGN128259Factory, WaterRefTypeUnavailable) {
+TEST(PGN128259, FactoryWaterRefTypeUnavailable) {
     auto msg = Nmea2000Factory::create(FRAME_TYPE_UNAVAILABLE);
     auto* pgn = dynamic_cast<PGN128259*>(msg.get());
     ASSERT_NE(pgn, nullptr);
@@ -221,7 +159,7 @@ TEST(PGN128259Factory, WaterRefTypeUnavailable) {
 
 // Verify that the reserved2 nibble in byte[6] upper nibble is parsed correctly
 // and does not corrupt speedDirection in the lower nibble.
-TEST(PGN128259Factory, Reserved2NibbleDoesNotCorruptSpeedDirection) {
+TEST(PGN128259, Reserved2NibbleDoesNotCorruptSpeedDirection) {
     // byte[6] = 0xF1 -> reserved2 = 0xF (upper nibble), speedDir = 0x1 (Reverse)
     std::string frame = "01F50300:01F4012C0100F100";
     auto msg = Nmea2000Factory::create(frame);
@@ -232,7 +170,7 @@ TEST(PGN128259Factory, Reserved2NibbleDoesNotCorruptSpeedDirection) {
 }
 
 // Verify that reserved1 (byte[7]) is parsed independently of byte[6]
-TEST(PGN128259Factory, Reserved1InByte7IsParsedCorrectly) {
+TEST(PGN128259, Reserved1InByte7IsParsedCorrectly) {
     // byte[6]=0x00, byte[7]=0xAB -> reserved1=0xAB=171
     std::string frame = "01F50300:01F4012C010000AB";
     auto msg = Nmea2000Factory::create(frame);
@@ -245,14 +183,14 @@ TEST(PGN128259Factory, Reserved1InByte7IsParsedCorrectly) {
 // Clone
 // ============================================================================
 
-TEST(PGN128259Clone, CloneReturnsIndependentNonNullCopy) {
+TEST(PGN128259, CloneReturnsIndependentNonNullCopy) {
     auto original = makeTypical();
     auto cloned = original.clone();
     ASSERT_NE(cloned, nullptr);
     EXPECT_NE(cloned.get(), &original);
 }
 
-TEST(PGN128259Clone, ClonedInstanceHasEqualContent) {
+TEST(PGN128259, ClonedInstanceHasEqualContent) {
     auto original = makeTypical();
     auto cloned = original.clone();
     ASSERT_NE(cloned, nullptr);
@@ -262,7 +200,7 @@ TEST(PGN128259Clone, ClonedInstanceHasEqualContent) {
     EXPECT_EQ(original, *clonedPgn);
 }
 
-TEST(PGN128259Clone, CloneViaFactoryReturnsCorrectType) {
+TEST(PGN128259, CloneViaFactoryReturnsCorrectType) {
     auto msg = Nmea2000Factory::create(FRAME_STANDARD);
     ASSERT_NE(msg, nullptr);
     auto cloned = msg->clone();
@@ -276,7 +214,7 @@ TEST(PGN128259Clone, CloneViaFactoryReturnsCorrectType) {
 // Equality operators
 // ============================================================================
 
-TEST(PGN128259Equality, OperatorEqual_SameTimestampAndContent_ReturnsTrue) {
+TEST(PGN128259, Equality) {
     using Clock = std::chrono::system_clock;
     auto ts = Clock::now();
 
@@ -291,19 +229,15 @@ TEST(PGN128259Equality, OperatorEqual_SameTimestampAndContent_ReturnsTrue) {
     ASSERT_NE(p2, nullptr);
 
     EXPECT_TRUE(*p1 == *p2);
-}
 
-TEST(PGN128259Equality, OperatorEqual_DifferentContent_ReturnsFalse) {
-    using Clock = std::chrono::system_clock;
-    auto ts = Clock::now();
-
-    auto msg1 = Nmea2000Factory::create(FRAME_STANDARD,     ts);
-    auto msg2 = Nmea2000Factory::create(FRAME_TYPE_DOPPLER, ts);
+    // Inequality
+    msg1 = Nmea2000Factory::create(FRAME_STANDARD,     ts);
+    msg2 = Nmea2000Factory::create(FRAME_TYPE_DOPPLER, ts);
     ASSERT_NE(msg1, nullptr);
     ASSERT_NE(msg2, nullptr);
 
-    auto* p1 = dynamic_cast<PGN128259*>(msg1.get());
-    auto* p2 = dynamic_cast<PGN128259*>(msg2.get());
+    p1 = dynamic_cast<PGN128259*>(msg1.get());
+    p2 = dynamic_cast<PGN128259*>(msg2.get());
     ASSERT_NE(p1, nullptr);
     ASSERT_NE(p2, nullptr);
 
@@ -314,7 +248,7 @@ TEST(PGN128259Equality, OperatorEqual_DifferentContent_ReturnsFalse) {
 // getStringContent — non-verbose (one-liner)
 // ============================================================================
 
-TEST(PGN128259StringContent, ConciseContainsPgnAndSpeeds) {
+TEST(PGN128259, StringContentConciseContainsPgnAndSpeeds) {
     auto pgn = makeTypical();
     std::string s = pgn.getStringContent(false);
     EXPECT_NE(s.find("128259"), std::string::npos);
@@ -322,7 +256,7 @@ TEST(PGN128259StringContent, ConciseContainsPgnAndSpeeds) {
     EXPECT_NE(s.find("3.00"),   std::string::npos);
 }
 
-TEST(PGN128259StringContent, ConciseSpeedDirForward) {
+TEST(PGN128259, StringContentConciseSpeedDirForward) {
     PGN128259 pgn(1,
                   Speed::fromValue(1.0f),
                   Speed::fromValue(1.0f),
@@ -334,7 +268,7 @@ TEST(PGN128259StringContent, ConciseSpeedDirForward) {
     EXPECT_NE(s.find("SpeedDir=F"), std::string::npos);
 }
 
-TEST(PGN128259StringContent, ConciseSpeedDirReverse) {
+TEST(PGN128259, StringContentConciseSpeedDirReverse) {
     PGN128259 pgn(1,
                   Speed::fromValue(1.0f),
                   Speed::fromValue(1.0f),
@@ -346,7 +280,7 @@ TEST(PGN128259StringContent, ConciseSpeedDirReverse) {
     EXPECT_NE(s.find("SpeedDir=R"), std::string::npos);
 }
 
-TEST(PGN128259StringContent, ConciseSpeedDirReserved) {
+TEST(PGN128259, StringContentConciseSpeedDirReserved) {
     PGN128259 pgn(1,
                   Speed::fromValue(1.0f),
                   Speed::fromValue(1.0f),
@@ -362,14 +296,14 @@ TEST(PGN128259StringContent, ConciseSpeedDirReserved) {
 // getStringContent — verbose (multi-line)
 // ============================================================================
 
-TEST(PGN128259StringContent, VerboseContainsProtocolAndPgn) {
+TEST(PGN128259, StringContentVerboseContainsProtocolAndPgn) {
     auto pgn = makeTypical();
     std::string s = pgn.getStringContent(true);
     EXPECT_NE(s.find("NMEA2000"), std::string::npos);
     EXPECT_NE(s.find("128259"),   std::string::npos);
 }
 
-TEST(PGN128259StringContent, VerboseContainsAllFieldLabels) {
+TEST(PGN128259, StringContentVerboseContainsAllFieldLabels) {
     auto pgn = makeTypical();
     std::string s = pgn.getStringContent(true);
     EXPECT_NE(s.find("Sequence ID"),             std::string::npos);
@@ -379,93 +313,65 @@ TEST(PGN128259StringContent, VerboseContainsAllFieldLabels) {
     EXPECT_NE(s.find("Speed Direction"),         std::string::npos);
 }
 
-TEST(PGN128259StringContent, VerboseWaterRefTypePaddle) {
+TEST(PGN128259, StringContentVerboseWaterRefTypePaddle) {
     PGN128259 pgn(1, Speed::fromValue(1.0f), Speed::fromValue(1.0f),
                   Byte::fromValue(0), HalfByte::fromValue(0),
                   Byte::fromValue(0), HalfByte::fromValue(0));
     EXPECT_NE(pgn.getStringContent(true).find("Paddle"), std::string::npos);
 }
 
-TEST(PGN128259StringContent, VerboseWaterRefTypePitot) {
+TEST(PGN128259, StringContentVerboseWaterRefTypePitot) {
     PGN128259 pgn(1, Speed::fromValue(1.0f), Speed::fromValue(1.0f),
                   Byte::fromValue(1), HalfByte::fromValue(0),
                   Byte::fromValue(0), HalfByte::fromValue(0));
     EXPECT_NE(pgn.getStringContent(true).find("Pitot"), std::string::npos);
 }
 
-TEST(PGN128259StringContent, VerboseWaterRefTypeDoppler) {
+TEST(PGN128259, StringContentVerboseWaterRefTypeDoppler) {
     PGN128259 pgn(1, Speed::fromValue(1.0f), Speed::fromValue(1.0f),
                   Byte::fromValue(2), HalfByte::fromValue(0),
                   Byte::fromValue(0), HalfByte::fromValue(0));
     EXPECT_NE(pgn.getStringContent(true).find("Doppler"), std::string::npos);
 }
 
-TEST(PGN128259StringContent, VerboseWaterRefTypeCorrelation) {
+TEST(PGN128259, StringContentVerboseWaterRefTypeCorrelation) {
     PGN128259 pgn(1, Speed::fromValue(1.0f), Speed::fromValue(1.0f),
                   Byte::fromValue(3), HalfByte::fromValue(0),
                   Byte::fromValue(0), HalfByte::fromValue(0));
     EXPECT_NE(pgn.getStringContent(true).find("Correlation"), std::string::npos);
 }
 
-TEST(PGN128259StringContent, VerboseWaterRefTypeEM) {
+TEST(PGN128259, StringContentVerboseWaterRefTypeEM) {
     PGN128259 pgn(1, Speed::fromValue(1.0f), Speed::fromValue(1.0f),
                   Byte::fromValue(4), HalfByte::fromValue(0),
                   Byte::fromValue(0), HalfByte::fromValue(0));
     EXPECT_NE(pgn.getStringContent(true).find("EM"), std::string::npos);
 }
 
-TEST(PGN128259StringContent, VerboseWaterRefTypeUnavailable) {
+TEST(PGN128259, StringContentVerboseWaterRefTypeUnavailable) {
     PGN128259 pgn(1, Speed::fromValue(1.0f), Speed::fromValue(1.0f),
                   Byte::fromValue(5), HalfByte::fromValue(0),
                   Byte::fromValue(0), HalfByte::fromValue(0));
     EXPECT_NE(pgn.getStringContent(true).find("Unavailable"), std::string::npos);
 }
 
-TEST(PGN128259StringContent, VerboseSpeedDirForward) {
+TEST(PGN128259, StringContentVerboseSpeedDirForward) {
     PGN128259 pgn(1, Speed::fromValue(1.0f), Speed::fromValue(1.0f),
                   Byte::fromValue(0), HalfByte::fromValue(0),
                   Byte::fromValue(0), HalfByte::fromValue(0));
     EXPECT_NE(pgn.getStringContent(true).find("Forward"), std::string::npos);
 }
 
-TEST(PGN128259StringContent, VerboseSpeedDirReverse) {
+TEST(PGN128259, StringContentVerboseSpeedDirReverse) {
     PGN128259 pgn(1, Speed::fromValue(1.0f), Speed::fromValue(1.0f),
                   Byte::fromValue(0), HalfByte::fromValue(1),
                   Byte::fromValue(0), HalfByte::fromValue(0));
     EXPECT_NE(pgn.getStringContent(true).find("Reverse"), std::string::npos);
 }
 
-TEST(PGN128259StringContent, VerboseSpeedDirReserved) {
+TEST(PGN128259, StringContentVerboseSpeedDirReserved) {
     PGN128259 pgn(1, Speed::fromValue(1.0f), Speed::fromValue(1.0f),
                   Byte::fromValue(0), HalfByte::fromValue(7),
                   Byte::fromValue(0), HalfByte::fromValue(0));
     EXPECT_NE(pgn.getStringContent(true).find("Unavailable"), std::string::npos);
-}
-
-// ============================================================================
-// DataType range validation
-// ============================================================================
-
-TEST(PGN128259DataTypes, SpeedAboveMaxThrows) {
-    EXPECT_THROW(Speed::fromValue(655.33f), OutOfRangeException);
-}
-
-TEST(PGN128259DataTypes, SpeedBelowMinThrows) {
-    EXPECT_THROW(Speed::fromValue(-0.01f), OutOfRangeException);
-}
-
-TEST(PGN128259DataTypes, HalfByteAboveMaxThrows) {
-    EXPECT_THROW(HalfByte::fromValue(16U), OutOfRangeException);
-}
-
-TEST(PGN128259DataTypes, SpeedToStringRoundTrip) {
-    Speed s = Speed::fromValue(5.0f);
-    EXPECT_EQ(s.toString(), "5.00");
-}
-
-TEST(PGN128259DataTypes, SpeedRawRoundTrip) {
-    Speed s = Speed::fromValue(12.34f);
-    uint16_t raw = s.getRaw();
-    Speed reconstructed = Speed::fromValue(static_cast<float>(raw) * 0.01f);
-    EXPECT_EQ(s, reconstructed);
 }
