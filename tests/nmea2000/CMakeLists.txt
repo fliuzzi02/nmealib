@@ -1,4 +1,5 @@
 add_executable(nmea2000_tests
+	test_dataTypes.cpp
 	test_nmea2000.cpp
 	test_pgn128259.cpp
 )
