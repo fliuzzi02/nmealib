@@ -35,7 +35,7 @@ static const std::string FRAME_TYPE_DOPPLER      = "01F50300:01F4012C01020000"; 
 static const std::string FRAME_TYPE_CORRELATION  = "01F50300:01F4012C01030000"; // byte[5]=3
 static const std::string FRAME_TYPE_EM           = "01F50300:01F4012C01040000"; // byte[5]=4
 static const std::string FRAME_TYPE_UNAVAILABLE  = "01F50300:01F4012C01050000"; // byte[5]=5
-static const std::string WRONG_MESSAGE = "01F50300:01F4012C01000000";
+static const std::string WRONG_MESSAGE           = "09F11260:342C71FF7FFF7FFD";
 // Wrong-length frames (must throw on PGN128259 parsing)
 static const std::string FRAME_TOO_SHORT      = "01F50300:01F4012C010000";     // 7 bytes
 static const std::string FRAME_TOO_LONG       = "01F50300:01F4012C0100000000"; // 9 bytes
@@ -95,7 +95,7 @@ TEST(PGN128259, FactoryConstruction) {
     auto wrongMsg = Nmea2000Factory::create(WRONG_MESSAGE);
     ASSERT_NE(wrongMsg, nullptr);
     auto* wrongPgn = dynamic_cast<PGN128259*>(wrongMsg.get());
-    EXPECT_EQ(wrongPgn, nullptr);
+    ASSERT_EQ(wrongPgn, nullptr);
 
     EXPECT_THROW(Nmea2000Factory::create(FRAME_TOO_SHORT), InvalidCanFrameException);
     EXPECT_THROW(Nmea2000Factory::create(FRAME_TOO_LONG), InvalidCanFrameException);
