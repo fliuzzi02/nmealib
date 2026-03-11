@@ -5,6 +5,8 @@
 #include <iomanip>
 #include <sstream>
 #include <cmath>
+#include <limits>
+#include <algorithm>
 
 namespace nmealib {
 namespace nmea2000 {
@@ -78,11 +80,22 @@ public:
      * @param value Physical value.
      */
     static constexpr DataType fromValue(TargetType value) {
-        if (value < MIN || value > MAX) {
-            throw OutOfRangeException("DataType::fromValue", "["+std::to_string(MIN)+", "+std::to_string(MAX)+"]");
+        const double physicalValue = static_cast<double>(value);
+        const double tolerance = RESOLUTION * 0.5;
+
+        if (physicalValue < MIN - tolerance || physicalValue > MAX + tolerance) {
+            throw OutOfRangeException("DataType::fromValue()");
         }
-        // Normalize to resolution by rounding to nearest multiple of RESOLUTION
-        return DataType(static_cast<TargetType>(std::round(value / RESOLUTION) * RESOLUTION));
+
+        const double clampedValue = std::clamp(physicalValue, MIN, MAX);
+
+        double scaled = clampedValue - MIN;
+        scaled /= (MAX - MIN);
+        scaled *= (static_cast<double>(Traits::RAW_MAX) - static_cast<double>(Traits::RAW_MIN));
+        scaled += static_cast<double>(Traits::RAW_MIN);
+        scaled = std::round(scaled / RESOLUTION) * RESOLUTION;
+
+        return DataType(static_cast<RawType>(scaled));
     }
 
     /**
@@ -93,11 +106,7 @@ public:
      * @param raw Raw integer value representing the physical quantity. 
      */
     static constexpr DataType fromRaw(RawType raw) noexcept {
-        // Convert raw value to physical units
-        TargetType physicalValue = static_cast<TargetType>(raw) * RESOLUTION;
-        // Normalize to resolution by rounding to nearest multiple of RESOLUTION
-        TargetType normalizedValue = static_cast<TargetType>(std::round(physicalValue / RESOLUTION) * RESOLUTION);
-        return DataType(normalizedValue);
+        return DataType(raw);
     }
 
     /**
@@ -105,14 +114,20 @@ public:
      * @return `true` if `MIN <= value <= MAX`, otherwise `false`.
      */
     constexpr bool isValid() const noexcept {
-        return value_ >= MIN && value_ <= MAX;
+        return value_ >= Traits::RAW_MIN && value_ <= Traits::RAW_MAX;
     }
 
     /**
      * @brief Returns the normalized physical value.
      * @return Value in physical units.
      */
-    constexpr TargetType getValue() const noexcept { return value_; }
+    constexpr TargetType getValue() const noexcept {
+        double scaled = static_cast<double>(value_) - static_cast<double>(Traits::RAW_MIN);
+        scaled /= (static_cast<double>(Traits::RAW_MAX) - static_cast<double>(Traits::RAW_MIN));
+        scaled *= (MAX - MIN);
+        scaled += MIN;
+        return static_cast<TargetType>(scaled);
+    }
     
     /**
      * @brief Converts physical value to raw integer representation.
@@ -122,7 +137,7 @@ public:
      * @return Raw integer value suitable for payload encoding.
      */
     RawType getRaw() const noexcept {
-        return static_cast<RawType>(std::round(value_ / RESOLUTION));
+        return value_;
     }
     
     /**
@@ -134,10 +149,11 @@ public:
      */
     std::string toString() const {
         std::ostringstream oss;
-        oss << std::fixed << std::setprecision(getPrecision()) << value_;
+        oss << std::fixed << std::setprecision(getPrecision()) << getValue();
         return oss.str();
     }
 
+    // Operators
     constexpr bool operator==(const DataType& other) const noexcept {
         return value_ == other.value_;
     }
@@ -159,10 +175,10 @@ public:
 
 private:
     /** @brief Stored normalized physical value. */
-    TargetType value_;
+    RawType value_;
 
     // Block default construction without parameters to enforce explicit initialization
-    constexpr explicit DataType(TargetType value) noexcept : value_(value) {}
+    constexpr explicit DataType(RawType value) noexcept : value_(value) {}
 
     /**
      * @brief Computes decimal precision from @ref RESOLUTION.
@@ -177,12 +193,60 @@ private:
     }
 };
 
-struct DistanceTraits { static constexpr double MIN = 0, MAX = 4.295e7, RESOLUTION = 1e-2;  using RawType = uint32_t; using TargetType = float;};
-struct SpeedTraits { static constexpr double MIN = 0, MAX = 655.32, RESOLUTION = 1e-2; using RawType = uint16_t; using TargetType = float;};
-struct AngleTraits { static constexpr double MIN = 0, MAX = 2*M_PI, RESOLUTION = 1e-4; using RawType = uint16_t; using TargetType = float;};
-struct SignedAngleTraits { static constexpr double MIN = -M_PI, MAX = M_PI, RESOLUTION = 1e-4; using RawType = uint16_t; using TargetType = float;};
-struct HalfByteTraits { static constexpr double MIN = 0, MAX = 15, RESOLUTION = 1; using RawType = uint8_t; using TargetType = uint8_t;};
-struct ByteTraits { static constexpr double MIN = 0, MAX = 255, RESOLUTION = 1; using RawType = uint8_t; using TargetType = uint8_t; };
+struct DistanceTraits {
+    static constexpr double MIN = 0;
+    static constexpr double MAX = 4.295e7;
+    static constexpr double RESOLUTION = 1e-2;
+    using RawType = uint32_t;
+    using TargetType = float;
+    static constexpr RawType RAW_MIN = std::numeric_limits<RawType>::min();
+    static constexpr RawType RAW_MAX = std::numeric_limits<RawType>::max();
+};
+struct SpeedTraits {
+    static constexpr double MIN = 0;
+    static constexpr double MAX = 655.32;
+    static constexpr double RESOLUTION = 1e-2;
+    using RawType = uint16_t;
+    using TargetType = float;
+    static constexpr RawType RAW_MIN = std::numeric_limits<RawType>::min();
+    static constexpr RawType RAW_MAX = std::numeric_limits<RawType>::max();
+};
+struct AngleTraits {
+    static constexpr double MIN = 0;
+    static constexpr double MAX = 2 * M_PI;
+    static constexpr double RESOLUTION = 1e-4;
+    using RawType = uint16_t;
+    using TargetType = float;
+    static constexpr RawType RAW_MIN = std::numeric_limits<RawType>::min();
+    static constexpr RawType RAW_MAX = std::numeric_limits<RawType>::max();
+};
+struct SignedAngleTraits {
+    static constexpr double MIN = -M_PI;
+    static constexpr double MAX = M_PI;
+    static constexpr double RESOLUTION = 1e-4;
+    using RawType = uint16_t;
+    using TargetType = float;
+    static constexpr RawType RAW_MIN = std::numeric_limits<RawType>::min();
+    static constexpr RawType RAW_MAX = std::numeric_limits<RawType>::max();
+};
+struct HalfByteTraits {
+    static constexpr double MIN = 0;
+    static constexpr double MAX = 15;
+    static constexpr double RESOLUTION = 1;
+    using RawType = uint8_t;
+    using TargetType = uint8_t;
+    static constexpr RawType RAW_MIN = 0;
+    static constexpr RawType RAW_MAX = 15;
+};
+struct ByteTraits {
+    static constexpr double MIN = 0;
+    static constexpr double MAX = 255;
+    static constexpr double RESOLUTION = 1;
+    using RawType = uint8_t;
+    using TargetType = uint8_t;
+    static constexpr RawType RAW_MIN = std::numeric_limits<RawType>::min();
+    static constexpr RawType RAW_MAX = std::numeric_limits<RawType>::max();
+};
 
 /**
  * @brief Custom type representing distances in meters.

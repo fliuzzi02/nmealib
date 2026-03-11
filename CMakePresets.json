@@ -39,7 +39,8 @@
       "displayName": "GCC Debug + Tests",
       "inherits": "gcc-debug",
       "cacheVariables": {
-        "ENABLE_TESTS": "ON"
+        "ENABLE_TESTS": "ON",
+        "ENABLE_COVERAGE": "ON"
       }
     },
     {
