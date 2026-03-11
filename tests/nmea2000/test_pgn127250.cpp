@@ -21,7 +21,7 @@ using namespace nmealib::nmea2000;
 //   [7]     6bits of Reserved and 4bits of Heading reference
 // ---------------------------------------------------------------------------
 
-TEST(PGN127250DirectConstruction, GettersReturnCorrectValues) {
+TEST(PGN127250, GettersReturnCorrectValues) {
     auto pgn = PGN127250(2,
         Angle::fromValue(1.5707f),
         SignedAngle::fromValue(-0.7853f),
@@ -49,7 +49,7 @@ TEST(PGN127250DirectConstruction, GettersReturnCorrectValues) {
     EXPECT_EQ(pgn.getCanFrame().size(), 8U);
 }
 
-TEST(PGN127250DirectConstruction, DataFieldLimits) {
+TEST(PGN127250, DataFieldLimits) {
     auto min = PGN127250(2,
         Angle::fromRaw(std::numeric_limits<uint16_t>::min()),
         SignedAngle::fromRaw(std::numeric_limits<uint16_t>::min()),
@@ -71,4 +71,20 @@ TEST(PGN127250DirectConstruction, DataFieldLimits) {
     EXPECT_NEAR(max.getHeading().getValue(), 6.2832f, 0.02f);
     EXPECT_NEAR(max.getDeviation().getValue(), 3.1415f, 0.02f);
     EXPECT_NEAR(max.getVariation().getValue(), 3.1415f, 0.02f);
+}
+
+TEST(PGN127250, FactoryConstruction) {
+    std::string VALID_MESSAGE = "09F11260:342C71FF7FFF7FFD";
+    auto msg = nmealib::nmea2000::Nmea2000Factory::create(
+        VALID_MESSAGE
+    );
+    ASSERT_NE(msg, nullptr);
+    auto* pgn = dynamic_cast<PGN127250*>(msg.get());
+    ASSERT_NE(pgn, nullptr);
+
+    EXPECT_EQ(pgn->getSequenceId(), 4U);
+    EXPECT_NEAR(pgn->getHeading().getValue(), 2.7777f, 0.02f);
+    EXPECT_NEAR(pgn->getDeviation().getValue(), 0.0f, 0.02f);
+    EXPECT_NEAR(pgn->getVariation().getValue(), 0.0f, 0.02f);
+    EXPECT_EQ(pgn->getHeadingReference(), HalfByte::fromValue(1));
 }
