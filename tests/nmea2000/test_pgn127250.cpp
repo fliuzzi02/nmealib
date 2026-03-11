@@ -76,24 +76,60 @@ TEST(PGN127250, DataFieldLimits) {
 TEST(PGN127250, FactoryConstruction) {
     std::string VALID_MESSAGE = "09F11260:342C71FF7FFF7FFD";
     std::string WRONG_MESSAGE = "01F50300:01F4012C01000000";
+    std::string LONG_MESSAGE = "09F11260:342C71FF7FFF7FFD00"; // 9 bytes, invalid
 
-    auto msg = nmealib::nmea2000::Nmea2000Factory::create(
+    auto msg = Nmea2000Factory::create(
         VALID_MESSAGE
     );
     ASSERT_NE(msg, nullptr);
     auto* pgn = dynamic_cast<PGN127250*>(msg.get());
     ASSERT_NE(pgn, nullptr);
 
-    auto wrongMsg = nmealib::nmea2000::Nmea2000Factory::create(
+    EXPECT_EQ(pgn->getSequenceId(), 52U);
+    EXPECT_NEAR(pgn->getHeading().getValue(), 2.7777f, 0.02f);
+    EXPECT_NEAR(pgn->getDeviation().getValue(), 0.0f, 0.02f);
+    EXPECT_NEAR(pgn->getVariation().getValue(), 0.0f, 0.02f);
+    EXPECT_EQ(pgn->getHeadingReference(), HalfByte::fromValue(1));
+
+    auto wrongMsg = Nmea2000Factory::create(
         WRONG_MESSAGE
     );
     ASSERT_NE(wrongMsg, nullptr);
     auto* wrongPgn = dynamic_cast<PGN127250*>(wrongMsg.get());
     EXPECT_EQ(wrongPgn, nullptr);
 
-    EXPECT_EQ(pgn->getSequenceId(), 52U);
-    EXPECT_NEAR(pgn->getHeading().getValue(), 2.7777f, 0.02f);
-    EXPECT_NEAR(pgn->getDeviation().getValue(), 0.0f, 0.02f);
-    EXPECT_NEAR(pgn->getVariation().getValue(), 0.0f, 0.02f);
-    EXPECT_EQ(pgn->getHeadingReference(), HalfByte::fromValue(1));
+    ASSERT_THROW(Nmea2000Factory::create(
+        LONG_MESSAGE
+    ), InvalidCanFrameException);
+}
+
+// Test clone() method
+TEST(PGN127250, CloneCreatesEqualObject) {
+    auto original = PGN127250(2,
+        Angle::fromValue(1.5707f),
+        SignedAngle::fromValue(-0.7853f),
+        SignedAngle::fromValue(0.7853f),
+        HalfByte::fromValue(1),
+        Byte::fromValue(0));
+
+    auto clone = original.clone();
+    auto* clonedPgn = dynamic_cast<PGN127250*>(clone.get());
+    ASSERT_NE(clonedPgn, nullptr);
+    EXPECT_EQ(*clonedPgn, original);
+}
+
+// Test toStringContent() method
+TEST(PGN127250, StringContent) {
+    auto pgn = PGN127250(2,
+        Angle::fromValue(1.5707f),
+        SignedAngle::fromValue(-0.7853f),
+        SignedAngle::fromValue(0.7853f),
+        HalfByte::fromValue(1),
+        Byte::fromValue(0));
+
+    std::string expectedVerbose = "--------------------------------\nProtocol: NMEA2000\nPGN: 127250(0x1f112)\nFrame Length: 8 bytes\nFrame Data: 02 fe 3f 00 60 fe 9f 01\nFields:\n\tSequence ID: 2\n\tHeading: 1.5706rad, 89.9904\xC2\xB0\n\tDeviation: -0.7854rad, -44.9979\xC2\xB0\n\tVariation: 0.7853rad, 44.9924\xC2\xB0\n\tHeading Reference: Magnetic\n";
+    std::string expectedNonVerbose = "[OK] NMEA2000 PGN127250: SeqID=2 Heading=89.9904° Deviation=-44.9979° Variation=44.9924° HeadingRef=1";
+
+    EXPECT_EQ(pgn.getStringContent(true), expectedVerbose);
+    EXPECT_EQ(pgn.getStringContent(false), expectedNonVerbose);
 }
