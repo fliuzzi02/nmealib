@@ -12,7 +12,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Set parallel build level to 4 by default (can be overridden by environment variable or command line)
 if(NOT DEFINED CMAKE_BUILD_PARALLEL_LEVEL)
-    set(CMAKE_BUILD_PARALLEL_LEVEL 4)
+    set(CMAKE_BUILD_PARALLEL_LEVEL 16)
 endif()
 
 # Code coverage options
