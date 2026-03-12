@@ -32,8 +32,13 @@ TEST(PGN130306, GettersReturnCorrectValues) {
 
     // Test standard getters
     EXPECT_EQ(pgn.getSequenceId(), 2U);
+    EXPECT_NEAR(pgn.getWindSpeed().getValue(), 5.0f, 0.02f);
+    EXPECT_NEAR(pgn.getWindDirection().getValue(), 1.5707f, 0.02f);
+    EXPECT_EQ(pgn.getWindReference(), HalfByte::fromValue(1));
 
     // Test custom getters
+    EXPECT_NEAR(pgn.getWindDirectionDegrees(), 90.0f, 0.02f);
+    EXPECT_NEAR(pgn.getWindSpeedKnots(), 9.72f, 0.02f);
     
     // Test parent class getters
     EXPECT_TRUE(pgn.validate());
@@ -53,8 +58,14 @@ TEST(PGN130306, DataFieldLimits) {
         HalfByte::fromRaw(std::numeric_limits<uint8_t>::max()));
     
     // Test minimum values
+    EXPECT_NEAR(min.getWindSpeed().getValue(), 0.0f, 0.02f);
+    EXPECT_NEAR(min.getWindDirection().getValue(), 0.0f, 0.02f);
+    EXPECT_EQ(min.getWindReference(), HalfByte::fromValue(0));
 
     // Test maximum values
+    EXPECT_NEAR(max.getWindSpeed().getValue(), 655.35f, 0.02f);
+    EXPECT_NEAR(max.getWindDirection().getValue(), 6.2831f, 0.02f);
+    EXPECT_EQ(max.getWindReference(), HalfByte::fromValue(15));
 }
 
 TEST(PGN130306, FactoryConstruction) {
