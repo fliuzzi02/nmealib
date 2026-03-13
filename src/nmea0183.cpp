@@ -146,7 +146,7 @@ std::string Message0183::toString(bool verbose) const noexcept {
         ss << "Talker: " << getTalker() << "\n";
         ss << "Sentence Type: " << getSentenceType() << "\n";
         ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
-        ss << "Fields: \n";
+        ss << "Fields:\n";
     } else {
         ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": ";
     }

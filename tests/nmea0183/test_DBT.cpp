@@ -122,7 +122,7 @@ TEST(DBT, FactoryThrowsOnMalformedDbtSentence)
 TEST(DBT, GetStringContent)
 {
     DBT dbt("SD", 15.5, 'f', 4.7, 'M', 2.6, 'F');
-    std::string expectedVerbose = "--------------------------------\nProtocol: NMEA0183\nTalker: SD\nSentence Type: DBT\nChecksum: None\nFields: \n\tDepth: 15.50 f\n\tDepth (meters): 4.70 M\n\tDepth (fathoms): 2.60 F\n";
+    std::string expectedVerbose = "--------------------------------\nProtocol: NMEA0183\nTalker: SD\nSentence Type: DBT\nChecksum: None\nFields:\n\tDepth: 15.50 f\n\tDepth (meters): 4.70 M\n\tDepth (fathoms): 2.60 F\n";
     std::string expectedOneLiner = "[OK] NMEA0183 SD DBT: Depth=15.50f, 4.70M, 2.60F";
     std::string actualVerbose = dbt.getStringContent(true);
     std::string actualOneLiner = dbt.getStringContent(false);
