@@ -44,7 +44,7 @@ Modern C++20 library for parsing **NMEA 0183** sentences and **NMEA 2000** CAN m
 ### NMEA 2000
 | Message / Transport | Implemented | Tested | Notes |
 |---|---|---|---|
-| [Single-frame messages](docs/PROTOCOL_SUPPORT.md#nmea-2000-single-frame-messages) | ✅ Yes | ✅ No | Standard one-frame CAN payloads |
+| [Single-frame messages](docs/PROTOCOL_SUPPORT.md#nmea-2000-single-frame-messages) | ✅ Yes | ✅ yes | Standard one-frame CAN payloads |
 | [PGN 127250](docs/PROTOCOL_SUPPORT.md#nmea-2000) | ✅ Yes | ✅ Yes | Vessel Heading |
 | [PGN 128259](docs/PROTOCOL_SUPPORT.md#nmea-2000) | ✅ Yes | ✅ Yes | Speed, Water Referenced |
 | [PGN 130306](docs/PROTOCOL_SUPPORT.md#nmea-2000) | ✅ Yes | ✅ Yes | Wind Data |
