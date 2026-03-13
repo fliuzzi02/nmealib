@@ -1,12 +1,6 @@
 # Single-message NMEA 2000 targets
-add_library(PGN128259 STATIC PGN128259.cpp)
-target_include_directories(PGN128259 PUBLIC ${PROJECT_SOURCE_DIR}/include)
-
-add_library(PGN127250 STATIC PGN127250.cpp)
-target_include_directories(PGN127250 PUBLIC ${PROJECT_SOURCE_DIR}/include)
-
-add_library(PGN130306 STATIC PGN130306.cpp)
-target_include_directories(PGN130306 PUBLIC ${PROJECT_SOURCE_DIR}/include)
+# add_library(PGN128259 STATIC PGN128259.cpp)
+# target_include_directories(PGN128259 PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 # Monolithic NMEA 2000 target (contains all nmea2000 infrastructure)
 add_library(nmealib2000 STATIC
