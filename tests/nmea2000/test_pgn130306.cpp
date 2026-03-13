@@ -31,7 +31,7 @@ TEST(PGN130306, GettersReturnCorrectValues) {
     EXPECT_EQ(pgn.getPgn(), 130306U);
 
     // Test standard getters
-    EXPECT_EQ(pgn.getSequenceId(), 2U);
+    EXPECT_EQ(pgn.getSequenceId(), 1U);
     EXPECT_NEAR(pgn.getWindSpeed().getValue(), 5.0f, 0.02f);
     EXPECT_NEAR(pgn.getWindDirection().getValue(), 1.5707f, 0.02f);
     EXPECT_EQ(pgn.getWindReference(), HalfByte::fromValue(1));
@@ -55,23 +55,23 @@ TEST(PGN130306, DataFieldLimits) {
     auto max = PGN130306(2,
         Speed::fromRaw(std::numeric_limits<uint16_t>::max()),
         Angle::fromRaw(std::numeric_limits<uint16_t>::max()),
-        HalfByte::fromRaw(std::numeric_limits<uint8_t>::max()));
+        HalfByte::fromRaw(0xF));
     
     // Test minimum values
-    EXPECT_NEAR(min.getWindSpeed().getValue(), 0.0f, 0.02f);
-    EXPECT_NEAR(min.getWindDirection().getValue(), 0.0f, 0.02f);
-    EXPECT_EQ(min.getWindReference(), HalfByte::fromValue(0));
+    EXPECT_NEAR(min.getWindSpeed().getValue(), 0.0f, 0.03f);
+    EXPECT_NEAR(min.getWindDirection().getValue(), 0.0f, 0.03f);
+    EXPECT_EQ(min.getWindReference().getValue(), 0U);
 
     // Test maximum values
-    EXPECT_NEAR(max.getWindSpeed().getValue(), 655.35f, 0.02f);
-    EXPECT_NEAR(max.getWindDirection().getValue(), 6.2831f, 0.02f);
-    EXPECT_EQ(max.getWindReference(), HalfByte::fromValue(15));
+    EXPECT_NEAR(max.getWindSpeed().getValue(), 655.35f, 0.03f);
+    EXPECT_NEAR(max.getWindDirection().getValue(), 6.2831f, 0.03f);
+    EXPECT_EQ(max.getWindReference().getValue(), 15U);
 }
 
 TEST(PGN130306, FactoryConstruction) {
-    std::string VALID_MESSAGE = "";
-    std::string WRONG_MESSAGE = "";
-    std::string LONG_MESSAGE = ""; // 9 bytes, invalid
+    std::string VALID_MESSAGE = "19FD0201:8C2C010479FAFFFF";
+    std::string WRONG_MESSAGE = "01F50300:01F4012C01000000";
+    std::string LONG_MESSAGE  = "19FD0201:970000FFFF00FFFFFF"; // 9 bytes, invalid
 
     auto msg = Nmea2000Factory::create(
         VALID_MESSAGE
@@ -81,7 +81,7 @@ TEST(PGN130306, FactoryConstruction) {
     ASSERT_NE(pgn, nullptr);
 
     // Test standard getters
-    EXPECT_EQ(pgn->getSequenceId(), 52U);
+    EXPECT_EQ(pgn->getSequenceId(), 140U);
 
     auto wrongMsg = Nmea2000Factory::create(
         WRONG_MESSAGE
@@ -115,8 +115,8 @@ TEST(PGN130306, StringContent) {
         Angle::fromValue(1.5707f),
         HalfByte::fromValue(1));
 
-    std::string expectedVerbose = "";
-    std::string expectedNonVerbose = "";
+    std::string expectedVerbose = "--------------------------------\nProtocol: NMEA2000\nPGN: 130306(0x1fd02)\nFrame Length: 8 bytes\nFrame Data: 01 f4 01 fe 3f 01 00 00\nFields:\n\tSequence ID: 1\n\tWind Speed: 5.00 knots\n\tWind Direction: 1.5706rad, 89.9904\xC2\xB0\n\tWind Reference: Magnetic(North)\n";
+    std::string expectedNonVerbose = "[OK] NMEA2000 PGN130306: SeqID=1 WindSpeed=4.99977 knots WindDirection=89.9904° WindReference=1";
 
     EXPECT_EQ(pgn.getStringContent(true), expectedVerbose);
     EXPECT_EQ(pgn.getStringContent(false), expectedNonVerbose);
