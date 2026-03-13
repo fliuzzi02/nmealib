@@ -24,6 +24,9 @@ This page tracks message/PGN support and implementation details.
 |---|---|---|---|
 | [Single-frame messages](#nmea-2000-single-frame-messages) | ✅ Yes | ❌ No | Standard one-frame CAN payloads |
 | [Fast-packet transport](#nmea-2000-fast-packet-transport) | ✅ Yes | ❌ No | Multi-frame transport handling |
+| [PGN 127250](#pgn-127250--vessel-heading) | ✅ Yes | ✅ Yes | Vessel Heading |
+| [PGN 128259](#pgn-128259--speed-water-referenced) | ✅ Yes | ✅ Yes | Speed, Water Referenced |
+| [PGN 130306](#pgn-130306--wind-data) | ✅ Yes | ✅ Yes | Wind Data |
 
 ---
 
@@ -436,3 +439,40 @@ $--ZDA,hhmmss.ss,xx,xx,xxxx,xx,xx*hh<CR><LF>
 ```text
 $GPZDA,160012.71,11,03,2004,-1,00*7D
 ```
+
+## NMEA 2000
+
+### PGN 127250 — Vessel Heading
+
+Reports vessel heading and related magnetic correction values.
+
+#### Field definitions
+
+1. **Sequence ID** — message sequence counter  
+2. **Heading** — radians, resolution 1e-4  
+3. **Deviation** — signed radians, resolution 1e-4  
+4. **Variation** — signed radians, resolution 1e-4  
+5. **Heading reference** — true or magnetic reference selector
+
+### PGN 128259 — Speed, Water Referenced
+
+Reports water-referenced and ground-referenced vessel speed.
+
+#### Field definitions
+
+1. **Sequence ID** — message sequence counter  
+2. **Speed water referenced** — m/s, resolution 1e-2  
+3. **Speed ground referenced** — m/s, resolution 1e-2  
+4. **Speed water referenced type** — sensor/source indicator  
+5. **Speed direction** — direction relative to the water
+
+### PGN 130306 — Wind Data
+
+Reports wind speed and wind direction with reference type.
+
+#### Field definitions
+
+1. **Sequence ID** — message sequence counter  
+2. **Wind speed** — m/s, resolution 1e-2  
+3. **Wind direction** — radians, resolution 1e-4  
+4. **Wind reference** — true/apparent wind reference selector

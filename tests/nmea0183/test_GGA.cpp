@@ -162,7 +162,7 @@ TEST(GGA, ConvertsCoordinatesWithHighPrecision)
 TEST(GGA, GetStringContent)
 {
     GGA gga("GN", 62735.0, 31.8464692667, 'N', 117.1987063833, 'E', 1, 12, 2.0, 90.0, 'M', 0.0, 'M', 0.0, "");
-    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: GN\nSentence Type: GGA\nChecksum: None\nFields:\n\tTimestamp: 62735\n\tLatitude: 31.84646927 N\n\tLongitude: 117.1987064 E\n\tGPS Quality: 1\n\tSatellites: 12\n\tHDOP: 2\n\tAltitude: 90 M\n\tGeoidal Separation: 0 M\n\tDGPS Age: 0\n\tDGPS Ref: ";
+    std::string expectedVerbose = "--------------------------------\nProtocol: NMEA0183\nTalker: GN\nSentence Type: GGA\nChecksum: None\nFields:\n\tTimestamp: 62735\n\tLatitude: 31.84646927 N\n\tLongitude: 117.1987064 E\n\tGPS Quality: 1\n\tSatellites: 12\n\tHDOP: 2\n\tAltitude: 90 M\n\tGeoidal Separation: 0 M\n\tDGPS Age: 0\n\tDGPS Ref: \n";
     std::string expectedOneLiner = "[OK] NMEA0183 GN GGA: Time=62735, Lat=31.84646927N, Lon=117.1987064E, Qual=1, Sats=12, HDOP=2, Alt=90M, GeoSep=0M, DGPSAge=0, DGPSRef=";
     std::string actualVerbose = gga.getStringContent(true);
     std::string actualOneLiner = gga.getStringContent(false);

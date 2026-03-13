@@ -113,7 +113,7 @@ TEST(HDM, BoundaryHeadingValues)
 TEST(HDM, GetStringContent)
 {
     HDM hdm("II", 45.0, 'M');
-    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: II\nSentence Type: HDM\nChecksum: None\nFields:\n\tHeading: 45.0 M\n";
+    std::string expectedVerbose = "--------------------------------\nProtocol: NMEA0183\nTalker: II\nSentence Type: HDM\nChecksum: None\nFields:\n\tHeading: 45.0 M\n";
     std::string expectedOneLiner = "[OK] NMEA0183 II HDM: Heading=45.0M";
     std::string actualVerbose = hdm.getStringContent(true);
     std::string actualOneLiner = hdm.getStringContent(false);

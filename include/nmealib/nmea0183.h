@@ -247,6 +247,14 @@ protected:
      */
     static std::unique_ptr<Message0183> create(const std::string& raw, TimePoint ts = std::chrono::system_clock::now());
 
+    /**
+     * @brief Provides the common string representation for every NMEA 0183 message, which can be used by derived classes to implement their own getStringContent method.
+     * 
+     * @param verbose Selects wether to print a one-liner or a more detailed multi-line string with field names and values.
+     * @return std::string the head of the stringified message
+     */
+    std::string toString(bool verbose) const noexcept;
+
 private:
     explicit Message0183(std::string raw,
                         TimePoint ts,

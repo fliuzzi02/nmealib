@@ -96,28 +96,19 @@ std::unique_ptr<nmealib::Message> DBT::clone() const {
 
 std::string DBT::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
-    std::string validity = "KO";
-    if (validate()) {
-        validity = "OK";
-    }
+    ss << this->toString(verbose);
     ss << std::fixed << std::setprecision(2);
 
     if (verbose) {
-        ss << "Protocol: " << typeToString(type_) << "\n";
-        ss << "Talker: " << getTalker() << "\n";
-        ss << "Sentence Type: " << getSentenceType() << "\n";
-        ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
-        ss << "Fields:\n";
         ss << "\tDepth: " << depthFeet_ << " " << feetUnit_ << "\n";
         ss << "\tDepth (meters): " << depthMeters_ << " " << metersUnit_ << "\n";
-        ss << "\tDepth (fathoms): " << depthFathoms_ << " " << fathomsUnit_ << "\n";
+        ss << "\tDepth (fathoms): " << depthFathoms_ << " " << fathomsUnit_;
+        ss << "\n";
     } else {
-        ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
-           << "Depth=" << depthFeet_ << feetUnit_
+        ss << "Depth=" << depthFeet_ << feetUnit_
            << ", " << depthMeters_ << metersUnit_
            << ", " << depthFathoms_ << fathomsUnit_;
     }
-
     return ss.str();
 }
 

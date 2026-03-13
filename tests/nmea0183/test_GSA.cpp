@@ -163,7 +163,7 @@ TEST(GSA, FactoryThrowsOnMalformedGsaSentence)
 TEST(GSA, GetStringContent)
 {
     GSA gsa("GN", 'A', 3u, {}, 1.83, 1.09, 1.47, 1u);
-    std::string expectedVerbose = "Protocol: NMEA0183\nTalker: GN\nSentence Type: GSA\nChecksum: None\nFields:\n\tSelection Mode: A\n\tMode: 3\n\tSatellites: None\n\tPDOP: 1.83\n\tHDOP: 1.09\n\tVDOP: 1.47\n\tSystem ID: 1";
+    std::string expectedVerbose = "--------------------------------\nProtocol: NMEA0183\nTalker: GN\nSentence Type: GSA\nChecksum: None\nFields:\n\tSelection Mode: A\n\tMode: 3\n\tSatellites: None\n\tPDOP: 1.83\n\tHDOP: 1.09\n\tVDOP: 1.47\n\tSystem ID: 1\n";
     std::string expectedOneLiner = "[OK] NMEA0183 GN GSA: SelectionMode=A, Mode=3, PDOP=1.83, HDOP=1.09, VDOP=1.47, SystemID=1";
     std::string actualVerbose = gsa.getStringContent(true);
     std::string actualOneLiner = gsa.getStringContent(false);

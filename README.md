@@ -1,5 +1,9 @@
 # nmealib
 
+<p align="center">
+    <img src="docs/nmealib.png" alt="nmealib logo" width="240"/>
+</p>
+
 [![License: GPL-3.0](https://img.shields.io/github/license/fliuzzi02/nmealib)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/fliuzzi02/nmealib)](https://github.com/fliuzzi02/nmealib/releases)
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-blue)
@@ -40,8 +44,11 @@ Modern C++20 library for parsing **NMEA 0183** sentences and **NMEA 2000** CAN m
 ### NMEA 2000
 | Message / Transport | Implemented | Tested | Notes |
 |---|---|---|---|
-| [Single-frame messages](docs/PROTOCOL_SUPPORT.md#nmea-2000-single-frame-messages) | ✅ Yes | ❌ No | Standard one-frame CAN payloads |
-| [Fast-packet transport](docs/PROTOCOL_SUPPORT.md#nmea-2000-fast-packet-transport) | ✅ Yes | ❌ No | Multi-frame transport handling ||
+| [Single-frame messages](docs/PROTOCOL_SUPPORT.md#nmea-2000-single-frame-messages) | ✅ Yes | ✅ yes | Standard one-frame CAN payloads |
+| [PGN 127250](docs/PROTOCOL_SUPPORT.md#nmea-2000) | ✅ Yes | ✅ Yes | Vessel Heading |
+| [PGN 128259](docs/PROTOCOL_SUPPORT.md#nmea-2000) | ✅ Yes | ✅ Yes | Speed, Water Referenced |
+| [PGN 130306](docs/PROTOCOL_SUPPORT.md#nmea-2000) | ✅ Yes | ✅ Yes | Wind Data |
+
 
 > Messages/PGNs not listed are currently considered **not implemented**.
 

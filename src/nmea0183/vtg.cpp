@@ -147,18 +147,10 @@ std::unique_ptr<nmealib::Message> VTG::clone() const {
 
 std::string VTG::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
-    std::string validity = "KO";
-    if (validate()) {
-        validity = "OK";
-    }
+    ss << this->toString(verbose);
     ss << std::fixed << std::setprecision(2);
 
     if (verbose) {
-        ss << "Protocol: " << typeToString(type_) << "\n";
-        ss << "Talker: " << getTalker() << "\n";
-        ss << "Sentence Type: " << getSentenceType() << "\n";
-        ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
-        ss << "Fields:\n";
         ss << "\tLegacy Format: " << (legacyFormat_ ? "Yes" : "No") << "\n";
         ss << "\tCourse Over Ground: " << courseOverGroundTrue_ << "T\n";
         ss << "\tCourse Over Ground: " << courseOverGroundMagnetic_ << "M\n";
@@ -168,9 +160,9 @@ std::string VTG::getStringContent(bool verbose) const noexcept {
             ss << "\n"
                << "\tFAA Mode Indicator: " << faaModeIndicator_.value();
         }
+        ss << "\n";
     } else {
-        ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
-           << "True=" << courseOverGroundTrue_
+        ss << "True=" << courseOverGroundTrue_
            << ", Magnetic=" << courseOverGroundMagnetic_
            << ", Knots=" << speedOverGroundKnots_
            << ", KPH=" << speedOverGroundKph_;

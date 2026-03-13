@@ -106,6 +106,7 @@ std::unique_ptr<nmealib::Message> GLL::clone() const {
 
 std::string GLL::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
+    ss << this->toString(verbose);
     std::ostringstream latStream;
     latStream << std::setprecision(10) << latitude_;
     const std::string latitudeStr = latStream.str();
@@ -114,26 +115,16 @@ std::string GLL::getStringContent(bool verbose) const noexcept {
     lonStream << std::setprecision(10) << longitude_;
     const std::string longitudeStr = lonStream.str();
 
-    std::string validity = "KO";
-    if (validate()) {
-        validity = "OK";
-    }
-
     if (verbose) {
-        ss << "Protocol: " << typeToString(type_) << "\n";
-        ss << "Talker: " << getTalker() << "\n";
-        ss << "Sentence Type: " << getSentenceType() << "\n";
-        ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
-        ss << "Fields:\n";
         ss << "\tLatitude: " << latitudeStr << " " << latitudeDirection_ << "\n";
         ss << "\tLongitude: " << longitudeStr << " " << longitudeDirection_ << "\n";
         ss << "\tTimestamp: " << utcTime_ << "\n";
         ss << "\tStatus: " << status_ << "\n";
         ss << "\tMode Indicator: " << modeIndicator_;
+        ss << "\n";
     } else {
-        ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
-              << "Lat=" << latitudeStr << latitudeDirection_
-              << ", Lon=" << longitudeStr << longitudeDirection_
+        ss << "Lat=" << latitudeStr << latitudeDirection_
+           << ", Lon=" << longitudeStr << longitudeDirection_
            << ", Time=" << utcTime_
            << ", Status=" << status_
            << ", Mode=" << modeIndicator_;
