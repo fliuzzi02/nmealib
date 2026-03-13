@@ -37,7 +37,7 @@ public:
               Speed windSpeed,
               Angle windDirection,
               HalfByte windReference,
-              HalfByte reserved,
+              HalfByte reserved1,
               Byte reserved2,
               Byte reserved3
             ) noexcept;
