@@ -1,5 +1,9 @@
 # nmealib
 
+<p align="center">
+    <img src="docs/nmealib.png" alt="nmealib logo" width="240"/>
+</p>
+
 [![License: GPL-3.0](https://img.shields.io/github/license/fliuzzi02/nmealib)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/fliuzzi02/nmealib)](https://github.com/fliuzzi02/nmealib/releases)
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-blue)
