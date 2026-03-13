@@ -104,26 +104,18 @@ std::unique_ptr<nmealib::Message> VWR::clone() const {
 
 std::string VWR::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
-    std::string validity = "KO";
-    if (validate()) {
-        validity = "OK";
-    }
+    ss << this->toString(verbose);
     ss << std::fixed << std::setprecision(2);
 
     if (verbose) {
-        ss << "Protocol: " << typeToString(type_) << "\n";
-        ss << "Talker: " << getTalker() << "\n";
-        ss << "Sentence Type: " << getSentenceType() << "\n";
-        ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
-        ss << "Fields:\n";
         ss << "\tWind Angle: " << windAngle_ << "\n";
         ss << "\tWind Side: " << windSide_ << "\n";
         ss << "\tSpeed: " << speedKnots_ << "kts\n";
         ss << "\tSpeed: " << speedMps_ << " m/s\n";
         ss << "\tSpeed: " << speedKph_ << " kph";
+        ss << "\n";
     } else {
-        ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
-           << "Angle=" << windAngle_ << windSide_
+        ss << "Angle=" << windAngle_ << windSide_
            << ", Knots=" << speedKnots_
            << ", m/s=" << speedMps_
            << ", KPH=" << speedKph_;

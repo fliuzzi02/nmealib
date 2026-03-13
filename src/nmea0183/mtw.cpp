@@ -66,22 +66,14 @@ std::unique_ptr<nmealib::Message> MTW::clone() const {
 
 std::string MTW::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
-    std::string validity = "KO";
-    if (validate()) {
-        validity = "OK";
-    }
+    ss << this->toString(verbose);
     ss << std::fixed << std::setprecision(2);
 
     if (verbose) {
-        ss << "Protocol: " << typeToString(type_) << "\n";
-        ss << "Talker: " << getTalker() << "\n";
-        ss << "Sentence Type: " << getSentenceType() << "\n";
-        ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
-        ss << "Fields:\n";
-        ss << "\tTemperature: " << temperature_ << " " << unit_ << "\n";
+        ss << "\tTemperature: " << temperature_ << " " << unit_;
+        ss << "\n";
     } else {
-        ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
-           << "Temperature=" << temperature_ << unit_;
+        ss << "Temperature=" << temperature_ << unit_;
     }
 
     return ss.str();

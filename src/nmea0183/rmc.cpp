@@ -129,6 +129,7 @@ std::unique_ptr<nmealib::Message> RMC::clone() const {
 
 std::string RMC::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
+    ss << this->toString(verbose);
     std::ostringstream latStream;
     latStream << std::setprecision(10) << latitude_;
     const std::string latitudeStr = latStream.str();
@@ -137,17 +138,7 @@ std::string RMC::getStringContent(bool verbose) const noexcept {
     lonStream << std::setprecision(10) << longitude_;
     const std::string longitudeStr = lonStream.str();
 
-    std::string validity = "KO";
-    if (validate()) {
-        validity = "OK";
-    }
-
     if (verbose) {
-        ss << "Protocol: " << typeToString(type_) << "\n";
-        ss << "Talker: " << getTalker() << "\n";
-        ss << "Sentence Type: " << getSentenceType() << "\n";
-        ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
-        ss << "Fields:\n";
         ss << "\tUTC Fix: " << utcFix_ << "\n";
         ss << "\tStatus: " << status_ << "\n";
         ss << "\tLatitude: " << latitudeStr << " " << latitudeDirection_ << "\n";
@@ -158,10 +149,9 @@ std::string RMC::getStringContent(bool verbose) const noexcept {
         ss << "\tMagnetic Variation: " << magneticVariation_ << " " << magneticVariationDirection_ << "\n";
         ss << "\tMode Indicator: " << modeIndicator_ << "\n";
         ss << "\tNavigation Status: " << navigationStatus_;
-
+        ss << "\n";
     } else {
-        ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
-           << "UTC Fix=" << utcFix_
+        ss << "UTC Fix=" << utcFix_
            << ", Status=" << status_
            << ", Lat=" << latitudeStr << latitudeDirection_
            << ", Lon=" << longitudeStr << longitudeDirection_

@@ -89,24 +89,16 @@ std::unique_ptr<nmealib::Message> MWV::clone() const {
 
 std::string MWV::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
-    std::string validity = "KO";
-    if (validate()) {
-        validity = "OK";
-    }
+    ss << this->toString(verbose);
     ss << std::fixed << std::setprecision(2);
 
     if (verbose) {
-        ss << "Protocol: " << typeToString(type_) << "\n";
-        ss << "Talker: " << getTalker() << "\n";
-        ss << "Sentence Type: " << getSentenceType() << "\n";
-        ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
-        ss << "Fields:\n";
         ss << "\tWind Angle: " << windAngle_ << " " << reference_ << "\n";
         ss << "\tWind Speed: " << windSpeed_ << " " << windSpeedUnits_ << "\n";
         ss << "\tStatus: " << status_;
+        ss << "\n";
     } else {
-        ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
-           << "Angle=" << windAngle_ << reference_
+        ss << "Angle=" << windAngle_ << reference_
            << ", Speed=" << windSpeed_ << windSpeedUnits_
            << ", Status=" << status_;
     }

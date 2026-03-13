@@ -113,17 +113,9 @@ std::unique_ptr<nmealib::Message> GSA::clone() const {
 
 std::string GSA::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
-    std::string validity = "KO";
-    if (validate()) {
-        validity = "OK";
-    }
+    ss << this->toString(verbose);
 
     if (verbose) {
-        ss << "Protocol: " << typeToString(type_) << "\n";
-        ss << "Talker: " << getTalker() << "\n";
-        ss << "Sentence Type: " << getSentenceType() << "\n";
-        ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
-        ss << "Fields:\n";
         ss << "\tSelection Mode: " << selectionMode_ << "\n";
         ss << "\tMode: " << mode_ << "\n";
         ss << "\tSatellites: ";
@@ -152,9 +144,9 @@ std::string GSA::getStringContent(bool verbose) const noexcept {
             ss << "\n"
                     << "\tSystem ID: " << systemId_.value();
         }
+        ss << "\n";
     } else {
-          ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": "
-              << "SelectionMode=" << selectionMode_
+        ss << "SelectionMode=" << selectionMode_
            << ", Mode=" << mode_
            << ", PDOP=" << pdop_
            << ", HDOP=" << hdop_

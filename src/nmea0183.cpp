@@ -124,20 +124,31 @@ std::string Message0183::getCalculatedChecksumStr() const noexcept {
 
 std::string Message0183::getStringContent(bool verbose) const noexcept {
     std::stringstream ss;
+
+    ss << this->toString(verbose);
+
+    if (verbose) ss << "\tUnimplemented sentence type";
+    else ss << "Unimplemented sentence type";
+
+    return ss.str();
+}
+
+std::string Message0183::toString(bool verbose) const noexcept {
+    std::stringstream ss;
     std::string validity = "KO";
     if(validate()) {
         validity = "OK";
     }
 
-    if (!verbose) {
-        ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": " << "Unimplemented sentence type";
-    } else {
+    if (verbose) {
+        ss << "--------------------------------\n";
         ss << "Protocol: " << typeToString(type_) << "\n";
         ss << "Talker: " << getTalker() << "\n";
         ss << "Sentence Type: " << getSentenceType() << "\n";
         ss << "Checksum: " << (checksumStr_.empty() ? "None" : validity) << "\n";
         ss << "Fields: \n";
-        ss << "\tUnimplemented sentence type";
+    } else {
+        ss << "[" << validity << "] " << typeToString(type_) << " " << getTalker() << " " << getSentenceType() << ": ";
     }
 
     return ss.str();
