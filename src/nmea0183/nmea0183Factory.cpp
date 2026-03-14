@@ -6,6 +6,10 @@ namespace nmea0183 {
 
 std::unique_ptr<Message0183> Nmea0183Factory::create(const std::string& raw, Message::TimePoint ts) {
     auto baseMessage = Message0183::create(raw, ts);
+    if (!baseMessage) {
+        return nullptr;
+    }
+
     std::string sentenceType = baseMessage->getSentenceType();
 
     // Dispatch through the message registry

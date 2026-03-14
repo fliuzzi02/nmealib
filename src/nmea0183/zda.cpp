@@ -1,5 +1,8 @@
 #include "nmealib/nmea0183/zda.h"
 
+#include "nmealib/detail/errorSupport.h"
+#include "nmealib/detail/parse.h"
+
 #include <cmath>
 #include <iomanip>
 #include <sstream>
@@ -11,7 +14,7 @@ namespace nmea0183 {
 std::unique_ptr<ZDA> ZDA::create(std::unique_ptr<Message0183> baseMessage) {
     std::string context = "ZDA::create";
     if (baseMessage->getSentenceType() != "ZDA") {
-        throw NotZDAException(context, "Expected sentence type 'ZDA', got " + baseMessage->getSentenceType());
+        NMEALIB_RETURN_ERROR(NotZDAException(context, "Expected sentence type 'ZDA', got " + baseMessage->getSentenceType()));
     }
 
     std::string payload = baseMessage->getPayload();
@@ -32,27 +35,31 @@ std::unique_ptr<ZDA> ZDA::create(std::unique_ptr<Message0183> baseMessage) {
     }
 
     if (fields.size() != 6) {
-        throw NotZDAException(context, "Invalid fields in ZDA payload: expected 6, got " + std::to_string(fields.size()) + ". Payload: " + payload);
+        NMEALIB_RETURN_ERROR(NotZDAException(context, "Invalid fields in ZDA payload: expected 6, got " + std::to_string(fields.size()) + ". Payload: " + payload));
     }
 
-    try {
-        double utcTime = fields[0].empty() ? 0.0 : std::stod(fields[0]);
-        unsigned int day = fields[1].empty() ? 0u : std::stoul(fields[1]);
-        unsigned int month = fields[2].empty() ? 0u : std::stoul(fields[2]);
-        unsigned int year = fields[3].empty() ? 0u : std::stoul(fields[3]);
-        int localZoneHours = fields[4].empty() ? 0 : std::stoi(fields[4]);
-        int localZoneMinutes = fields[5].empty() ? 0 : std::stoi(fields[5]);
-
-        return std::unique_ptr<ZDA>(new ZDA(std::move(*baseMessage),
-                                            utcTime,
-                                            day,
-                                            month,
-                                            year,
-                                            localZoneHours,
-                                            localZoneMinutes));
-    } catch (const std::exception& e) {
-        throw NmeaException(context, "Error parsing ZDA fields: " + std::string(e.what()));
+    double utcTime = 0.0;
+    unsigned int day = 0U;
+    unsigned int month = 0U;
+    unsigned int year = 0U;
+    int localZoneHours = 0;
+    int localZoneMinutes = 0;
+    if (!detail::parseOptionalDouble(fields[0], utcTime) ||
+        !detail::parseOptionalUnsigned(fields[1], day) ||
+        !detail::parseOptionalUnsigned(fields[2], month) ||
+        !detail::parseOptionalUnsigned(fields[3], year) ||
+        !detail::parseOptionalInt(fields[4], localZoneHours) ||
+        !detail::parseOptionalInt(fields[5], localZoneMinutes)) {
+        NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing ZDA fields"));
     }
+
+    return std::unique_ptr<ZDA>(new ZDA(std::move(*baseMessage),
+                                        utcTime,
+                                        day,
+                                        month,
+                                        year,
+                                        localZoneHours,
+                                        localZoneMinutes));
 }
 
 ZDA::ZDA(Message0183 baseMessage,

@@ -1,5 +1,8 @@
 #include "nmealib/nmea0183/gsa.h"
 
+#include "nmealib/detail/errorSupport.h"
+#include "nmealib/detail/parse.h"
+
 #include <iomanip>
 #include <sstream>
 #include <vector>
@@ -10,7 +13,7 @@ namespace nmea0183 {
 std::unique_ptr<GSA> GSA::create(std::unique_ptr<Message0183> baseMessage) {
     std::string context = "GSA::create";
     if (baseMessage->getSentenceType() != "GSA") {
-        throw NotGSAException(context, "Expected sentence type 'GSA', got " + baseMessage->getSentenceType());
+        NMEALIB_RETURN_ERROR(NotGSAException(context, "Expected sentence type 'GSA', got " + baseMessage->getSentenceType()));
     }
 
     std::string payload = baseMessage->getPayload();
@@ -31,39 +34,48 @@ std::unique_ptr<GSA> GSA::create(std::unique_ptr<Message0183> baseMessage) {
     }
 
     if (fields.size() != 17 && fields.size() != 18) {
-        throw NotGSAException(context, "Invalid fields in GSA payload: expected 17 or 18, got " + std::to_string(fields.size()) + ". Payload: " + payload);
+        NMEALIB_RETURN_ERROR(NotGSAException(context, "Invalid fields in GSA payload: expected 17 or 18, got " + std::to_string(fields.size()) + ". Payload: " + payload));
     }
 
-    try {
-        char selectionMode = fields[0].empty() ? '\0' : fields[0][0];
-        unsigned int mode = fields[1].empty() ? 0u : std::stoul(fields[1]);
-
-        std::array<unsigned int, 12> satelliteIds{};
-        for (size_t index = 0; index < satelliteIds.size(); ++index) {
-            const std::string& field = fields[2 + index];
-            satelliteIds[index] = field.empty() ? 0u : std::stoul(field);
-        }
-
-        double pdop = fields[14].empty() ? 0.0 : std::stod(fields[14]);
-        double hdop = fields[15].empty() ? 0.0 : std::stod(fields[15]);
-        double vdop = fields[16].empty() ? 0.0 : std::stod(fields[16]);
-        std::optional<unsigned int> systemId = std::nullopt;
-
-        if (fields.size() == 18 && !fields[17].empty()) {
-            systemId = std::stoul(fields[17]);
-        }
-
-        return std::unique_ptr<GSA>(new GSA(std::move(*baseMessage),
-                                            selectionMode,
-                                            mode,
-                                            satelliteIds,
-                                            pdop,
-                                            hdop,
-                                            vdop,
-                                            systemId));
-    } catch (const std::exception& e) {
-        throw NmeaException(context, "Error parsing GSA fields: " + std::string(e.what()));
+    char selectionMode = fields[0].empty() ? '\0' : fields[0][0];
+    unsigned int mode = 0U;
+    if (!detail::parseOptionalUnsigned(fields[1], mode)) {
+        NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing GSA fields"));
     }
+
+    std::array<unsigned int, 12> satelliteIds{};
+    for (size_t index = 0; index < satelliteIds.size(); ++index) {
+        if (!detail::parseOptionalUnsigned(fields[2 + index], satelliteIds[index])) {
+            NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing GSA fields"));
+        }
+    }
+
+    double pdop = 0.0;
+    double hdop = 0.0;
+    double vdop = 0.0;
+    if (!detail::parseOptionalDouble(fields[14], pdop) ||
+        !detail::parseOptionalDouble(fields[15], hdop) ||
+        !detail::parseOptionalDouble(fields[16], vdop)) {
+        NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing GSA fields"));
+    }
+
+    std::optional<unsigned int> systemId = std::nullopt;
+    if (fields.size() == 18 && !fields[17].empty()) {
+        unsigned int parsedSystemId = 0U;
+        if (!detail::parseUnsigned(fields[17], parsedSystemId)) {
+            NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing GSA fields"));
+        }
+        systemId = parsedSystemId;
+    }
+
+    return std::unique_ptr<GSA>(new GSA(std::move(*baseMessage),
+                                        selectionMode,
+                                        mode,
+                                        satelliteIds,
+                                        pdop,
+                                        hdop,
+                                        vdop,
+                                        systemId));
 }
 
 GSA::GSA(Message0183 baseMessage,

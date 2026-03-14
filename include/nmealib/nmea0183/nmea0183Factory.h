@@ -23,6 +23,8 @@ public:
      * @param raw The raw NMEA 0183 sentence string to parse.
      * @param ts  Optional timestamp to associate with the message; defaults to the current system time.
      * @return std::unique_ptr<Message0183> A unique pointer to the most specific message type for the sentence.
+    *         When the library is compiled with `NMEALIB_NO_EXCEPTIONS`, returns `nullptr`
+    *         on failure.
      * @throws TooLongSentenceException If the input string exceeds the maximum allowed length of 82 characters.
      * @throws InvalidStartCharacterException If the input string does not start with either '$' or '!'.
      */

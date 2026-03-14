@@ -263,7 +263,7 @@ private:
 
     static std::string computeChecksum(const std::string& payload) noexcept;
     static bool isHexByte(const std::string& s) noexcept;
-    static void validateFormat(const std::string& context, const std::string& raw);
+    static bool validateFormat(const std::string& context, const std::string& raw);
 
     friend class Nmea0183Factory;
 };

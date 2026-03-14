@@ -1,5 +1,8 @@
 #include "nmealib/nmea0183/gga.h"
 
+#include "nmealib/detail/errorSupport.h"
+#include "nmealib/detail/parse.h"
+
 #include <cmath>
 #include <iomanip>
 #include <sstream>
@@ -11,7 +14,7 @@ namespace nmea0183 {
 std::unique_ptr<GGA> GGA::create(std::unique_ptr<Message0183> baseMessage) {
     std::string context = "GGA::create";
     if (baseMessage->getSentenceType() != "GGA") {
-        throw NotGGAException(context, "Expected sentence type 'GGA', got " + baseMessage->getSentenceType());
+        NMEALIB_RETURN_ERROR(NotGGAException(context, "Expected sentence type 'GGA', got " + baseMessage->getSentenceType()));
     }
 
     // Parse the payload to extract GGA-specific fields
@@ -35,48 +38,57 @@ std::unique_ptr<GGA> GGA::create(std::unique_ptr<Message0183> baseMessage) {
     }
     size_t messageSize = fields.size();
     if (messageSize != 14 && messageSize != 12) {
-        throw NotGGAException(context, "Insufficient fields in GGA payload: expected 14 or 12, got " + std::to_string(fields.size()) + ". Payload: " + payload);
+        NMEALIB_RETURN_ERROR(NotGGAException(context, "Insufficient fields in GGA payload: expected 14 or 12, got " + std::to_string(fields.size()) + ". Payload: " + payload));
     }
 
-    try {
-        double timestamp = fields[0].empty() ? 0.0 : std::stod(fields[0]);
-        double latitude = Message0183::convertNmeaCoordinateToDecimalDegrees(fields[1]);
-        char latitudeDirection = fields[2].empty() ? '\0' : fields[2][0];
-        double longitude = Message0183::convertNmeaCoordinateToDecimalDegrees(fields[3]);
-        char longitudeDirection = fields[4].empty() ? '\0' : fields[4][0];
-        unsigned int gpsQuality = fields[5].empty() ? 0 : std::stoul(fields[5]);
-        unsigned int satellites = fields[6].empty() ? 0 : std::stoul(fields[6]);
-        double hdop = fields[7].empty() ? 0.0 : std::stod(fields[7]);
-        double altitude = fields[8].empty() ? 0.0 : std::stod(fields[8]);
-        char altitudeUnits = fields[9].empty() ? '\0' : fields[9][0];
-        double geoidalSeparation = fields[10].empty() ? 0.0 : std::stod(fields[10]);
-        char geoidalSeparationUnits = fields[11].empty() ? '\0' : fields[11][0];
-        double dgpsAge = -1;
-        std::string dgpsReferenceStationId = "";
+    double timestamp = 0.0;
+    double latitude = 0.0;
+    double longitude = 0.0;
+    unsigned int gpsQuality = 0U;
+    unsigned int satellites = 0U;
+    double hdop = 0.0;
+    double altitude = 0.0;
+    double geoidalSeparation = 0.0;
+    double dgpsAge = -1.0;
+    if (!detail::parseOptionalDouble(fields[0], timestamp) ||
+        !detail::parseNmeaCoordinate(fields[1], latitude) ||
+        !detail::parseNmeaCoordinate(fields[3], longitude) ||
+        !detail::parseOptionalUnsigned(fields[5], gpsQuality) ||
+        !detail::parseOptionalUnsigned(fields[6], satellites) ||
+        !detail::parseOptionalDouble(fields[7], hdop) ||
+        !detail::parseOptionalDouble(fields[8], altitude) ||
+        !detail::parseOptionalDouble(fields[10], geoidalSeparation)) {
+        NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing GGA fields"));
+    }
 
-        if(messageSize == 14) {
-            dgpsAge = fields[12].empty() ? 0.0 : std::stod(fields[12]);
-            dgpsReferenceStationId = fields[13].empty() ? "" : fields[13];
+    char latitudeDirection = fields[2].empty() ? '\0' : fields[2][0];
+    char longitudeDirection = fields[4].empty() ? '\0' : fields[4][0];
+    char altitudeUnits = fields[9].empty() ? '\0' : fields[9][0];
+    char geoidalSeparationUnits = fields[11].empty() ? '\0' : fields[11][0];
+    std::string dgpsReferenceStationId;
+
+    if (messageSize == 14) {
+        if (!detail::parseOptionalDouble(fields[12], dgpsAge)) {
+            NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing GGA fields"));
         }
-
-        return std::unique_ptr<GGA>(new GGA(std::move(*baseMessage),
-                                            timestamp,
-                                            latitude,
-                                            latitudeDirection,
-                                            longitude,
-                                            longitudeDirection,
-                                            gpsQuality,
-                                            satellites,
-                                            hdop,
-                                            altitude,
-                                            altitudeUnits,
-                                            geoidalSeparation,
-                                            geoidalSeparationUnits,
-                                            dgpsAge,
-                                            dgpsReferenceStationId));
-    } catch (const std::exception& e) {
-        throw NmeaException(context, "Error parsing GGA fields: " + std::string(e.what()));
+        dgpsReferenceStationId = fields[13].empty() ? "" : fields[13];
     }
+
+    return std::unique_ptr<GGA>(new GGA(std::move(*baseMessage),
+                                        timestamp,
+                                        latitude,
+                                        latitudeDirection,
+                                        longitude,
+                                        longitudeDirection,
+                                        gpsQuality,
+                                        satellites,
+                                        hdop,
+                                        altitude,
+                                        altitudeUnits,
+                                        geoidalSeparation,
+                                        geoidalSeparationUnits,
+                                        dgpsAge,
+                                        dgpsReferenceStationId));
 }
 
 GGA::GGA(Message0183 baseMessage,

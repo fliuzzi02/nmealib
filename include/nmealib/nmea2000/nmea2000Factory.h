@@ -22,6 +22,8 @@ public:
      * @param raw The raw CAN frame string in any supported format.
      * @param ts Optional timestamp; defaults to the current system time.
      * @return std::unique_ptr<Message2000> A unique pointer to the created Message2000 instance.
+     *         When the library is compiled with `NMEALIB_NO_EXCEPTIONS`, returns `nullptr`
+     *         on failure.
      */
     static std::unique_ptr<Message2000> create(const std::string& raw, Message::TimePoint ts = std::chrono::system_clock::now());
 };

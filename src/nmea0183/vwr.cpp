@@ -1,5 +1,8 @@
 #include "nmealib/nmea0183/vwr.h"
 
+#include "nmealib/detail/errorSupport.h"
+#include "nmealib/detail/parse.h"
+
 #include <iomanip>
 #include <sstream>
 #include <vector>
@@ -10,7 +13,7 @@ namespace nmea0183 {
 std::unique_ptr<VWR> VWR::create(std::unique_ptr<Message0183> baseMessage) {
     std::string context = "VWR::create";
     if (baseMessage->getSentenceType() != "VWR") {
-        throw NotVWRException(context, "Expected sentence type 'VWR', got " + baseMessage->getSentenceType());
+        NMEALIB_RETURN_ERROR(NotVWRException(context, "Expected sentence type 'VWR', got " + baseMessage->getSentenceType()));
     }
 
     std::string payload = baseMessage->getPayload();
@@ -31,31 +34,34 @@ std::unique_ptr<VWR> VWR::create(std::unique_ptr<Message0183> baseMessage) {
     }
 
     if (fields.size() != 8) {
-        throw NotVWRException(context, "Invalid fields in VWR payload: expected 8, got " + std::to_string(fields.size()) + ". Payload: " + payload);
+        NMEALIB_RETURN_ERROR(NotVWRException(context, "Invalid fields in VWR payload: expected 8, got " + std::to_string(fields.size()) + ". Payload: " + payload));
     }
 
-    try {
-        double windAngle    = fields[0].empty() ? 0.0  : std::stod(fields[0]);
-        char windSide       = fields[1].empty() ? '\0' : fields[1][0];
-        double speedKnots   = fields[2].empty() ? 0.0  : std::stod(fields[2]);
-        char speedKnotsUnit = fields[3].empty() ? '\0' : fields[3][0];
-        double speedMps     = fields[4].empty() ? 0.0  : std::stod(fields[4]);
-        char speedMpsUnit   = fields[5].empty() ? '\0' : fields[5][0];
-        double speedKph     = fields[6].empty() ? 0.0  : std::stod(fields[6]);
-        char speedKphUnit   = fields[7].empty() ? '\0' : fields[7][0];
-
-        return std::unique_ptr<VWR>(new VWR(std::move(*baseMessage),
-                                            windAngle,
-                                            windSide,
-                                            speedKnots,
-                                            speedKnotsUnit,
-                                            speedMps,
-                                            speedMpsUnit,
-                                            speedKph,
-                                            speedKphUnit));
-    } catch (const std::exception& e) {
-        throw NmeaException(context, "Error parsing VWR fields: " + std::string(e.what()));
+    double windAngle = 0.0;
+    double speedKnots = 0.0;
+    double speedMps = 0.0;
+    double speedKph = 0.0;
+    if (!detail::parseOptionalDouble(fields[0], windAngle) ||
+        !detail::parseOptionalDouble(fields[2], speedKnots) ||
+        !detail::parseOptionalDouble(fields[4], speedMps) ||
+        !detail::parseOptionalDouble(fields[6], speedKph)) {
+        NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing VWR fields"));
     }
+
+    char windSide = fields[1].empty() ? '\0' : fields[1][0];
+    char speedKnotsUnit = fields[3].empty() ? '\0' : fields[3][0];
+    char speedMpsUnit = fields[5].empty() ? '\0' : fields[5][0];
+    char speedKphUnit = fields[7].empty() ? '\0' : fields[7][0];
+
+    return std::unique_ptr<VWR>(new VWR(std::move(*baseMessage),
+                                        windAngle,
+                                        windSide,
+                                        speedKnots,
+                                        speedKnotsUnit,
+                                        speedMps,
+                                        speedMpsUnit,
+                                        speedKph,
+                                        speedKphUnit));
 }
 
 VWR::VWR(Message0183 baseMessage,

@@ -1,5 +1,8 @@
 #include "nmealib/nmea0183/dbt.h"
 
+#include "nmealib/detail/errorSupport.h"
+#include "nmealib/detail/parse.h"
+
 #include <iomanip>
 #include <sstream>
 #include <vector>
@@ -10,7 +13,7 @@ namespace nmea0183 {
 std::unique_ptr<DBT> DBT::create(std::unique_ptr<Message0183> baseMessage) {
     std::string context = "DBT::create";
     if (baseMessage->getSentenceType() != "DBT") {
-        throw NotDBTException(context, "Expected sentence type 'DBT', got " + baseMessage->getSentenceType());
+        NMEALIB_RETURN_ERROR(NotDBTException(context, "Expected sentence type 'DBT', got " + baseMessage->getSentenceType()));
     }
 
     std::string payload = baseMessage->getPayload();
@@ -31,27 +34,29 @@ std::unique_ptr<DBT> DBT::create(std::unique_ptr<Message0183> baseMessage) {
     }
 
     if (fields.size() != 6) {
-        throw NotDBTException(context, "Invalid fields in DBT payload: expected 6, got " + std::to_string(fields.size()) + ". Payload: " + payload);
+        NMEALIB_RETURN_ERROR(NotDBTException(context, "Invalid fields in DBT payload: expected 6, got " + std::to_string(fields.size()) + ". Payload: " + payload));
     }
 
-    try {
-        double depthFeet = fields[0].empty() ? 0.0 : std::stod(fields[0]);
-        char feetUnit = fields[1].empty() ? '\0' : fields[1][0];
-        double depthMeters = fields[2].empty() ? 0.0 : std::stod(fields[2]);
-        char metersUnit = fields[3].empty() ? '\0' : fields[3][0];
-        double depthFathoms = fields[4].empty() ? 0.0 : std::stod(fields[4]);
-        char fathomsUnit = fields[5].empty() ? '\0' : fields[5][0];
-
-        return std::unique_ptr<DBT>(new DBT(std::move(*baseMessage),
-                                            depthFeet,
-                                            feetUnit,
-                                            depthMeters,
-                                            metersUnit,
-                                            depthFathoms,
-                                            fathomsUnit));
-    } catch (const std::exception& e) {
-        throw NmeaException(context, "Error parsing DBT fields: " + std::string(e.what()));
+    double depthFeet = 0.0;
+    double depthMeters = 0.0;
+    double depthFathoms = 0.0;
+    if (!detail::parseOptionalDouble(fields[0], depthFeet) ||
+        !detail::parseOptionalDouble(fields[2], depthMeters) ||
+        !detail::parseOptionalDouble(fields[4], depthFathoms)) {
+        NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing DBT fields"));
     }
+
+    char feetUnit = fields[1].empty() ? '\0' : fields[1][0];
+    char metersUnit = fields[3].empty() ? '\0' : fields[3][0];
+    char fathomsUnit = fields[5].empty() ? '\0' : fields[5][0];
+
+    return std::unique_ptr<DBT>(new DBT(std::move(*baseMessage),
+                                        depthFeet,
+                                        feetUnit,
+                                        depthMeters,
+                                        metersUnit,
+                                        depthFathoms,
+                                        fathomsUnit));
 }
 
 DBT::DBT(Message0183 baseMessage,

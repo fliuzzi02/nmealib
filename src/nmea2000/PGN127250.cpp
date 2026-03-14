@@ -1,5 +1,7 @@
 #include "nmealib/nmea2000/PGN127250.h"
 
+#include "nmealib/detail/errorSupport.h"
+
 namespace nmealib {
 namespace nmea2000 {
 
@@ -7,28 +9,23 @@ std::unique_ptr<PGN127250> PGN127250::create(std::unique_ptr<Message2000> baseMe
     std::string context = "PGN127250::create()";
 
     if (baseMessage->getCanFrameLength() != 8) {
-        throw InvalidCanFrameException(context, "CAN frame must be 8 bytes for PGN127250");
+        NMEALIB_RETURN_ERROR(InvalidCanFrameException(context, "CAN frame must be 8 bytes for PGN127250"));
     }
 
-    try {
-        uint8_t sequenceId = baseMessage->getCanFrame()[0];
-        Angle heading = Angle::fromRaw(baseMessage->getCanFrame()[1] | (baseMessage->getCanFrame()[2] << 8));
-        SignedAngle deviation = SignedAngle::fromRaw(baseMessage->getCanFrame()[3] | (baseMessage->getCanFrame()[4] << 8));
-        SignedAngle variation = SignedAngle::fromRaw(baseMessage->getCanFrame()[5] | (baseMessage->getCanFrame()[6] << 8));
-        // Byte 7: lower 2 bits = headingReference, upper 6 bits = reserved
-        HalfByte headingReference = HalfByte::fromRaw(baseMessage->getCanFrame()[7] & 0x03);
-        Byte reserved = Byte::fromRaw((baseMessage->getCanFrame()[7] >> 6) & 0x3F);
+    uint8_t sequenceId = baseMessage->getCanFrame()[0];
+    Angle heading = Angle::fromRaw(baseMessage->getCanFrame()[1] | (baseMessage->getCanFrame()[2] << 8));
+    SignedAngle deviation = SignedAngle::fromRaw(baseMessage->getCanFrame()[3] | (baseMessage->getCanFrame()[4] << 8));
+    SignedAngle variation = SignedAngle::fromRaw(baseMessage->getCanFrame()[5] | (baseMessage->getCanFrame()[6] << 8));
+    HalfByte headingReference = HalfByte::fromRaw(baseMessage->getCanFrame()[7] & 0x03);
+    Byte reserved = Byte::fromRaw((baseMessage->getCanFrame()[7] >> 6) & 0x3F);
 
-        return std::unique_ptr<PGN127250>(new PGN127250(std::move(*baseMessage),
-                                                        sequenceId,
-                                                        heading,
-                                                        deviation,
-                                                        variation,
-                                                        headingReference,
-                                                        reserved));
-    } catch (const std::exception& e) {
-        throw NmeaException(context, "Error creating PGN127250 message: " + std::string(e.what()));
-    }
+    return std::unique_ptr<PGN127250>(new PGN127250(std::move(*baseMessage),
+                                                    sequenceId,
+                                                    heading,
+                                                    deviation,
+                                                    variation,
+                                                    headingReference,
+                                                    reserved));
 }
 
 PGN127250::PGN127250(Message2000 baseMessage,

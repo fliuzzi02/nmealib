@@ -1,5 +1,7 @@
 #include "nmealib/nmea2000/PGN130306.h"
 
+#include "nmealib/detail/errorSupport.h"
+
 namespace nmealib {
 namespace nmea2000 {
 
@@ -7,30 +9,25 @@ std::unique_ptr<PGN130306> PGN130306::create(std::unique_ptr<Message2000> baseMe
     std::string context = "PGN130306::create()";
 
     if (baseMessage->getCanFrameLength() != 8) {
-        throw InvalidCanFrameException(context, "CAN frame must be 8 bytes for PGN130306");
+        NMEALIB_RETURN_ERROR(InvalidCanFrameException(context, "CAN frame must be 8 bytes for PGN130306"));
     }
 
-    try {
-        uint8_t sequenceId = baseMessage->getCanFrame()[0];
-        Speed windSpeed = Speed::fromRaw(baseMessage->getCanFrame()[1] | (baseMessage->getCanFrame()[2] << 8));
-        Angle windDirection = Angle::fromRaw(baseMessage->getCanFrame()[3] | (baseMessage->getCanFrame()[4] << 8));
-        // WindReference is lower 3 bits of byte 5, upper 5 bits are reserved
-        HalfByte windReference = HalfByte::fromRaw(baseMessage->getCanFrame()[5] & 0x07);
-        HalfByte reserved1 = HalfByte::fromRaw((baseMessage->getCanFrame()[5] >> 3) & 0x1F);
-        Byte reserved2 = Byte::fromRaw(baseMessage->getCanFrame()[6]);
-        Byte reserved3 = Byte::fromRaw(baseMessage->getCanFrame()[7]);
+    uint8_t sequenceId = baseMessage->getCanFrame()[0];
+    Speed windSpeed = Speed::fromRaw(baseMessage->getCanFrame()[1] | (baseMessage->getCanFrame()[2] << 8));
+    Angle windDirection = Angle::fromRaw(baseMessage->getCanFrame()[3] | (baseMessage->getCanFrame()[4] << 8));
+    HalfByte windReference = HalfByte::fromRaw(baseMessage->getCanFrame()[5] & 0x07);
+    HalfByte reserved1 = HalfByte::fromRaw((baseMessage->getCanFrame()[5] >> 3) & 0x1F);
+    Byte reserved2 = Byte::fromRaw(baseMessage->getCanFrame()[6]);
+    Byte reserved3 = Byte::fromRaw(baseMessage->getCanFrame()[7]);
 
-        return std::unique_ptr<PGN130306>(new PGN130306(std::move(*baseMessage),
-                                                        sequenceId,
-                                                        windSpeed,
-                                                        windDirection,
-                                                        windReference,
-                                                        reserved1,
-                                                        reserved2,
-                                                        reserved3));
-    } catch (const std::exception& e) {
-        throw NmeaException(context, "Error creating PGN130306 message: " + std::string(e.what()));
-    }
+    return std::unique_ptr<PGN130306>(new PGN130306(std::move(*baseMessage),
+                                                    sequenceId,
+                                                    windSpeed,
+                                                    windDirection,
+                                                    windReference,
+                                                    reserved1,
+                                                    reserved2,
+                                                    reserved3));
 }
 
 PGN130306::PGN130306(Message2000 baseMessage,

@@ -1,5 +1,8 @@
 #include "nmealib/nmea0183/vtg.h"
 
+#include "nmealib/detail/errorSupport.h"
+#include "nmealib/detail/parse.h"
+
 #include <iomanip>
 #include <sstream>
 #include <vector>
@@ -10,7 +13,7 @@ namespace nmea0183 {
 std::unique_ptr<VTG> VTG::create(std::unique_ptr<Message0183> baseMessage) {
     std::string context = "VTG::create";
     if (baseMessage->getSentenceType() != "VTG") {
-        throw NotVTGException(context, "Expected sentence type 'VTG', got " + baseMessage->getSentenceType());
+        NMEALIB_RETURN_ERROR(NotVTGException(context, "Expected sentence type 'VTG', got " + baseMessage->getSentenceType()));
     }
 
     std::string payload = baseMessage->getPayload();
@@ -31,66 +34,75 @@ std::unique_ptr<VTG> VTG::create(std::unique_ptr<Message0183> baseMessage) {
     }
 
     if (fields.size() != 4 && fields.size() != 8 && fields.size() != 9) {
-        throw NotVTGException(context, "Invalid fields in VTG payload: expected 4, 8 or 9, got " + std::to_string(fields.size()) + ". Payload: " + payload);
+        NMEALIB_RETURN_ERROR(NotVTGException(context, "Invalid fields in VTG payload: expected 4, 8 or 9, got " + std::to_string(fields.size()) + ". Payload: " + payload));
     }
 
-    try {
-        bool legacyFormat = fields.size() == 4;
-        if (!legacyFormat && !fields[1].empty() && fields[1] != "T") {
-            legacyFormat = true;
+    bool legacyFormat = fields.size() == 4;
+    if (!legacyFormat && !fields[1].empty() && fields[1] != "T") {
+        legacyFormat = true;
+    }
+
+    if (legacyFormat) {
+        if (fields.size() != 4) {
+            NMEALIB_RETURN_ERROR(NotVTGException(context, "Legacy VTG format requires exactly 4 fields"));
         }
 
-        if (legacyFormat) {
-            if (fields.size() != 4) {
-                throw NotVTGException(context, "Legacy VTG format requires exactly 4 fields");
-            }
-
-            double courseOverGroundTrue = fields[0].empty() ? 0.0 : std::stod(fields[0]);
-            double courseOverGroundMagnetic = fields[1].empty() ? 0.0 : std::stod(fields[1]);
-            double speedOverGroundKnots = fields[2].empty() ? 0.0 : std::stod(fields[2]);
-            double speedOverGroundKph = fields[3].empty() ? 0.0 : std::stod(fields[3]);
-
-            return std::unique_ptr<VTG>(new VTG(std::move(*baseMessage),
-                                                courseOverGroundTrue,
-                                                '\0',
-                                                courseOverGroundMagnetic,
-                                                '\0',
-                                                speedOverGroundKnots,
-                                                '\0',
-                                                speedOverGroundKph,
-                                                '\0',
-                                                std::nullopt,
-                                                true));
-        }
-
-        double courseOverGroundTrue = fields[0].empty() ? 0.0 : std::stod(fields[0]);
-        char courseOverGroundTrueType = fields[1].empty() ? '\0' : fields[1][0];
-        double courseOverGroundMagnetic = fields[2].empty() ? 0.0 : std::stod(fields[2]);
-        char courseOverGroundMagneticType = fields[3].empty() ? '\0' : fields[3][0];
-        double speedOverGroundKnots = fields[4].empty() ? 0.0 : std::stod(fields[4]);
-        char speedOverGroundKnotsType = fields[5].empty() ? '\0' : fields[5][0];
-        double speedOverGroundKph = fields[6].empty() ? 0.0 : std::stod(fields[6]);
-        char speedOverGroundKphType = fields[7].empty() ? '\0' : fields[7][0];
-        std::optional<char> faaModeIndicator = std::nullopt;
-
-        if (fields.size() == 9 && !fields[8].empty()) {
-            faaModeIndicator = fields[8][0];
+        double courseOverGroundTrue = 0.0;
+        double courseOverGroundMagnetic = 0.0;
+        double speedOverGroundKnots = 0.0;
+        double speedOverGroundKph = 0.0;
+        if (!detail::parseOptionalDouble(fields[0], courseOverGroundTrue) ||
+            !detail::parseOptionalDouble(fields[1], courseOverGroundMagnetic) ||
+            !detail::parseOptionalDouble(fields[2], speedOverGroundKnots) ||
+            !detail::parseOptionalDouble(fields[3], speedOverGroundKph)) {
+            NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing VTG fields"));
         }
 
         return std::unique_ptr<VTG>(new VTG(std::move(*baseMessage),
                                             courseOverGroundTrue,
-                                            courseOverGroundTrueType,
+                                            '\0',
                                             courseOverGroundMagnetic,
-                                            courseOverGroundMagneticType,
+                                            '\0',
                                             speedOverGroundKnots,
-                                            speedOverGroundKnotsType,
+                                            '\0',
                                             speedOverGroundKph,
-                                            speedOverGroundKphType,
-                                            faaModeIndicator,
-                                            false));
-    } catch (const std::exception& e) {
-        throw NmeaException(context, "Error parsing VTG fields: " + std::string(e.what()));
+                                            '\0',
+                                            std::nullopt,
+                                            true));
     }
+
+    double courseOverGroundTrue = 0.0;
+    double courseOverGroundMagnetic = 0.0;
+    double speedOverGroundKnots = 0.0;
+    double speedOverGroundKph = 0.0;
+    if (!detail::parseOptionalDouble(fields[0], courseOverGroundTrue) ||
+        !detail::parseOptionalDouble(fields[2], courseOverGroundMagnetic) ||
+        !detail::parseOptionalDouble(fields[4], speedOverGroundKnots) ||
+        !detail::parseOptionalDouble(fields[6], speedOverGroundKph)) {
+        NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing VTG fields"));
+    }
+
+    char courseOverGroundTrueType = fields[1].empty() ? '\0' : fields[1][0];
+    char courseOverGroundMagneticType = fields[3].empty() ? '\0' : fields[3][0];
+    char speedOverGroundKnotsType = fields[5].empty() ? '\0' : fields[5][0];
+    char speedOverGroundKphType = fields[7].empty() ? '\0' : fields[7][0];
+    std::optional<char> faaModeIndicator = std::nullopt;
+
+    if (fields.size() == 9 && !fields[8].empty()) {
+        faaModeIndicator = fields[8][0];
+    }
+
+    return std::unique_ptr<VTG>(new VTG(std::move(*baseMessage),
+                                        courseOverGroundTrue,
+                                        courseOverGroundTrueType,
+                                        courseOverGroundMagnetic,
+                                        courseOverGroundMagneticType,
+                                        speedOverGroundKnots,
+                                        speedOverGroundKnotsType,
+                                        speedOverGroundKph,
+                                        speedOverGroundKphType,
+                                        faaModeIndicator,
+                                        false));
 }
 
 VTG::VTG(Message0183 baseMessage,
