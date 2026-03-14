@@ -6,6 +6,7 @@
 
 [![License: GPL-3.0](https://img.shields.io/github/license/fliuzzi02/nmealib)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/fliuzzi02/nmealib)](https://github.com/fliuzzi02/nmealib/releases)
+[![PlatformIO Registry](https://badges.registry.platformio.org/packages/fliuzzi02/library/nmealib.svg)](https://registry.platformio.org/libraries/fliuzzi02/nmealib)
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-blue)
 [![Coverage Status](https://coveralls.io/repos/github/fliuzzi02/nmealib/badge.svg?branch=main)](https://coveralls.io/github/fliuzzi02/nmealib?branch=main)
 
@@ -21,36 +22,6 @@ Modern C++20 library for parsing **NMEA 0183** sentences and **NMEA 2000** CAN m
 - Extensible architecture for new sentence/PGN support
 - CLI tool for quick parsing and debugging
 - Unit-tested codebase
-
----
-
-## Supported Protocols
-
-### NMEA 0183
-| Message | Implemented | Tested| Notes |
-|---|---|---|---|
-| [DBT](docs/PROTOCOL_SUPPORT.md#dbt--depth-below-transducer) | ✅ Yes | ✅ Yes | Depth Below Transducer |
-| [GGA](docs/PROTOCOL_SUPPORT.md#gga--global-positioning-system-fix-data) | ✅ Yes | ✅ Yes | Global Positioning System Fix Data |
-| [GLL](docs/PROTOCOL_SUPPORT.md#gll--geographic-position---latitudelongitude) | ✅ Yes | ✅ Yes | Geographic Position |
-| [GSA](docs/PROTOCOL_SUPPORT.md#gsa--gps-dop-and-active-satellites) | ✅ Yes | ✅ Yes | GPS DOP and Active Satellites |
-| [MTW](docs/PROTOCOL_SUPPORT.md#mtw--mean-temperature-of-water) | ✅ Yes | ✅ Yes | Mean Temperature of Water |
-| [MWV](docs/PROTOCOL_SUPPORT.md#mwv--wind-speed-and-angle) | ✅ Yes | ✅ Yes | Wind Speed and Angle |
-| [RMC](docs/PROTOCOL_SUPPORT.md#rmc--recommended-minimum-navigation-information) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Data |
-| [VHW](docs/PROTOCOL_SUPPORT.md#vhw--water-speed-and-heading) | ✅ Yes | ✅ Yes | Water Speed and Heading |
-| [VTG](docs/PROTOCOL_SUPPORT.md#vtg--track-made-good-and-ground-speed) | ✅ Yes | ✅ Yes | Course Over Ground and Ground Speed |
-| [VWR](docs/PROTOCOL_SUPPORT.md#vwr--relative-wind-speed-and-angle) | ✅ Yes | ✅ Yes | Relative Wind Speed and Angle |
-| [ZDA](docs/PROTOCOL_SUPPORT.md#zda--time--date-utc-day-month-year-local-time-zone) | ✅ Yes | ✅ Yes | Time and Date |
-
-### NMEA 2000
-| Message / Transport | Implemented | Tested | Notes |
-|---|---|---|---|
-| [Single-frame messages](docs/PROTOCOL_SUPPORT.md#nmea-2000-single-frame-messages) | ✅ Yes | ✅ yes | Standard one-frame CAN payloads |
-| [PGN 127250](docs/PROTOCOL_SUPPORT.md#nmea-2000) | ✅ Yes | ✅ Yes | Vessel Heading |
-| [PGN 128259](docs/PROTOCOL_SUPPORT.md#nmea-2000) | ✅ Yes | ✅ Yes | Speed, Water Referenced |
-| [PGN 130306](docs/PROTOCOL_SUPPORT.md#nmea-2000) | ✅ Yes | ✅ Yes | Wind Data |
-
-
-> Messages/PGNs not listed are currently considered **not implemented**.
 
 ---
 
@@ -80,6 +51,8 @@ int main() {
     try {
         auto msg = nmealib::NMEA0183::GGA::parse(sentence);
         std::cout << "Parsed GGA message: " << msg.toString() << std::endl;
+        std::cout << "Latitude: " << msg.getLatitude() << std::endl;
+        // Access other fields as needed
     } catch (const nmealib::ParseException& e) {
         std::cerr << "Failed to parse sentence: " << e.what() << std::endl;
     }
@@ -88,6 +61,32 @@ int main() {
 ```
 
 See [using-nmealib](https://github.com/fliuzzi02/using-nmealib) for a full example project demonstrating library usage.
+
+### Use the library in PlatformIO
+
+Add the dependency in your `platformio.ini`:
+
+```ini
+lib_deps = fliuzzi02/nmealib
+```
+
+The published PlatformIO package is built with exceptions disabled:
+
+- `-fno-exceptions`
+- `-DNMEALIB_NO_EXCEPTIONS`
+
+In that configuration, parse failures do not throw. Factory methods return `nullptr`.
+
+```cpp
+#include <nmealib.h>
+
+auto message = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
+if (!message) {
+    return;
+}
+```
+
+An embedded reference example is available in `examples/platformio-esp32`.
 
 ---
 
@@ -117,14 +116,6 @@ cmake --install out/build/gcc-release --prefix out/install/gcc-release
 Artifacts are installed under:
 
 `out/install/gcc-release`
-
-### Run Tests
-
-```bash
-cmake --preset gcc-release-tests
-cmake --build --preset build-release-tests
-ctest --preset build-release-tests
-```
 
 ---
 
@@ -161,6 +152,36 @@ nmealib/
 
 ---
 
+## Supported Protocols
+
+### NMEA 0183
+| Message | Implemented | Tested| Notes |
+|---|---|---|---|
+| [DBT](docs/PROTOCOL_SUPPORT.md#dbt--depth-below-transducer) | ✅ Yes | ✅ Yes | Depth Below Transducer |
+| [GGA](docs/PROTOCOL_SUPPORT.md#gga--global-positioning-system-fix-data) | ✅ Yes | ✅ Yes | Global Positioning System Fix Data |
+| [GLL](docs/PROTOCOL_SUPPORT.md#gll--geographic-position---latitudelongitude) | ✅ Yes | ✅ Yes | Geographic Position |
+| [GSA](docs/PROTOCOL_SUPPORT.md#gsa--gps-dop-and-active-satellites) | ✅ Yes | ✅ Yes | GPS DOP and Active Satellites |
+| [MTW](docs/PROTOCOL_SUPPORT.md#mtw--mean-temperature-of-water) | ✅ Yes | ✅ Yes | Mean Temperature of Water |
+| [MWV](docs/PROTOCOL_SUPPORT.md#mwv--wind-speed-and-angle) | ✅ Yes | ✅ Yes | Wind Speed and Angle |
+| [RMC](docs/PROTOCOL_SUPPORT.md#rmc--recommended-minimum-navigation-information) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Data |
+| [VHW](docs/PROTOCOL_SUPPORT.md#vhw--water-speed-and-heading) | ✅ Yes | ✅ Yes | Water Speed and Heading |
+| [VTG](docs/PROTOCOL_SUPPORT.md#vtg--track-made-good-and-ground-speed) | ✅ Yes | ✅ Yes | Course Over Ground and Ground Speed |
+| [VWR](docs/PROTOCOL_SUPPORT.md#vwr--relative-wind-speed-and-angle) | ✅ Yes | ✅ Yes | Relative Wind Speed and Angle |
+| [ZDA](docs/PROTOCOL_SUPPORT.md#zda--time--date-utc-day-month-year-local-time-zone) | ✅ Yes | ✅ Yes | Time and Date |
+
+### NMEA 2000
+| Message / Transport | Implemented | Tested | Notes |
+|---|---|---|---|
+| [Single-frame messages](docs/PROTOCOL_SUPPORT.md#nmea-2000-single-frame-messages) | ✅ Yes | ✅ yes | Standard one-frame CAN payloads |
+| [PGN 127250](docs/PROTOCOL_SUPPORT.md#nmea-2000) | ✅ Yes | ✅ Yes | Vessel Heading |
+| [PGN 128259](docs/PROTOCOL_SUPPORT.md#nmea-2000) | ✅ Yes | ✅ Yes | Speed, Water Referenced |
+| [PGN 130306](docs/PROTOCOL_SUPPORT.md#nmea-2000) | ✅ Yes | ✅ Yes | Wind Data |
+
+
+> Messages/PGNs not listed are currently considered **not implemented**.
+
+---
+
 ## Compatibility
 
 | Platform | Compiler | Standard |
@@ -169,11 +190,14 @@ nmealib/
 | Windows | MSVC 2019+ | C++20 |
 | macOS | Clang 12+ | C++20 |
 
+PlatformIO support is also available through `library.json` with broad platform/framework declaration (`*`).
+Target toolchains must support C++20.
+
 ---
 
 ## License
 
-Licensed under **GPL-3.0**. See [LICENSE](LICENSE).
+Licensed under **MIT**. See [LICENSE](LICENSE).
 
 ---
 
