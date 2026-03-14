@@ -6,6 +6,9 @@ string(STRIP "${NMEALIB_VERSION}" NMEALIB_VERSION)
 
 project(nmealib VERSION "${NMEALIB_VERSION}" LANGUAGES CXX)
 
+# Expose project version to C++ code as a string literal macro.
+add_compile_definitions(NMEALIB_VERSION="${NMEALIB_VERSION}")
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)

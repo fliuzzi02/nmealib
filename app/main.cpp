@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
             print_usage();
             return 0;
         } else if (arg == "-v" || arg == "--version") {
-            std::cout << "nmealib version 0.3.1\n";
+            std::cout << "nmealib version " << NMEALIB_VERSION << "\n";
             return 0;
         } else if (arg == "-V" || arg == "--verbose") {
             verbose = true;
