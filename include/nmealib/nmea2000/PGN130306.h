@@ -7,10 +7,9 @@ namespace nmealib {
 namespace nmea2000 {
 
 /**
- * @brief Strongly-typed class representing PGN 127250 - Speed, Water Referenced.
+ * @brief Strongly-typed class representing PGN 127250 - Wind Data
  * 
- * PGN 127250 is used to report the water-referenced speed of a vessel, along with
- * the ground-referenced speed, the type of water speed sensor, and the direction of movement.
+ * PGN 127250 is used to report the wind data, including wind speed, direction, and reference.
  * The message contains the following fields:
  * 
  * - Sequence ID (1 byte): A counter that increments with each new message instance.
