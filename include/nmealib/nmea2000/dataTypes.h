@@ -235,6 +235,24 @@ struct ByteTraits {
     static constexpr RawType RAW_MIN = std::numeric_limits<RawType>::min();
     static constexpr RawType RAW_MAX = std::numeric_limits<RawType>::max();
 };
+struct LatitudeTraits {
+    static constexpr double MIN = -90;
+    static constexpr double MAX = 90;
+    static constexpr double RESOLUTION = 1e-7;
+    using RawType = int32_t;
+    using TargetType = float;
+    static constexpr RawType RAW_MIN = -90 * static_cast<RawType>(1e7);
+    static constexpr RawType RAW_MAX = 90 * static_cast<RawType>(1e7);
+};
+struct LongitudeTraits {
+    static constexpr double MIN = -180;
+    static constexpr double MAX = 180;
+    static constexpr double RESOLUTION = 1e-7;
+    using RawType = int32_t;
+    using TargetType = float;
+    static constexpr RawType RAW_MIN = -180 * static_cast<RawType>(1e7);
+    static constexpr RawType RAW_MAX = 180 * static_cast<RawType>(1e7);
+};
 
 /**
  * @brief Custom type representing distances in meters.
@@ -313,6 +331,32 @@ using Angle = DataType<AngleTraits>;
  * - Target type: float (for use in higher-level fields that expect a signed angle value)
  */
 using SignedAngle = DataType<SignedAngleTraits>;
+
+/**
+ * @brief Custom type representing latitudes in degrees.
+ * 
+ * - Range: [-90, 90] deg
+ * 
+ * - Resolution: 0.0000001 deg
+ * 
+ * - Raw type: int32_t
+ * 
+ * - Target type: float (for use in higher-level fields that expect a latitude value)
+ */
+using Latitude = DataType<LatitudeTraits>;
+
+/**
+ * @brief Custom type representing longitudes in degrees.
+ * 
+ * - Range: [-180, 180] deg
+ * 
+ * - Resolution: 0.0000001 deg
+ * 
+ * - Raw type: int32_t
+ * 
+ * - Target type: float (for use in higher-level fields that expect a longitude value)
+ */
+using Longitude = DataType<LongitudeTraits>;
 
 } // namespace nmea2000
 } // namespace nmealib
