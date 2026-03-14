@@ -81,25 +81,14 @@ jobs:
         else
           git checkout -B "$branch"
         fi
-        echo "${{ steps.version.outputs.version }}" > VERSION
-
-        python3 - <<'PY'
-        import json
-        from pathlib import Path
-
-        version = Path("VERSION").read_text(encoding="utf-8").strip()
-        library_json_path = Path("library.json")
-        data = json.loads(library_json_path.read_text(encoding="utf-8"))
-        data["version"] = version
-        library_json_path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
-        PY
+        python3 scripts/update_version.py "${{ steps.version.outputs.version }}"
 
         if git diff --quiet; then
           echo "VERSION already up to date."
         else
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add VERSION
+          git add VERSION library.json
           git commit -m "chore(release): set version ${{ steps.version.outputs.version }}"
           git push origin "$branch"
         fi
