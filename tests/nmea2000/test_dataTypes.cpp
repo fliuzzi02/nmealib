@@ -180,3 +180,55 @@ TEST(DataType, HalfByte) {
     EXPECT_TRUE(max >= min);
     EXPECT_TRUE(min <= max);
 }
+
+TEST(DataType, Latitude) {
+    auto min = Latitude::fromRaw(std::numeric_limits<int32_t>::min());
+    EXPECT_EQ(min.getRaw(), std::numeric_limits<int32_t>::min());
+    EXPECT_NEAR(min.getValue(), -90.0f, 1e-4f);
+
+    auto max = Latitude::fromRaw(std::numeric_limits<int32_t>::max());
+    EXPECT_EQ(max.getRaw(), std::numeric_limits<int32_t>::max());
+    EXPECT_NEAR(max.getValue(), 90.0f, 1e-4f);
+
+    auto minValue = Latitude::fromValue(-90.0f);
+    EXPECT_EQ(minValue.getRaw(), std::numeric_limits<int32_t>::min());
+    EXPECT_NEAR(minValue.getValue(), -90.0f, 1e-4f);
+
+    auto maxValue = Latitude::fromValue(90.0f);
+    EXPECT_EQ(maxValue.getRaw(), std::numeric_limits<int32_t>::max());
+    EXPECT_NEAR(maxValue.getValue(), 90.0f, 1e-4f);
+
+    // Test operators
+    EXPECT_EQ(max, maxValue);
+    EXPECT_EQ(min, minValue);
+    EXPECT_TRUE(max > min);
+    EXPECT_TRUE(min < max);
+    EXPECT_TRUE(max >= min);
+    EXPECT_TRUE(min <= max);
+}
+
+TEST(DataType, Longitude) {
+    auto min = Longitude::fromRaw(std::numeric_limits<int32_t>::min());
+    EXPECT_EQ(min.getRaw(), std::numeric_limits<int32_t>::min());
+    EXPECT_NEAR(min.getValue(), -180.0f, 1e-4f);
+
+    auto max = Longitude::fromRaw(std::numeric_limits<int32_t>::max());
+    EXPECT_EQ(max.getRaw(), std::numeric_limits<int32_t>::max());
+    EXPECT_NEAR(max.getValue(), 180.0f, 1e-4f);
+
+    auto minValue = Longitude::fromValue(-180.0f);
+    EXPECT_EQ(minValue.getRaw(), std::numeric_limits<int32_t>::min());
+    EXPECT_NEAR(minValue.getValue(), -180.0f, 1e-4f);
+
+    auto maxValue = Longitude::fromValue(180.0f);
+    EXPECT_EQ(maxValue.getRaw(), std::numeric_limits<int32_t>::max());
+    EXPECT_NEAR(maxValue.getValue(), 180.0f, 1e-4f);
+
+    // Test operators
+    EXPECT_EQ(max, maxValue);
+    EXPECT_EQ(min, minValue);
+    EXPECT_TRUE(max > min);
+    EXPECT_TRUE(min < max);
+    EXPECT_TRUE(max >= min);
+    EXPECT_TRUE(min <= max);
+}
