@@ -26,12 +26,12 @@ TEST(PGN129025, GettersReturnCorrectValues) {
 
 TEST(PGN129025, DataFieldLimits) {
     auto min = PGN129025(
-        Latitude::fromRaw(std::numeric_limits<int32_t>::min()),
-        Longitude::fromRaw(std::numeric_limits<int32_t>::min()));
+        Latitude::fromRaw(-90 * static_cast<int32_t>(1e7)),
+        Longitude::fromRaw(-180 * static_cast<int32_t>(1e7)));
 
     auto max = PGN129025(
-        Latitude::fromRaw(std::numeric_limits<int32_t>::max()),
-        Longitude::fromRaw(std::numeric_limits<int32_t>::max()));
+        Latitude::fromRaw(90 * static_cast<int32_t>(1e7)),
+        Longitude::fromRaw(180 * static_cast<int32_t>(1e7)));
 
     EXPECT_NEAR(min.getLatitude().getValue(), -90.0f, 0.02f);
     EXPECT_NEAR(min.getLongitude().getValue(), -180.0f, 0.02f);

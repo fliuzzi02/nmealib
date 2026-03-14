@@ -44,4 +44,5 @@
 #include "nmealib/nmea2000/PGN128259.h"
 #include "nmealib/nmea2000/PGN127250.h"
 #include "nmealib/nmea2000/PGN129025.h"
+#include "nmealib/nmea2000/PGN129026.h"
 #include "nmealib/nmea2000/PGN130306.h"

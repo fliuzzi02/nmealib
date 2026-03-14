@@ -10,6 +10,7 @@ add_library(nmealib2000 STATIC
     PGN128259.cpp
     PGN127250.cpp
     PGN129025.cpp
+    PGN129026.cpp
     PGN130306.cpp
 )
 
@@ -23,6 +24,7 @@ set(NMEALIB_NMEA2000_SOURCES
     nmea2000/PGN128259.cpp
     nmea2000/PGN127250.cpp
     nmea2000/PGN129025.cpp
+    nmea2000/PGN129026.cpp
     nmea2000/PGN130306.cpp
     PARENT_SCOPE
 )
