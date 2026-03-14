@@ -11,12 +11,6 @@
 namespace nmealib {
 namespace nmea2000 {
 
-class OutOfRangeException : public NmeaException {
-public:
-    explicit OutOfRangeException(const std::string& context, const std::string& details = "") :
-    NmeaException(context, "The value exceeds the valid range: ", details) {}
-};
-
 /**
  * @brief Strongly typed numeric wrapper for NMEA 2000 custom data types.
  *
@@ -81,14 +75,7 @@ public:
      */
     static DataType fromValue(TargetType value) {
         const double physicalValue = static_cast<double>(value);
-
-#if !defined(NMEALIB_NO_EXCEPTIONS)
         const double tolerance = RESOLUTION * 0.5;
-        if (physicalValue < MIN - tolerance || physicalValue > MAX + tolerance) {
-            throw OutOfRangeException("DataType::fromValue()");
-        }
-#endif
-
         const double clampedValue = std::clamp(physicalValue, MIN, MAX);
 
         double scaled = clampedValue - MIN;
