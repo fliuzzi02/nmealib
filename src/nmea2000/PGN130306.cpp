@@ -6,9 +6,8 @@ namespace nmealib {
 namespace nmea2000 {
 
 std::unique_ptr<PGN130306> PGN130306::create(std::unique_ptr<Message2000> baseMessage) {
-    std::string context = "PGN130306::create()";
-
     if (baseMessage->getCanFrameLength() != 8) {
+        std::string context = "PGN130306::create()";
         NMEALIB_RETURN_ERROR(InvalidCanFrameException(context, "CAN frame must be 8 bytes for PGN130306"));
     }
 

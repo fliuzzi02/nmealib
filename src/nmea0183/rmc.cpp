@@ -60,13 +60,12 @@ std::unique_ptr<RMC> RMC::create(std::unique_ptr<Message0183> baseMessage) {
     char lonDirection = fields[5].empty() ? '\0' : fields[5][0];
     char magneticVariationDirection = fields[10].empty() ? '\0' : fields[10][0];
     char modeIndicator = '\0';
-    char navigationStatus = '\0';
+    char navigationStatus = (messageSize == 12)
+                                ? (fields[11].empty() ? '\0' : fields[11][0])
+                                : (fields[12].empty() ? '\0' : fields[12][0]);
 
-    if (messageSize == 12) {
-        navigationStatus = fields[11].empty() ? '\0' : fields[11][0];
-    } else {
+    if (messageSize != 12) {
         modeIndicator = fields[11].empty() ? '\0' : fields[11][0];
-        navigationStatus = fields[12].empty() ? '\0' : fields[12][0];
     }
 
     return std::unique_ptr<RMC>(new RMC(std::move(*baseMessage), utcFix, status, latitude, latDirection, longitude, lonDirection, speedOverGround, courseOverGround, date, magneticVariation, magneticVariationDirection, modeIndicator, navigationStatus));

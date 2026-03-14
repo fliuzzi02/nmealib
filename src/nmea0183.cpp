@@ -46,9 +46,13 @@ Message0183::Message0183(std::string raw,
 
 std::unique_ptr<Message0183> Message0183::create(const std::string& raw, TimePoint ts) {
     std::string context = "Message0183::create";
+#if defined(NMEALIB_NO_EXCEPTIONS)
     if (!validateFormat(context, raw)) {
         return nullptr;
     }
+#else
+    validateFormat(context, raw);
+#endif
 
     char startChar = raw[0];
 
