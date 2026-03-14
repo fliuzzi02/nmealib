@@ -69,7 +69,7 @@ Add nmealib to your CMakeLists.txt using FetchContent to download the pre-compil
 include(FetchContent)
 
 # Fetch the pre-compiled nmealib binary release
-set(NMEALIB_VERSION "0.3.2")
+set(NMEALIB_VERSION "X.X.X")
 FetchContent_Declare(
     nmealib
     URL "https://github.com/fliuzzi02/nmealib/releases/download/v${NMEALIB_VERSION}/nmealib-${NMEALIB_VERSION}-linux64.tar.gz"
@@ -97,29 +97,17 @@ auto msg = nmealib::nmea0183::Nmea0183Factory::create("$GPGGA,...*47\r\n");
 `nmealib` can be consumed as a PlatformIO library dependency.
 
 ```ini
-[env:esp32dev]
-platform = espressif32
-board = esp32dev
-framework = arduino
-build_flags =
-    -std=gnu++20
+[env:esp32]
+platform = ...
+...
 lib_deps =
-    fliuzzi02/nmealib @ ^0.3.2
+    ...
+    fliuzzi02/nmealib
 ```
 
 Then include the umbrella header from your firmware source:
 
 ```cpp
 #include <nmealib.h>
-```
-
-Notes:
-- Toolchain must support C++20.
-- The CLI target is not used in PlatformIO firmware builds.
-- For local testing before first registry publication, use a Git URL dependency:
-
-```ini
-lib_deps =
-    https://github.com/fliuzzi02/nmealib.git#v0.3.2
 ```
 
