@@ -241,8 +241,8 @@ struct LatitudeTraits {
     static constexpr double RESOLUTION = 1e-7;
     using RawType = int32_t;
     using TargetType = float;
-    static constexpr RawType RAW_MIN = std::numeric_limits<RawType>::min();
-    static constexpr RawType RAW_MAX = std::numeric_limits<RawType>::max();
+    static constexpr RawType RAW_MIN = -90 * static_cast<RawType>(1e7);
+    static constexpr RawType RAW_MAX = 90 * static_cast<RawType>(1e7);
 };
 struct LongitudeTraits {
     static constexpr double MIN = -180;
@@ -250,8 +250,8 @@ struct LongitudeTraits {
     static constexpr double RESOLUTION = 1e-7;
     using RawType = int32_t;
     using TargetType = float;
-    static constexpr RawType RAW_MIN = std::numeric_limits<RawType>::min();
-    static constexpr RawType RAW_MAX = std::numeric_limits<RawType>::max();
+    static constexpr RawType RAW_MIN = -180 * static_cast<RawType>(1e7);
+    static constexpr RawType RAW_MAX = 180 * static_cast<RawType>(1e7);
 };
 
 /**

@@ -182,20 +182,20 @@ TEST(DataType, HalfByte) {
 }
 
 TEST(DataType, Latitude) {
-    auto min = Latitude::fromRaw(std::numeric_limits<int32_t>::min());
-    EXPECT_EQ(min.getRaw(), std::numeric_limits<int32_t>::min());
+    auto min = Latitude::fromRaw(-90 * static_cast<int32_t>(1e7));
+    EXPECT_EQ(min.getRaw(), -90 * static_cast<int32_t>(1e7));
     EXPECT_NEAR(min.getValue(), -90.0f, 1e-4f);
 
-    auto max = Latitude::fromRaw(std::numeric_limits<int32_t>::max());
-    EXPECT_EQ(max.getRaw(), std::numeric_limits<int32_t>::max());
+    auto max = Latitude::fromRaw(90 * static_cast<int32_t>(1e7));
+    EXPECT_EQ(max.getRaw(), 90 * static_cast<int32_t>(1e7));
     EXPECT_NEAR(max.getValue(), 90.0f, 1e-4f);
 
     auto minValue = Latitude::fromValue(-90.0f);
-    EXPECT_EQ(minValue.getRaw(), std::numeric_limits<int32_t>::min());
+    EXPECT_EQ(minValue.getRaw(), -90 * static_cast<int32_t>(1e7));
     EXPECT_NEAR(minValue.getValue(), -90.0f, 1e-4f);
 
     auto maxValue = Latitude::fromValue(90.0f);
-    EXPECT_EQ(maxValue.getRaw(), std::numeric_limits<int32_t>::max());
+    EXPECT_EQ(maxValue.getRaw(), 90 * static_cast<int32_t>(1e7));
     EXPECT_NEAR(maxValue.getValue(), 90.0f, 1e-4f);
 
     // Test operators
@@ -208,20 +208,20 @@ TEST(DataType, Latitude) {
 }
 
 TEST(DataType, Longitude) {
-    auto min = Longitude::fromRaw(std::numeric_limits<int32_t>::min());
-    EXPECT_EQ(min.getRaw(), std::numeric_limits<int32_t>::min());
+    auto min = Longitude::fromRaw(-180 * static_cast<int32_t>(1e7));
+    EXPECT_EQ(min.getRaw(), -180 * static_cast<int32_t>(1e7));
     EXPECT_NEAR(min.getValue(), -180.0f, 1e-4f);
 
-    auto max = Longitude::fromRaw(std::numeric_limits<int32_t>::max());
-    EXPECT_EQ(max.getRaw(), std::numeric_limits<int32_t>::max());
+    auto max = Longitude::fromRaw(180 * static_cast<int32_t>(1e7));
+    EXPECT_EQ(max.getRaw(), 180 * static_cast<int32_t>(1e7));
     EXPECT_NEAR(max.getValue(), 180.0f, 1e-4f);
 
     auto minValue = Longitude::fromValue(-180.0f);
-    EXPECT_EQ(minValue.getRaw(), std::numeric_limits<int32_t>::min());
+    EXPECT_EQ(minValue.getRaw(), -180 * static_cast<int32_t>(1e7));
     EXPECT_NEAR(minValue.getValue(), -180.0f, 1e-4f);
 
     auto maxValue = Longitude::fromValue(180.0f);
-    EXPECT_EQ(maxValue.getRaw(), std::numeric_limits<int32_t>::max());
+    EXPECT_EQ(maxValue.getRaw(), 180 * static_cast<int32_t>(1e7));
     EXPECT_NEAR(maxValue.getValue(), 180.0f, 1e-4f);
 
     // Test operators
