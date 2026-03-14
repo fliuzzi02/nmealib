@@ -1,37 +1,32 @@
 #include "nmealib/nmea2000/PGN128259.h"
 
+#include "nmealib/detail/errorSupport.h"
+
 namespace nmealib {
 namespace nmea2000 {
 
 std::unique_ptr<PGN128259> PGN128259::create(std::unique_ptr<Message2000> baseMessage) {
-    std::string context = "PGN128259::create()";
-
     if (baseMessage->getCanFrameLength() != 8) {
-        throw InvalidCanFrameException(context, "CAN frame must be 8 bytes for PGN128259");
+        std::string context = "PGN128259::create()";
+        NMEALIB_RETURN_ERROR(InvalidCanFrameException(context, "CAN frame must be 8 bytes for PGN128259"));
     }
 
-    try {
-        uint8_t sequenceId = baseMessage->getCanFrame()[0];
-        Speed speedWaterReferenced = Speed::fromRaw(baseMessage->getCanFrame()[1] | (baseMessage->getCanFrame()[2] << 8));
-        Speed speedGroundReferenced = Speed::fromRaw(baseMessage->getCanFrame()[3] | (baseMessage->getCanFrame()[4] << 8));
-        Byte speedWaterReferencedType = Byte::fromRaw(baseMessage->getCanFrame()[5]);
-        // Byte 6: lower nibble = speedDirection, upper nibble = reserved2
-        HalfByte speedDirection = HalfByte::fromRaw(baseMessage->getCanFrame()[6] & 0x0F);
-        HalfByte reserved2 = HalfByte::fromRaw((baseMessage->getCanFrame()[6] >> 4) & 0x0F);
-        // Byte 7: full byte = reserved1
-        Byte reserved1 = Byte::fromRaw(baseMessage->getCanFrame()[7]);
+    uint8_t sequenceId = baseMessage->getCanFrame()[0];
+    Speed speedWaterReferenced = Speed::fromRaw(baseMessage->getCanFrame()[1] | (baseMessage->getCanFrame()[2] << 8));
+    Speed speedGroundReferenced = Speed::fromRaw(baseMessage->getCanFrame()[3] | (baseMessage->getCanFrame()[4] << 8));
+    Byte speedWaterReferencedType = Byte::fromRaw(baseMessage->getCanFrame()[5]);
+    HalfByte speedDirection = HalfByte::fromRaw(baseMessage->getCanFrame()[6] & 0x0F);
+    HalfByte reserved2 = HalfByte::fromRaw((baseMessage->getCanFrame()[6] >> 4) & 0x0F);
+    Byte reserved1 = Byte::fromRaw(baseMessage->getCanFrame()[7]);
 
-        return std::unique_ptr<PGN128259>(new PGN128259(std::move(*baseMessage),
-                                                        sequenceId,
-                                                        speedWaterReferenced,
-                                                        speedGroundReferenced,
-                                                        speedWaterReferencedType,
-                                                        speedDirection,
-                                                        reserved1,
-                                                        reserved2));
-    } catch (const std::exception& e) {
-        throw NmeaException(context, "Error creating PGN128259 message: " + std::string(e.what()));
-    }
+    return std::unique_ptr<PGN128259>(new PGN128259(std::move(*baseMessage),
+                                                    sequenceId,
+                                                    speedWaterReferenced,
+                                                    speedGroundReferenced,
+                                                    speedWaterReferencedType,
+                                                    speedDirection,
+                                                    reserved1,
+                                                    reserved2));
 }
 
 PGN128259::PGN128259(Message2000 baseMessage,

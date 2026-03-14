@@ -102,7 +102,6 @@ TEST(ZDA, ClonePreservesZdaContent)
     auto cloned = dynamic_cast<ZDA*>(clonedBase.get());
     ASSERT_NE(cloned, nullptr);
 
-    EXPECT_TRUE(source.hasEqualContent(*cloned));
     EXPECT_TRUE(source == *cloned);
 }
 

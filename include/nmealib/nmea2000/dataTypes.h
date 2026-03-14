@@ -1,21 +1,15 @@
 #pragma once
 
-#include <cstdint>
-#include <string>
-#include <iomanip>
-#include <sstream>
-#include <cmath>
-#include <limits>
 #include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <iomanip>
+#include <limits>
+#include <sstream>
+#include <string>
 
 namespace nmealib {
 namespace nmea2000 {
-
-class OutOfRangeException : public NmeaException {
-public:
-    explicit OutOfRangeException(const std::string& context, const std::string& details = "") :
-    NmeaException(context, "The value exceeds the valid range: ", details) {}
-};
 
 /**
  * @brief Strongly typed numeric wrapper for NMEA 2000 custom data types.
@@ -79,14 +73,8 @@ public:
      *
      * @param value Physical value.
      */
-    static constexpr DataType fromValue(TargetType value) {
+    static DataType fromValue(TargetType value) {
         const double physicalValue = static_cast<double>(value);
-        const double tolerance = RESOLUTION * 0.5;
-
-        if (physicalValue < MIN - tolerance || physicalValue > MAX + tolerance) {
-            throw OutOfRangeException("DataType::fromValue()");
-        }
-
         const double clampedValue = std::clamp(physicalValue, MIN, MAX);
 
         double scaled = clampedValue - MIN;

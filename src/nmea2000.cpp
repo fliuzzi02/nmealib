@@ -1,5 +1,8 @@
 #include "nmealib/nmea2000.h"
 
+#include "nmealib/detail/errorSupport.h"
+#include "nmealib/detail/parse.h"
+
 #include <cctype>
 #include <iomanip>
 #include <sstream>
@@ -111,16 +114,14 @@ std::unique_ptr<Message2000> Message2000::create(std::string raw, TimePoint ts) 
     // Parse raw string in format "CANID:data"
     size_t colonPos = normalizedRaw.find(':');
     if (colonPos == std::string::npos) {
-        throw InvalidCanFrameException(context, "This formatting is not supported");
+        NMEALIB_RETURN_ERROR(InvalidCanFrameException(context, "This formatting is not supported"));
     }
 
     // Extract and parse CAN ID
     std::string canIdStr = normalizedRaw.substr(0, colonPos);
-    uint32_t canId;
-    try {
-        canId = std::stoul(canIdStr, nullptr, 16);
-    } catch (const std::exception& e) {
-        throw InvalidCanFrameException(context, "Invalid CAN ID format: " + canIdStr);
+    uint32_t canId = 0;
+    if (!detail::parseUnsigned(canIdStr, canId, 16)) {
+        NMEALIB_RETURN_ERROR(InvalidCanFrameException(context, "Invalid CAN ID format: " + canIdStr));
     }
 
     // Extract and parse frame data
@@ -129,31 +130,30 @@ std::unique_ptr<Message2000> Message2000::create(std::string raw, TimePoint ts) 
     
     if (!dataStr.empty()) {
         if (dataStr.length() % 2 != 0) {
-            throw InvalidCanFrameException(context, 
-                                           "Frame data must have even number of hex characters");
+            NMEALIB_RETURN_ERROR(InvalidCanFrameException(context,
+                                                          "Frame data must have even number of hex characters"));
         }
 
-        try {
-            for (size_t i = 0; i < dataStr.length(); i += 2) {
-                std::string byteStr = dataStr.substr(i, 2);
-                uint8_t byte = static_cast<uint8_t>(std::stoul(byteStr, nullptr, 16));
-                frameData.push_back(byte);
+        for (size_t i = 0; i < dataStr.length(); i += 2) {
+            std::string byteStr = dataStr.substr(i, 2);
+            unsigned int byte = 0;
+            if (!detail::parseUnsigned(byteStr, byte, 16) || byte > 0xFFU) {
+                NMEALIB_RETURN_ERROR(InvalidCanFrameException(context, "Invalid frame data hex format"));
             }
-        } catch (const std::exception& e) {
-            throw InvalidCanFrameException(context, "Invalid frame data hex format");
+            frameData.push_back(static_cast<uint8_t>(byte));
         }
     }
 
     // Validate frame length (supports single-frame and fast-packet up to 223 bytes)
     if (frameData.size() > 223) {
-        throw FrameTooLongException(context, "Frame length: " + std::to_string(frameData.size()));
+        NMEALIB_RETURN_ERROR(FrameTooLongException(context, "Frame length: " + std::to_string(frameData.size())));
     }
 
     // Extract and validate PGN from CAN ID
     uint32_t pgn = extractPgnFromCanId(canId);
     if (!isValidPgn(pgn)) {
-        throw InvalidPgnException(context, "PGN out of valid range: 0x" + 
-                                 std::to_string(pgn));
+        NMEALIB_RETURN_ERROR(InvalidPgnException(context, "PGN out of valid range: 0x" +
+                                                 std::to_string(pgn)));
     }
 
     return std::unique_ptr<Message2000>(

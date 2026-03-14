@@ -201,15 +201,6 @@ public:
     bool operator==(const Message0183& other) const noexcept;
 
     /**
-     * @brief Compares the content of the message only, ignoring the timestamp.
-     *
-     * @param other The other Message0183 object to compare with
-     * @return true if the content of both messages is equal (start char, talker, sentence type, payload, checksum string, and calculated checksum string), regardless of their timestamps;
-     * @return false otherwise
-     */
-    virtual bool hasEqualContent(const Message0183& other) const noexcept;
-
-    /**
      * @brief Returns whether the message is valid or not.
      *
      * @return true If there is no checksum or if the checksum matches the calculated checksum for the payload
@@ -272,7 +263,7 @@ private:
 
     static std::string computeChecksum(const std::string& payload) noexcept;
     static bool isHexByte(const std::string& s) noexcept;
-    static void validateFormat(const std::string& context, const std::string& raw);
+    static bool validateFormat(const std::string& context, const std::string& raw);
 
     friend class Nmea0183Factory;
 };

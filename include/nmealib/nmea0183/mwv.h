@@ -97,16 +97,6 @@ public:
      */
     bool operator==(const MWV& other) const noexcept;
 
-    /**
-     * @brief Compare the parsed content of two MWV messages.
-     *
-     * Content comparison delegates to Message0183::hasEqualContent.
-     *
-     * @param other The MWV message to compare with.
-     * @return bool true if content is equal, false otherwise.
-     */
-    bool hasEqualContent(const MWV& other) const noexcept;
-
 private:
     double windAngle_{};
     char reference_{};

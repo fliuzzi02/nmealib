@@ -172,8 +172,6 @@ TEST(DataType, HalfByte) {
     EXPECT_EQ(maxValue.getRaw(), 15);
     EXPECT_EQ(maxValue.getValue(), 0b1111);
 
-    EXPECT_THROW(HalfByte::fromValue(16U), OutOfRangeException);
-
     // Test operators
     EXPECT_EQ(max, maxValue);
     EXPECT_EQ(min, minValue);

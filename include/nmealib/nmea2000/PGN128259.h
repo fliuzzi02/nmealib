@@ -68,6 +68,7 @@ public:
 
     // Overridden methods
     std::string getStringContent(bool verbose) const noexcept override;
+    using Message2000::operator==;
     bool operator==(const PGN128259& other) const noexcept;
 
 private:

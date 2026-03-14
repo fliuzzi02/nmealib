@@ -1,5 +1,8 @@
 #include "nmealib/nmea0183/gll.h"
 
+#include "nmealib/detail/errorSupport.h"
+#include "nmealib/detail/parse.h"
+
 #include <cmath>
 #include <iomanip>
 #include <sstream>
@@ -11,7 +14,7 @@ namespace nmea0183 {
 std::unique_ptr<GLL> GLL::create(std::unique_ptr<Message0183> baseMessage) {
     std::string context = "GLL::create";
     if (baseMessage->getSentenceType() != "GLL") {
-        throw NotGLLException(context, "Expected sentence type 'GLL', got " + baseMessage->getSentenceType());
+        NMEALIB_RETURN_ERROR(NotGLLException(context, "Expected sentence type 'GLL', got " + baseMessage->getSentenceType()));
     }
 
     // Parse the payload to extract GLL-specific fields
@@ -34,29 +37,31 @@ std::unique_ptr<GLL> GLL::create(std::unique_ptr<Message0183> baseMessage) {
     }
 
     if (fields.size() != 7) {
-        throw NotGLLException(context, "Insufficient fields in GLL payload: expected 7, got " + std::to_string(fields.size()) + ". Payload: " + payload);
+        NMEALIB_RETURN_ERROR(NotGLLException(context, "Insufficient fields in GLL payload: expected 7, got " + std::to_string(fields.size()) + ". Payload: " + payload));
     }
 
-    try {
-        double latitude = Message0183::convertNmeaCoordinateToDecimalDegrees(fields[0]);
-        char latitudeDirection = fields[1].empty() ? '\0' : fields[1][0];
-        double longitude = Message0183::convertNmeaCoordinateToDecimalDegrees(fields[2]);
-        char longitudeDirection = fields[3].empty() ? '\0' : fields[3][0];
-        double timestamp = fields[4].empty() ? 0.0 : std::stod(fields[4]);
-        char status = fields[5].empty() ? '\0' : fields[5][0];
-        char modeIndicator = fields[6].empty() ? '\0' : fields[6][0];
-
-        return std::unique_ptr<GLL>(new GLL(std::move(*baseMessage),
-                                            latitude,
-                                            latitudeDirection,
-                                            longitude,
-                                            longitudeDirection,
-                                            timestamp,
-                                            status,
-                                            modeIndicator));
-    } catch (const std::exception& e) {
-        throw NmeaException(context, "Error parsing GLL fields: " + std::string(e.what()));
+    double latitude = 0.0;
+    double longitude = 0.0;
+    double timestamp = 0.0;
+    if (!detail::parseNmeaCoordinate(fields[0], latitude) ||
+        !detail::parseNmeaCoordinate(fields[2], longitude) ||
+        !detail::parseOptionalDouble(fields[4], timestamp)) {
+        NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing GLL fields"));
     }
+
+    char latitudeDirection = fields[1].empty() ? '\0' : fields[1][0];
+    char longitudeDirection = fields[3].empty() ? '\0' : fields[3][0];
+    char status = fields[5].empty() ? '\0' : fields[5][0];
+    char modeIndicator = fields[6].empty() ? '\0' : fields[6][0];
+
+    return std::unique_ptr<GLL>(new GLL(std::move(*baseMessage),
+                                        latitude,
+                                        latitudeDirection,
+                                        longitude,
+                                        longitudeDirection,
+                                        timestamp,
+                                        status,
+                                        modeIndicator));
 }
 
 GLL::GLL(Message0183 baseMessage,
@@ -193,10 +198,6 @@ char GLL::getModeIndicator() const noexcept {
 
 bool GLL::operator==(const GLL& other) const noexcept {
     return Message0183::operator==(other);
-}
-
-bool GLL::hasEqualContent(const GLL& other) const noexcept {
-    return Message0183::hasEqualContent(other);
 }
 
 } // namespace nmea0183

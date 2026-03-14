@@ -1,5 +1,8 @@
 #include "nmealib/nmea0183.h"
 
+#include "nmealib/detail/errorSupport.h"
+#include "nmealib/detail/parse.h"
+
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
@@ -43,7 +46,13 @@ Message0183::Message0183(std::string raw,
 
 std::unique_ptr<Message0183> Message0183::create(const std::string& raw, TimePoint ts) {
     std::string context = "Message0183::create";
+#if defined(NMEALIB_NO_EXCEPTIONS)
+    if (!validateFormat(context, raw)) {
+        return nullptr;
+    }
+#else
     validateFormat(context, raw);
+#endif
 
     char startChar = raw[0];
 
@@ -69,15 +78,15 @@ std::unique_ptr<Message0183> Message0183::create(const std::string& raw, TimePoi
     }
 }
 
-void Message0183::validateFormat(const std::string& context, const std::string& raw) {
+bool Message0183::validateFormat(const std::string& context, const std::string& raw) {
     // TODO: I have to check that it correspons to the minimum sentence: $XXXXX*ZZ<CR><LF>
     // and also without checksum: $XXXXX<CR><LF>
     // and also without CRLF: $XXXXX*ZZ and $XXXXX
     if(raw.size() > 82) {
-        throw TooLongSentenceException(context, "Input string length: " + std::to_string(raw.size()));
+        NMEALIB_RETURN_ERROR_VALUE(TooLongSentenceException(context, "Input string length: " + std::to_string(raw.size())), false);
     }
     if(raw.empty() || (raw[0] != '$' && raw[0] != '!')) {
-        throw InvalidStartCharacterException("NMEA 0183 sentence must start with '$' or '!'");
+        NMEALIB_RETURN_ERROR_VALUE(InvalidStartCharacterException(context), false);
     }
 
     bool hasChecksum = raw.find('*') != std::string::npos;
@@ -86,9 +95,11 @@ void Message0183::validateFormat(const std::string& context, const std::string& 
         size_t asteriskPos = raw.find('*');
         std::string checksumStr = raw.substr(asteriskPos + 1, 2);
         if(!isHexByte(checksumStr)) {
-            throw NoChecksumException(context, "Invalid checksum format: " + checksumStr);
+            NMEALIB_RETURN_ERROR_VALUE(NoChecksumException(context, "Invalid checksum format: " + checksumStr), false);
         }
     }
+
+    return true;
 }
 
 std::unique_ptr<nmealib::Message> Message0183::clone() const {
@@ -113,7 +124,7 @@ std::string Message0183::getSentenceType() const noexcept {
 
 std::string Message0183::getChecksumStr() const {
     if (checksumStr_.empty()) {
-        throw NoChecksumException("Message0183::getChecksumStr", "This sentence does not contain a checksum");
+        NMEALIB_RETURN_ERROR_VALUE(NoChecksumException("Message0183::getChecksumStr", "This sentence does not contain a checksum"), std::string());
     }
     return checksumStr_;
 }
@@ -159,16 +170,11 @@ std::string Message0183::serialize() const {
 }
 
 bool Message0183::validate() const noexcept{
-    bool hasChecksum = true;
-    bool valid = true;
-    // Try to get checksum, if i get an exception it does not have one
-    try {
-        valid = getChecksumStr() == getCalculatedChecksumStr();
-    } catch (const NoChecksumException&) {
-        hasChecksum = false;
+    if (checksumStr_.empty()) {
+        return true;
     }
-    
-    return !hasChecksum || valid;
+
+    return checksumStr_ == getCalculatedChecksumStr();
 }
 
 std::string Message0183::computeChecksum(const std::string& payload) noexcept {
@@ -186,16 +192,15 @@ bool Message0183::isHexByte(const std::string& s) noexcept {
 }
 
 double Message0183::convertNmeaCoordinateToDecimalDegrees(const std::string& nmeaCoordinate) {
-    if (nmeaCoordinate.empty()) {
-        return 0.0;
+    double converted = 0.0;
+    if (!detail::parseNmeaCoordinate(nmeaCoordinate, converted)) {
+        NMEALIB_RETURN_ERROR_VALUE(NmeaException("Message0183::convertNmeaCoordinateToDecimalDegrees", "Invalid coordinate format", nmeaCoordinate), 0.0);
     }
 
-    const long double raw = std::stold(nmeaCoordinate);
-    const long double degrees = std::floor(raw / 100.0L);
-    const long double minutes = raw - (degrees * 100.0L);
-    return static_cast<double>(degrees + (minutes / 60.0L));
+    return converted;
 }
 
+// TODO: Re-expose this method to all child classes and restrict the inherited ones like i did in 
 bool Message0183::operator==(const Message0183& other) const noexcept {
     return startChar_ == other.startChar_ &&
            talker_ == other.talker_ &&
@@ -204,15 +209,6 @@ bool Message0183::operator==(const Message0183& other) const noexcept {
            checksumStr_ == other.checksumStr_ &&
            calculatedChecksumStr_ == other.calculatedChecksumStr_ &&
            Message::operator==(other);
-}
-
-bool Message0183::hasEqualContent(const Message0183& other) const noexcept {
-    return startChar_ == other.startChar_ &&
-           talker_ == other.talker_ &&
-           sentenceType_ == other.sentenceType_ &&
-           payload_ == other.payload_ &&
-           checksumStr_ == other.checksumStr_ &&
-           calculatedChecksumStr_ == other.calculatedChecksumStr_;
 }
 
 } // namespace nmea0183

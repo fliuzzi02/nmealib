@@ -156,7 +156,6 @@ TEST(RMC, ClonePreservesRmcContent)
     auto cloned = dynamic_cast<RMC*>(clonedBase.get());
     ASSERT_NE(cloned, nullptr);
 
-    EXPECT_TRUE(source.hasEqualContent(*cloned));
     EXPECT_TRUE(source == *cloned);
 }
 

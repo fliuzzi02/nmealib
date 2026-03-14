@@ -6,13 +6,18 @@ string(STRIP "${NMEALIB_VERSION}" NMEALIB_VERSION)
 
 project(nmealib VERSION "${NMEALIB_VERSION}" LANGUAGES CXX)
 
+# Expose project version to C++ code as a string literal macro.
+add_compile_definitions(NMEALIB_VERSION="${NMEALIB_VERSION}")
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Set parallel build level to 4 by default (can be overridden by environment variable or command line)
-if(NOT DEFINED CMAKE_BUILD_PARALLEL_LEVEL)
-    set(CMAKE_BUILD_PARALLEL_LEVEL 16)
+# Enable compiler warnings and treat them as errors
+if(MSVC)
+    add_compile_options(/W4 /WX)
+else()
+    add_compile_options(-Wall -Wextra -Werror)
 endif()
 
 # Code coverage options
@@ -30,6 +35,7 @@ endif()
 
 add_subdirectory(src)
 
+# Optionally build the CLI app
 option(BUILD_CLI "Build the CLI app" ON)
 if(BUILD_CLI)
   add_subdirectory(app)

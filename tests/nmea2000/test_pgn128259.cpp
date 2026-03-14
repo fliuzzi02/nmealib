@@ -190,7 +190,7 @@ TEST(PGN128259, CloneReturnsIndependentNonNullCopy) {
     EXPECT_NE(cloned.get(), &original);
 }
 
-TEST(PGN128259, ClonedInstanceHasEqualContent) {
+TEST(PGN128259, ClonedInstanceIsEqual) {
     auto original = makeTypical();
     auto cloned = original.clone();
     ASSERT_NE(cloned, nullptr);

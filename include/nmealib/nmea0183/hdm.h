@@ -112,17 +112,6 @@ public:
      */
     bool operator==(const HDM& other) const noexcept;
 
-    /**
-     * @brief Compare the parsed content of two HDM messages.
-     *
-     * Unlike @c operator==, this method compares the decoded field values
-     * rather than the raw sentence bytes.
-     *
-     * @param other The HDM message to compare with.
-     * @return bool @c true if the content is equal, @c false otherwise.
-     */
-    bool hasEqualContent(const HDM& other) const noexcept;
-
 private:
     double heading_{};
     char indicator_{};

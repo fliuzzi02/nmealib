@@ -103,16 +103,6 @@ public:
      */
     bool operator==(const VHW& other) const noexcept;
 
-    /**
-     * @brief Compare the parsed content of two VHW messages.
-     *
-     * Content comparison delegates to Message0183::hasEqualContent.
-     *
-     * @param other The VHW message to compare with.
-     * @return bool true if content is equal, false otherwise.
-     */
-    bool hasEqualContent(const VHW& other) const noexcept;
-
 private:
     double headingTrue_{};
     char headingTrueType_{};

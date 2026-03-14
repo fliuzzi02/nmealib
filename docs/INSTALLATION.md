@@ -69,7 +69,7 @@ Add nmealib to your CMakeLists.txt using FetchContent to download the pre-compil
 include(FetchContent)
 
 # Fetch the pre-compiled nmealib binary release
-set(NMEALIB_VERSION "0.3.1")
+set(NMEALIB_VERSION "X.X.X")
 FetchContent_Declare(
     nmealib
     URL "https://github.com/fliuzzi02/nmealib/releases/download/v${NMEALIB_VERSION}/nmealib-${NMEALIB_VERSION}-linux64.tar.gz"
@@ -90,5 +90,24 @@ Then include and use the library:
 #include <nmealib.h>
 
 auto msg = nmealib::nmea0183::Nmea0183Factory::create("$GPGGA,...*47\r\n");
+```
+
+## Installation with PlatformIO
+
+`nmealib` can be consumed as a PlatformIO library dependency.
+
+```ini
+[env:esp32]
+platform = ...
+...
+lib_deps =
+    ...
+    fliuzzi02/nmealib
+```
+
+Then include the umbrella header from your firmware source:
+
+```cpp
+#include <nmealib.h>
 ```
 

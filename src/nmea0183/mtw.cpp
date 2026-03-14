@@ -1,5 +1,8 @@
 #include "nmealib/nmea0183/mtw.h"
 
+#include "nmealib/detail/errorSupport.h"
+#include "nmealib/detail/parse.h"
+
 #include <iomanip>
 #include <sstream>
 #include <vector>
@@ -10,7 +13,7 @@ namespace nmea0183 {
 std::unique_ptr<MTW> MTW::create(std::unique_ptr<Message0183> baseMessage) {
     std::string context = "MTW::create";
     if (baseMessage->getSentenceType() != "MTW") {
-        throw NotMTWException(context, "Expected sentence type 'MTW', got " + baseMessage->getSentenceType());
+        NMEALIB_RETURN_ERROR(NotMTWException(context, "Expected sentence type 'MTW', got " + baseMessage->getSentenceType()));
     }
 
     std::string payload = baseMessage->getPayload();
@@ -31,19 +34,19 @@ std::unique_ptr<MTW> MTW::create(std::unique_ptr<Message0183> baseMessage) {
     }
 
     if (fields.size() != 2) {
-        throw NotMTWException(context, "Invalid fields in MTW payload: expected 2, got " + std::to_string(fields.size()) + ". Payload: " + payload);
+        NMEALIB_RETURN_ERROR(NotMTWException(context, "Invalid fields in MTW payload: expected 2, got " + std::to_string(fields.size()) + ". Payload: " + payload));
     }
 
-    try {
-        double temperature = fields[0].empty() ? 0.0 : std::stod(fields[0]);
-        char unit = fields[1].empty() ? '\0' : fields[1][0];
-
-        return std::unique_ptr<MTW>(new MTW(std::move(*baseMessage),
-                                            temperature,
-                                            unit));
-    } catch (const std::exception& e) {
-        throw NmeaException(context, "Error parsing MTW fields: " + std::string(e.what()));
+    double temperature = 0.0;
+    if (!detail::parseOptionalDouble(fields[0], temperature)) {
+        NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing MTW fields"));
     }
+
+    char unit = fields[1].empty() ? '\0' : fields[1][0];
+
+    return std::unique_ptr<MTW>(new MTW(std::move(*baseMessage),
+                                        temperature,
+                                        unit));
 }
 
 MTW::MTW(Message0183 baseMessage,
@@ -101,10 +104,6 @@ char MTW::getUnit() const noexcept {
 
 bool MTW::operator==(const MTW& other) const noexcept {
     return Message0183::operator==(other);
-}
-
-bool MTW::hasEqualContent(const MTW& other) const noexcept {
-    return Message0183::hasEqualContent(other);
 }
 
 } // namespace nmea0183

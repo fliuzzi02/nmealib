@@ -7,6 +7,10 @@ namespace nmea2000 {
 
 std::unique_ptr<Message2000> Nmea2000Factory::create(const std::string& raw, Message::TimePoint ts) {
     auto baseMessage = Message2000::create(raw, ts);
+    if (!baseMessage) {
+        return nullptr;
+    }
+
     std::uint32_t pgn = baseMessage->getPgn();
 
     // Dispatch through the message registry

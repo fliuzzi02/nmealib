@@ -1,5 +1,8 @@
 #include "nmealib/nmea0183/vhw.h"
 
+#include "nmealib/detail/errorSupport.h"
+#include "nmealib/detail/parse.h"
+
 #include <iomanip>
 #include <sstream>
 #include <vector>
@@ -10,7 +13,7 @@ namespace nmea0183 {
 std::unique_ptr<VHW> VHW::create(std::unique_ptr<Message0183> baseMessage) {
     std::string context = "VHW::create";
     if (baseMessage->getSentenceType() != "VHW") {
-        throw NotVHWException(context, "Expected sentence type 'VHW', got " + baseMessage->getSentenceType());
+        NMEALIB_RETURN_ERROR(NotVHWException(context, "Expected sentence type 'VHW', got " + baseMessage->getSentenceType()));
     }
 
     std::string payload = baseMessage->getPayload();
@@ -31,31 +34,34 @@ std::unique_ptr<VHW> VHW::create(std::unique_ptr<Message0183> baseMessage) {
     }
 
     if (fields.size() != 8) {
-        throw NotVHWException(context, "Invalid fields in VHW payload: expected 8, got " + std::to_string(fields.size()) + ". Payload: " + payload);
+        NMEALIB_RETURN_ERROR(NotVHWException(context, "Invalid fields in VHW payload: expected 8, got " + std::to_string(fields.size()) + ". Payload: " + payload));
     }
 
-    try {
-        double headingTrue = fields[0].empty() ? 0.0 : std::stod(fields[0]);
-        char headingTrueType = fields[1].empty() ? '\0' : fields[1][0];
-        double headingMagnetic = fields[2].empty() ? 0.0 : std::stod(fields[2]);
-        char headingMagneticType = fields[3].empty() ? '\0' : fields[3][0];
-        double speedKnots = fields[4].empty() ? 0.0 : std::stod(fields[4]);
-        char speedKnotsType = fields[5].empty() ? '\0' : fields[5][0];
-        double speedKph = fields[6].empty() ? 0.0 : std::stod(fields[6]);
-        char speedKphType = fields[7].empty() ? '\0' : fields[7][0];
-
-        return std::unique_ptr<VHW>(new VHW(std::move(*baseMessage),
-                                            headingTrue,
-                                            headingTrueType,
-                                            headingMagnetic,
-                                            headingMagneticType,
-                                            speedKnots,
-                                            speedKnotsType,
-                                            speedKph,
-                                            speedKphType));
-    } catch (const std::exception& e) {
-        throw NmeaException(context, "Error parsing VHW fields: " + std::string(e.what()));
+    double headingTrue = 0.0;
+    double headingMagnetic = 0.0;
+    double speedKnots = 0.0;
+    double speedKph = 0.0;
+    if (!detail::parseOptionalDouble(fields[0], headingTrue) ||
+        !detail::parseOptionalDouble(fields[2], headingMagnetic) ||
+        !detail::parseOptionalDouble(fields[4], speedKnots) ||
+        !detail::parseOptionalDouble(fields[6], speedKph)) {
+        NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing VHW fields"));
     }
+
+    char headingTrueType = fields[1].empty() ? '\0' : fields[1][0];
+    char headingMagneticType = fields[3].empty() ? '\0' : fields[3][0];
+    char speedKnotsType = fields[5].empty() ? '\0' : fields[5][0];
+    char speedKphType = fields[7].empty() ? '\0' : fields[7][0];
+
+    return std::unique_ptr<VHW>(new VHW(std::move(*baseMessage),
+                                        headingTrue,
+                                        headingTrueType,
+                                        headingMagnetic,
+                                        headingMagneticType,
+                                        speedKnots,
+                                        speedKnotsType,
+                                        speedKph,
+                                        speedKphType));
 }
 
 VHW::VHW(Message0183 baseMessage,
@@ -171,10 +177,6 @@ char VHW::getSpeedKphType() const noexcept {
 
 bool VHW::operator==(const VHW& other) const noexcept {
     return Message0183::operator==(other);
-}
-
-bool VHW::hasEqualContent(const VHW& other) const noexcept {
-    return Message0183::hasEqualContent(other);
 }
 
 } // namespace nmea0183

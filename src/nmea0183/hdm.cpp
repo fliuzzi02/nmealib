@@ -1,5 +1,8 @@
 #include "nmealib/nmea0183/hdm.h"
 
+#include "nmealib/detail/errorSupport.h"
+#include "nmealib/detail/parse.h"
+
 #include <iomanip>
 #include <sstream>
 #include <vector>
@@ -10,7 +13,7 @@ namespace nmea0183 {
 std::unique_ptr<HDM> HDM::create(std::unique_ptr<Message0183> baseMessage) {
     std::string context = "HDM::create";
     if (baseMessage->getSentenceType() != "HDM") {
-        throw NotHDMException(context, "Expected sentence type 'HDM', got " + baseMessage->getSentenceType());
+        NMEALIB_RETURN_ERROR(NotHDMException(context, "Expected sentence type 'HDM', got " + baseMessage->getSentenceType()));
     }
 
     std::string payload = baseMessage->getPayload();
@@ -31,19 +34,19 @@ std::unique_ptr<HDM> HDM::create(std::unique_ptr<Message0183> baseMessage) {
     }
 
     if (fields.size() != 2) {
-        throw NotHDMException(context, "Invalid fields in HDM payload: expected 2, got " + std::to_string(fields.size()) + ". Payload: " + payload);
+        NMEALIB_RETURN_ERROR(NotHDMException(context, "Invalid fields in HDM payload: expected 2, got " + std::to_string(fields.size()) + ". Payload: " + payload));
     }
 
-    try {
-        double heading = fields[0].empty() ? 0.0 : std::stod(fields[0]);
-        char indicator = fields[1].empty() ? '\0' : fields[1][0];
-
-        return std::unique_ptr<HDM>(new HDM(std::move(*baseMessage),
-                                            heading,
-                                            indicator));
-    } catch (const std::exception& e) {
-        throw NmeaException(context, "Error parsing HDM fields: " + std::string(e.what()));
+    double heading = 0.0;
+    if (!detail::parseOptionalDouble(fields[0], heading)) {
+        NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing HDM fields"));
     }
+
+    char indicator = fields[1].empty() ? '\0' : fields[1][0];
+
+    return std::unique_ptr<HDM>(new HDM(std::move(*baseMessage),
+                                        heading,
+                                        indicator));
 }
 
 HDM::HDM(Message0183 baseMessage,
@@ -101,10 +104,6 @@ char HDM::getIndicator() const noexcept {
 
 bool HDM::operator==(const HDM& other) const noexcept {
     return Message0183::operator==(other);
-}
-
-bool HDM::hasEqualContent(const HDM& other) const noexcept {
-    return Message0183::hasEqualContent(other);
 }
 
 } // namespace nmea0183

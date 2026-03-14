@@ -1,5 +1,8 @@
 #include "nmealib/nmea0183/mwv.h"
 
+#include "nmealib/detail/errorSupport.h"
+#include "nmealib/detail/parse.h"
+
 #include <iomanip>
 #include <sstream>
 #include <vector>
@@ -10,7 +13,7 @@ namespace nmea0183 {
 std::unique_ptr<MWV> MWV::create(std::unique_ptr<Message0183> baseMessage) {
     std::string context = "MWV::create";
     if (baseMessage->getSentenceType() != "MWV") {
-        throw NotMWVException(context, "Expected sentence type 'MWV', got " + baseMessage->getSentenceType());
+        NMEALIB_RETURN_ERROR(NotMWVException(context, "Expected sentence type 'MWV', got " + baseMessage->getSentenceType()));
     }
 
     std::string payload = baseMessage->getPayload();
@@ -31,25 +34,26 @@ std::unique_ptr<MWV> MWV::create(std::unique_ptr<Message0183> baseMessage) {
     }
 
     if (fields.size() != 5) {
-        throw NotMWVException(context, "Invalid fields in MWV payload: expected 5, got " + std::to_string(fields.size()) + ". Payload: " + payload);
+        NMEALIB_RETURN_ERROR(NotMWVException(context, "Invalid fields in MWV payload: expected 5, got " + std::to_string(fields.size()) + ". Payload: " + payload));
     }
 
-    try {
-        double windAngle = fields[0].empty() ? 0.0 : std::stod(fields[0]);
-        char reference = fields[1].empty() ? '\0' : fields[1][0];
-        double windSpeed = fields[2].empty() ? 0.0 : std::stod(fields[2]);
-        char windSpeedUnits = fields[3].empty() ? '\0' : fields[3][0];
-        char status = fields[4].empty() ? '\0' : fields[4][0];
-
-        return std::unique_ptr<MWV>(new MWV(std::move(*baseMessage),
-                                            windAngle,
-                                            reference,
-                                            windSpeed,
-                                            windSpeedUnits,
-                                            status));
-    } catch (const std::exception& e) {
-        throw NmeaException(context, "Error parsing MWV fields: " + std::string(e.what()));
+    double windAngle = 0.0;
+    double windSpeed = 0.0;
+    if (!detail::parseOptionalDouble(fields[0], windAngle) ||
+        !detail::parseOptionalDouble(fields[2], windSpeed)) {
+        NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing MWV fields"));
     }
+
+    char reference = fields[1].empty() ? '\0' : fields[1][0];
+    char windSpeedUnits = fields[3].empty() ? '\0' : fields[3][0];
+    char status = fields[4].empty() ? '\0' : fields[4][0];
+
+    return std::unique_ptr<MWV>(new MWV(std::move(*baseMessage),
+                                        windAngle,
+                                        reference,
+                                        windSpeed,
+                                        windSpeedUnits,
+                                        status));
 }
 
 MWV::MWV(Message0183 baseMessage,
@@ -146,10 +150,6 @@ char MWV::getStatus() const noexcept {
 
 bool MWV::operator==(const MWV& other) const noexcept {
     return Message0183::operator==(other);
-}
-
-bool MWV::hasEqualContent(const MWV& other) const noexcept {
-    return Message0183::hasEqualContent(other);
 }
 
 } // namespace nmea0183

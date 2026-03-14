@@ -80,26 +80,7 @@ TEST(Message0183, CloneProducesEqualObject)
     // Attempt to downcast and compare content
     auto derivedClone = dynamic_cast<Message0183*>(baseClone.get());
     ASSERT_NE(derivedClone, nullptr);
-    EXPECT_TRUE(msg->hasEqualContent(*derivedClone));
-}
-
-TEST(Message0183, EqualityAndHasEqualContent)
-{
-    using Clock = std::chrono::system_clock;
-    auto ts = Clock::now();
-
-    auto m1 = Nmea0183Factory::create(SAMPLE_WITH_CHECKSUM, ts);
-    auto m2 = Nmea0183Factory::create(SAMPLE_WITH_CHECKSUM, ts);
-    ASSERT_NE(m1, nullptr);
-    ASSERT_NE(m2, nullptr);
-
-    // When timestamps are identical, operator== should consider them equal
-    EXPECT_TRUE(*m1 == *m2);
-
-    // Different timestamps -> operator== may be false, but hasEqualContent ignores timestamp
-    auto m3 = Nmea0183Factory::create(SAMPLE_WITH_CHECKSUM);
-    ASSERT_NE(m3, nullptr);
-    EXPECT_TRUE(m1->hasEqualContent(*m3));
+    EXPECT_TRUE(*msg == *derivedClone);
 }
 
 TEST(Message0183, ValidateBehavior)
