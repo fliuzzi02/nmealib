@@ -75,7 +75,6 @@ public:
      */
     static DataType fromValue(TargetType value) {
         const double physicalValue = static_cast<double>(value);
-        const double tolerance = RESOLUTION * 0.5;
         const double clampedValue = std::clamp(physicalValue, MIN, MAX);
 
         double scaled = clampedValue - MIN;
