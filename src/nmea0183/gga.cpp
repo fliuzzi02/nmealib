@@ -314,9 +314,5 @@ bool GGA::operator==(const GGA& other) const noexcept {
     return Message0183::operator==(other);
 }
 
-bool GGA::hasEqualContent(const GGA& other) const noexcept {
-    return Message0183::hasEqualContent(other);
-}
-
 } // namespace nmea0183
 } // namespace nmealib

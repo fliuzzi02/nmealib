@@ -165,9 +165,5 @@ bool ZDA::operator==(const ZDA& other) const noexcept {
     return Message0183::operator==(other);
 }
 
-bool ZDA::hasEqualContent(const ZDA& other) const noexcept {
-    return Message0183::hasEqualContent(other);
-}
-
 } // namespace nmea0183
 } // namespace nmealib

@@ -103,9 +103,5 @@ bool MTW::operator==(const MTW& other) const noexcept {
     return Message0183::operator==(other);
 }
 
-bool MTW::hasEqualContent(const MTW& other) const noexcept {
-    return Message0183::hasEqualContent(other);
-}
-
 } // namespace nmea0183
 } // namespace nmealib

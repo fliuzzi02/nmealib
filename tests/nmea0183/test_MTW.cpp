@@ -81,7 +81,6 @@ TEST(MTW, ClonePreservesMtwContent)
     auto cloned = dynamic_cast<MTW*>(clonedBase.get());
     ASSERT_NE(cloned, nullptr);
 
-    EXPECT_TRUE(source.hasEqualContent(*cloned));
     EXPECT_TRUE(source == *cloned);
 }
 

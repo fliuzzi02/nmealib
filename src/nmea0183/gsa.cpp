@@ -231,9 +231,5 @@ bool GSA::operator==(const GSA& other) const noexcept {
     return Message0183::operator==(other);
 }
 
-bool GSA::hasEqualContent(const GSA& other) const noexcept {
-    return Message0183::hasEqualContent(other);
-}
-
 } // namespace nmea0183
 } // namespace nmealib

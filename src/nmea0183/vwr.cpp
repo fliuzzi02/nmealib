@@ -178,9 +178,5 @@ bool VWR::operator==(const VWR& other) const noexcept {
     return Message0183::operator==(other);
 }
 
-bool VWR::hasEqualContent(const VWR& other) const noexcept {
-    return Message0183::hasEqualContent(other);
-}
-
 } // namespace nmea0183
 } // namespace nmealib

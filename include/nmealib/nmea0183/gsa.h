@@ -117,16 +117,6 @@ public:
      */
     bool operator==(const GSA& other) const noexcept;
 
-    /**
-     * @brief Compare the parsed content of two GSA messages.
-     *
-     * Content comparison delegates to Message0183::hasEqualContent.
-     *
-     * @param other The GSA message to compare with.
-     * @return bool true if content is equal, false otherwise.
-     */
-    bool hasEqualContent(const GSA& other) const noexcept;
-
 private:
     char selectionMode_{};
     unsigned int mode_{};

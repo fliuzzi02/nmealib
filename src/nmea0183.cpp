@@ -206,14 +206,5 @@ bool Message0183::operator==(const Message0183& other) const noexcept {
            Message::operator==(other);
 }
 
-bool Message0183::hasEqualContent(const Message0183& other) const noexcept {
-    return startChar_ == other.startChar_ &&
-           talker_ == other.talker_ &&
-           sentenceType_ == other.sentenceType_ &&
-           payload_ == other.payload_ &&
-           checksumStr_ == other.checksumStr_ &&
-           calculatedChecksumStr_ == other.calculatedChecksumStr_;
-}
-
 } // namespace nmea0183
 } // namespace nmealib

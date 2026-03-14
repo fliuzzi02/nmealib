@@ -135,16 +135,6 @@ public:
      */
     bool operator==(const GGA& other) const noexcept;
 
-    /**
-     * @brief Compare the parsed content of two GGA messages.
-     *
-     * Content comparison delegates to Message0183::hasEqualContent.
-     *
-     * @param other The GGA message to compare with.
-     * @return bool true if content is equal, false otherwise.
-     */
-    bool hasEqualContent(const GGA& other) const noexcept;
-
 private:
     double utcTime_{};
     double latitude_{};

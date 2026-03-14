@@ -103,9 +103,5 @@ bool HDM::operator==(const HDM& other) const noexcept {
     return Message0183::operator==(other);
 }
 
-bool HDM::hasEqualContent(const HDM& other) const noexcept {
-    return Message0183::hasEqualContent(other);
-}
-
 } // namespace nmea0183
 } // namespace nmealib

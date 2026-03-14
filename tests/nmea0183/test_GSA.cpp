@@ -141,8 +141,7 @@ TEST(GSA, ClonePreservesGsaContent)
     ASSERT_NE(clonedBase, nullptr);
     auto cloned = dynamic_cast<GSA*>(clonedBase.get());
     ASSERT_NE(cloned, nullptr);
-
-    EXPECT_TRUE(source.hasEqualContent(*cloned));
+    
     EXPECT_TRUE(source == *cloned);
 }
 

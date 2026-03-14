@@ -130,16 +130,6 @@ public:
      */
     bool operator==(const DBT& other) const noexcept;
 
-    /**
-     * @brief Compare the parsed content of two DBT messages.
-     *
-     * Content comparison delegates to Message0183::hasEqualContent.
-     *
-     * @param other The DBT message to compare with.
-     * @return bool true if content is equal, false otherwise.
-     */
-    bool hasEqualContent(const DBT& other) const noexcept;
-
 private:
     double depthFeet_{};
     char feetUnit_{};

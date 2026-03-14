@@ -160,9 +160,5 @@ bool DBT::operator==(const DBT& other) const noexcept {
     return Message0183::operator==(other);
 }
 
-bool DBT::hasEqualContent(const DBT& other) const noexcept {
-    return Message0183::hasEqualContent(other);
-}
-
 } // namespace nmea0183
 } // namespace nmealib

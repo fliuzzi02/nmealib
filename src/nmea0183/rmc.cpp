@@ -260,9 +260,5 @@ bool RMC::operator==(const RMC& other) const noexcept {
     return Message0183::operator==(other);
 }
 
-bool RMC::hasEqualContent(const RMC& other) const noexcept {
-    return Message0183::hasEqualContent(other);
-}
-
 } // namespace nmea0183
 } // namespace nmealib

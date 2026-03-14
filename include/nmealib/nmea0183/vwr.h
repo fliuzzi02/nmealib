@@ -121,7 +121,6 @@ public:
 
     std::string getStringContent(bool verbose) const noexcept override;
     bool operator==(const VWR& other) const noexcept;
-    bool hasEqualContent(const VWR& other) const noexcept;
 
 private:
     double windAngle_{};

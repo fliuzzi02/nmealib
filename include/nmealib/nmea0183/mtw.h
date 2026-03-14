@@ -111,17 +111,6 @@ public:
      */
     bool operator==(const MTW& other) const noexcept;
 
-    /**
-     * @brief Compare the parsed content of two MTW messages.
-     *
-     * Unlike @c operator==, this method compares the decoded field values
-     * rather than the raw sentence bytes.
-     *
-     * @param other The MTW message to compare with.
-     * @return bool @c true if the content is equal, @c false otherwise.
-     */
-    bool hasEqualContent(const MTW& other) const noexcept;
-
 private:
     double temperature_{};
     char unit_{};

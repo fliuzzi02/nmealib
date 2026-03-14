@@ -107,16 +107,6 @@ public:
      */
     bool operator==(const GLL& other) const noexcept;
 
-    /**
-     * @brief Compare the parsed content of two GLL messages.
-     *
-     * Content comparison delegates to Message0183::hasEqualContent.
-     *
-     * @param other The GLL message to compare with.
-     * @return bool true if content is equal, false otherwise.
-     */
-    bool hasEqualContent(const GLL& other) const noexcept;
-
 private:
     double latitude_{};
     char latitudeDirection_{};

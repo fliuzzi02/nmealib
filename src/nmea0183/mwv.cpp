@@ -148,9 +148,5 @@ bool MWV::operator==(const MWV& other) const noexcept {
     return Message0183::operator==(other);
 }
 
-bool MWV::hasEqualContent(const MWV& other) const noexcept {
-    return Message0183::hasEqualContent(other);
-}
-
 } // namespace nmea0183
 } // namespace nmealib

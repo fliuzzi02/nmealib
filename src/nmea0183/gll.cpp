@@ -195,9 +195,5 @@ bool GLL::operator==(const GLL& other) const noexcept {
     return Message0183::operator==(other);
 }
 
-bool GLL::hasEqualContent(const GLL& other) const noexcept {
-    return Message0183::hasEqualContent(other);
-}
-
 } // namespace nmea0183
 } // namespace nmealib

@@ -118,16 +118,6 @@ public:
      */
     bool operator==(const VTG& other) const noexcept;
 
-    /**
-     * @brief Compare the parsed content of two VTG messages.
-     *
-     * Content comparison delegates to Message0183::hasEqualContent.
-     *
-     * @param other The VTG message to compare with.
-     * @return bool true if content is equal, false otherwise.
-     */
-    bool hasEqualContent(const VTG& other) const noexcept;
-
 private:
     double courseOverGroundTrue_{};
     char courseOverGroundTrueType_{};

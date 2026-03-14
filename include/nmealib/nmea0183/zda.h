@@ -100,16 +100,6 @@ public:
      */
     bool operator==(const ZDA& other) const noexcept;
 
-    /**
-     * @brief Compare the parsed content of two ZDA messages.
-     *
-     * Content comparison delegates to Message0183::hasEqualContent.
-     *
-     * @param other The ZDA message to compare with.
-     * @return bool true if content is equal, false otherwise.
-     */
-    bool hasEqualContent(const ZDA& other) const noexcept;
-
 private:
     double utcTime_{};
     unsigned int day_{};
