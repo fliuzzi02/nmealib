@@ -151,7 +151,7 @@ private:
     double dgpsAge_{};
     std::string dgpsReferenceStationId_{};
 
-    GGA() = default;
+    GGA() = delete;
 
     GGA(Message0183 baseMessage,
         double timestamp,

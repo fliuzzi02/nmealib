@@ -116,7 +116,7 @@ private:
     char status_{};
     char modeIndicator_{};
 
-    GLL() = default;
+    GLL() = delete;
 
     GLL(Message0183 baseMessage,
         double latitude,

@@ -130,7 +130,7 @@ private:
     std::optional<char> faaModeIndicator_{};
     bool legacyFormat_{};
 
-    VTG() = default;
+    VTG() = delete;
 
     VTG(Message0183 baseMessage,
         double courseOverGroundTrue,

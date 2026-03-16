@@ -126,7 +126,7 @@ private:
     double vdop_{};
     std::optional<unsigned int> systemId_{};
 
-    GSA() = default;
+    GSA() = delete;
 
     GSA(Message0183 baseMessage,
         char selectionMode,

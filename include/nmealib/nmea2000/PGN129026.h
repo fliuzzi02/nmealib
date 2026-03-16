@@ -90,7 +90,7 @@ private:
     Byte reserved2_ = Byte::fromValue(0U);
     Byte reserved3_ = Byte::fromValue(0U);
 
-    PGN129026() = default;
+    PGN129026() = delete;
 
     // Private constructor used by the factory method
     PGN129026(Message2000 baseMessage,

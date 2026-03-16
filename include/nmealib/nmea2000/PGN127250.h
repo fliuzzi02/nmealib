@@ -76,7 +76,7 @@ private:
     HalfByte headingReference_;
     Byte reserved_;
 
-    PGN127250() = default;
+    PGN127250() = delete;
 
     // Private constructor used by the factory method
     PGN127250(Message2000 baseMessage,

@@ -138,7 +138,7 @@ private:
     double depthFathoms_{};
     char fathomsUnit_{};
 
-    DBT() = default;
+    DBT() = delete;
 
     DBT(Message0183 baseMessage,
         double depthFeet,

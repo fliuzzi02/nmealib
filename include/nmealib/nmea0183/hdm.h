@@ -116,7 +116,7 @@ private:
     double heading_{};
     char indicator_{};
 
-    HDM() = default;
+    HDM() = delete;
 
     HDM(Message0183 baseMessage,
         double heading,

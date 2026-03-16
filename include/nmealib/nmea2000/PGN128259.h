@@ -80,7 +80,7 @@ private:
     Byte reserved1_;
     HalfByte reserved2_;
 
-    PGN128259() = default;
+    PGN128259() = delete;
 
     // Private constructor used by the factory method
     PGN128259(Message2000 baseMessage,

@@ -115,7 +115,7 @@ private:
     double temperature_{};
     char unit_{};
 
-    MTW() = default;
+    MTW() = delete;
 
     MTW(Message0183 baseMessage,
         double temperature,
