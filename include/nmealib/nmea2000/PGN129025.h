@@ -50,7 +50,7 @@ private:
     Latitude latitude_;
     Longitude longitude_;
 
-    PGN129025() = default;
+    PGN129025() = delete;
 
     // Private constructor used by the factory method
     PGN129025(Message2000 baseMessage,

@@ -113,7 +113,7 @@ private:
     double speedKph_{};
     char speedKphType_{};
 
-    VHW() = default;
+    VHW() = delete;
 
     VHW(Message0183 baseMessage,
         double headingTrue,

@@ -108,7 +108,7 @@ private:
     int localZoneHours_{};
     int localZoneMinutes_{};
 
-    ZDA() = default;
+    ZDA() = delete;
 
     ZDA(Message0183 baseMessage,
         double utcTime,

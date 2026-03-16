@@ -147,7 +147,7 @@ private:
     char modeIndicator_{};
     char navigationStatus_{};
 
-    RMC() = default;
+    RMC() = delete;
 
     RMC(Message0183 baseMessage, 
         unsigned int utcFix, 

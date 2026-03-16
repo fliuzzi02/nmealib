@@ -104,7 +104,7 @@ private:
     char windSpeedUnits_{};
     char status_{};
 
-    MWV() = default;
+    MWV() = delete;
 
     MWV(Message0183 baseMessage,
         double windAngle,

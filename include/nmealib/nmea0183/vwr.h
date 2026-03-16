@@ -132,7 +132,7 @@ private:
     double speedKph_{};
     char speedKphUnit_{};
 
-    VWR() = default;
+    VWR() = delete;
 
     VWR(Message0183 baseMessage,
         double windAngle,
