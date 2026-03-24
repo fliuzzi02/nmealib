@@ -1,4 +1,5 @@
 #include "messageRegistry.hpp"
+#include "nmealib/nmea0183/apb.h"
 #include "nmealib/nmea0183/dbt.h"
 #include "nmealib/nmea0183/gga.h"
 #include "nmealib/nmea0183/gll.h"
@@ -6,11 +7,13 @@
 #include "nmealib/nmea0183/hdm.h"
 #include "nmealib/nmea0183/mtw.h"
 #include "nmealib/nmea0183/mwv.h"
+#include "nmealib/nmea0183/rmb.h"
 #include "nmealib/nmea0183/rmc.h"
 #include "nmealib/nmea0183/vhw.h"
 #include "nmealib/nmea0183/vtg.h"
 #include "nmealib/nmea0183/vwr.h"
 #include "nmealib/nmea0183/xdr.h"
+#include "nmealib/nmea0183/xte.h"
 #include "nmealib/nmea0183/zda.h"
 
 namespace nmealib {
@@ -24,7 +27,9 @@ MessageRegistry& MessageRegistry::instance() {
 std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentenceType,
                                                       std::unique_ptr<Message0183> baseMessage) {
     // TODO: Consider using a map of string to function pointer for better scalability if many sentence types are supported
-    if (sentenceType == "DBT") {
+    if (sentenceType == "APB") {
+        return APB::create(std::move(baseMessage));
+    } else if (sentenceType == "DBT") {
         return DBT::create(std::move(baseMessage));
     } else if (sentenceType == "GGA") {
         return GGA::create(std::move(baseMessage));
@@ -38,6 +43,8 @@ std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentence
         return MTW::create(std::move(baseMessage));
     } else if (sentenceType == "MWV") {
         return MWV::create(std::move(baseMessage));
+    } else if (sentenceType == "RMB") {
+        return RMB::create(std::move(baseMessage));
     } else if (sentenceType == "RMC") {
         return RMC::create(std::move(baseMessage));
     } else if (sentenceType == "VHW") {
@@ -48,6 +55,8 @@ std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentence
         return VWR::create(std::move(baseMessage));
     } else if (sentenceType == "XDR") {
         return XDR::create(std::move(baseMessage));
+    } else if (sentenceType == "XTE") {
+        return XTE::create(std::move(baseMessage));
     } else if (sentenceType == "ZDA") {
         return ZDA::create(std::move(baseMessage));
     } else {

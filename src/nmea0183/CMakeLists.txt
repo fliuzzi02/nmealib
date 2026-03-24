@@ -7,6 +7,7 @@ add_library(nmealib0183 STATIC
     ../nmea0183.cpp
     messageRegistry.cpp
     nmea0183Factory.cpp
+    apb.cpp
     dbt.cpp
     gga.cpp
     gll.cpp
@@ -14,11 +15,13 @@ add_library(nmealib0183 STATIC
     hdm.cpp
     mwv.cpp
     mtw.cpp
+    rmb.cpp
     rmc.cpp
     vhw.cpp
     vtg.cpp
     vwr.cpp
     xdr.cpp
+    xte.cpp
     zda.cpp
 )
 
@@ -29,6 +32,7 @@ set(NMEALIB_NMEA0183_SOURCES
     nmea0183.cpp
     nmea0183/messageRegistry.cpp
     nmea0183/nmea0183Factory.cpp
+    nmea0183/apb.cpp
     nmea0183/dbt.cpp
     nmea0183/gga.cpp
     nmea0183/gll.cpp
@@ -36,11 +40,13 @@ set(NMEALIB_NMEA0183_SOURCES
     nmea0183/hdm.cpp
     nmea0183/mwv.cpp
     nmea0183/mtw.cpp
+    nmea0183/rmb.cpp
     nmea0183/rmc.cpp
     nmea0183/vhw.cpp
     nmea0183/vtg.cpp
     nmea0183/vwr.cpp
     nmea0183/xdr.cpp
+    nmea0183/xte.cpp
     nmea0183/zda.cpp
     PARENT_SCOPE
 )
