@@ -12,6 +12,7 @@ add_executable(nmea0183_tests
     test_VHW.cpp
     test_VTG.cpp
     test_VWR.cpp
+    test_XTE.cpp
     test_ZDA.cpp
 )
 
