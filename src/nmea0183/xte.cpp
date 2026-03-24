@@ -41,7 +41,7 @@ std::unique_ptr<XTE> XTE::create(std::unique_ptr<Message0183> baseMessage) {
     char status2 = fields[1].empty() ? '\0' : fields[1][0];
     double crossTrackError = 0.0;
     if (!detail::parseOptionalDouble(fields[2], crossTrackError)) {
-        NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing XTE fields"));
+        NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing cross-track error field"));
     }
     char steerDirection = fields[3].empty() ? '\0' : fields[3][0];
     char crossTrackUnits = fields[4].empty() ? '\0' : fields[4][0];
@@ -135,11 +135,22 @@ std::string XTE::composeRaw(const std::string& talkerId,
                             std::optional<char> faaModeIndicator) {
     std::ostringstream payloadStream;
     payloadStream << talkerId << "XTE,";
-    payloadStream << status1 << ",";
-    payloadStream << status2 << ",";
+    if (status1 != '\0') {
+        payloadStream << status1;
+    }
+    payloadStream << ",";
+    if (status2 != '\0') {
+        payloadStream << status2;
+    }
+    payloadStream << ",";
     payloadStream << std::fixed << std::setprecision(1) << crossTrackError << ",";
-    payloadStream << steerDirection << ",";
-    payloadStream << crossTrackUnits;
+    if (steerDirection != '\0') {
+        payloadStream << steerDirection;
+    }
+    payloadStream << ",";
+    if (crossTrackUnits != '\0') {
+        payloadStream << crossTrackUnits;
+    }
     if (faaModeIndicator.has_value()) {
         payloadStream << "," << faaModeIndicator.value();
     }
@@ -177,7 +188,13 @@ std::optional<char> XTE::getFaaModeIndicator() const noexcept {
 }
 
 bool XTE::operator==(const XTE& other) const noexcept {
-    return Message0183::operator==(other);
+    return Message0183::operator==(other) &&
+           status1_ == other.status1_ &&
+           status2_ == other.status2_ &&
+           crossTrackError_ == other.crossTrackError_ &&
+           steerDirection_ == other.steerDirection_ &&
+           crossTrackUnits_ == other.crossTrackUnits_ &&
+           faaModeIndicator_ == other.faaModeIndicator_;
 }
 
 } // namespace nmea0183

@@ -103,7 +103,7 @@ public:
     /**
      * @brief Compare two XTE messages for equality.
      *
-     * Equality delegates to Message0183::operator==.
+     * Equality checks both base Message0183 state and all XTE-specific fields.
      *
      * @param other The XTE message to compare with.
      * @return bool true if equal, false otherwise.
