@@ -38,6 +38,7 @@
 #include "nmealib/nmea0183/vhw.h"
 #include "nmealib/nmea0183/vtg.h"
 #include "nmealib/nmea0183/vwr.h"
+#include "nmealib/nmea0183/xte.h"
 #include "nmealib/nmea0183/zda.h"
 #include "nmealib/nmea2000/nmea2000Factory.h"
 #include "nmealib/nmea2000/dataTypes.h"
