@@ -27,6 +27,7 @@
 #include "nmealib/nmea0183.h"
 #include "nmealib/nmea2000.h"
 #include "nmealib/nmea0183/nmea0183Factory.h"
+#include "nmealib/nmea0183/apb.h"
 #include "nmealib/nmea0183/dbt.h"
 #include "nmealib/nmea0183/rmc.h"
 #include "nmealib/nmea0183/gga.h"

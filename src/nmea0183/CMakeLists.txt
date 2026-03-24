@@ -7,6 +7,7 @@ add_library(nmealib0183 STATIC
     ../nmea0183.cpp
     messageRegistry.cpp
     nmea0183Factory.cpp
+    apb.cpp
     dbt.cpp
     gga.cpp
     gll.cpp
@@ -28,6 +29,7 @@ set(NMEALIB_NMEA0183_SOURCES
     nmea0183.cpp
     nmea0183/messageRegistry.cpp
     nmea0183/nmea0183Factory.cpp
+    nmea0183/apb.cpp
     nmea0183/dbt.cpp
     nmea0183/gga.cpp
     nmea0183/gll.cpp
