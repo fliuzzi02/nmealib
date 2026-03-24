@@ -9,7 +9,7 @@ using namespace nmealib::nmea0183;
 
 static const std::string APB_SENTENCE = "$GPAPB,A,A,0.10,R,N,V,V,011,M,DEST,011,M,011,M*82\r\n";
 static const std::string APB_SENTENCE_NO_CHECKSUM = "$GPAPB,A,A,0.10,R,N,V,V,011,M,DEST,011,M,011,M\r\n";
-static const std::string INCOMPLETE_APB_SENTENCE = "$GPAPB,A,A,,L,N,,,,,DEST,,,," "\r\n";
+static const std::string INCOMPLETE_APB_SENTENCE = "$GPAPB,A,A,,L,N,,,,,DEST,,,,\r\n";
 static const std::string NOT_APB_SENTENCE = "$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W,A,V*6A\r\n";
 static const std::string MALFORMED_APB_SENTENCE = "$GPAPB,A,A,0.10,R,N,V,V,011,M,DEST,011,M\r\n";
 
