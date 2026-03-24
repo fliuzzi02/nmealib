@@ -7,6 +7,7 @@ add_executable(nmea0183_tests
     test_HDM.cpp
     test_MTW.cpp
     test_MWV.cpp
+    test_RMB.cpp
     test_RMC.cpp
     test_VHW.cpp
     test_VTG.cpp

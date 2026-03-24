@@ -14,6 +14,7 @@ add_library(nmealib0183 STATIC
     hdm.cpp
     mwv.cpp
     mtw.cpp
+    rmb.cpp
     rmc.cpp
     vhw.cpp
     vtg.cpp
@@ -35,6 +36,7 @@ set(NMEALIB_NMEA0183_SOURCES
     nmea0183/hdm.cpp
     nmea0183/mwv.cpp
     nmea0183/mtw.cpp
+    nmea0183/rmb.cpp
     nmea0183/rmc.cpp
     nmea0183/vhw.cpp
     nmea0183/vtg.cpp

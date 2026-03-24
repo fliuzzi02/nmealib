@@ -6,6 +6,7 @@
 #include "nmealib/nmea0183/hdm.h"
 #include "nmealib/nmea0183/mtw.h"
 #include "nmealib/nmea0183/mwv.h"
+#include "nmealib/nmea0183/rmb.h"
 #include "nmealib/nmea0183/rmc.h"
 #include "nmealib/nmea0183/vhw.h"
 #include "nmealib/nmea0183/vtg.h"
@@ -37,6 +38,8 @@ std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentence
         return MTW::create(std::move(baseMessage));
     } else if (sentenceType == "MWV") {
         return MWV::create(std::move(baseMessage));
+    } else if (sentenceType == "RMB") {
+        return RMB::create(std::move(baseMessage));
     } else if (sentenceType == "RMC") {
         return RMC::create(std::move(baseMessage));
     } else if (sentenceType == "VHW") {
