@@ -18,6 +18,7 @@ add_library(nmealib0183 STATIC
     vhw.cpp
     vtg.cpp
     vwr.cpp
+    xdr.cpp
     zda.cpp
 )
 
@@ -39,6 +40,7 @@ set(NMEALIB_NMEA0183_SOURCES
     nmea0183/vhw.cpp
     nmea0183/vtg.cpp
     nmea0183/vwr.cpp
+    nmea0183/xdr.cpp
     nmea0183/zda.cpp
     PARENT_SCOPE
 )
