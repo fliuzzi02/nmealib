@@ -12,6 +12,7 @@
 #include "nmealib/nmea0183/vhw.h"
 #include "nmealib/nmea0183/vtg.h"
 #include "nmealib/nmea0183/vwr.h"
+#include "nmealib/nmea0183/xdr.h"
 #include "nmealib/nmea0183/xte.h"
 #include "nmealib/nmea0183/zda.h"
 
@@ -52,6 +53,8 @@ std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentence
         return VTG::create(std::move(baseMessage));
     } else if (sentenceType == "VWR") {
         return VWR::create(std::move(baseMessage));
+    } else if (sentenceType == "XDR") {
+        return XDR::create(std::move(baseMessage));
     } else if (sentenceType == "XTE") {
         return XTE::create(std::move(baseMessage));
     } else if (sentenceType == "ZDA") {

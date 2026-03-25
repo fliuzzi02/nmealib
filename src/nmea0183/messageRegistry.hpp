@@ -57,6 +57,7 @@ private:
     friend class VHW;
     friend class VTG;
     friend class VWR;
+    friend class XDR;
     friend class ZDA;
 };
 
