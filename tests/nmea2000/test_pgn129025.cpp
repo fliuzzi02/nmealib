@@ -77,7 +77,7 @@ TEST(PGN129025, StringContent) {
         Latitude::fromRaw(0),
         Longitude::fromRaw(0));
 
-    std::string expectedVerbose = "--------------------------------\nProtocol: NMEA2000\nPGN: 129025(0x1f801)\nFrame Length: 8 bytes\nFrame Data: 00 00 00 00 00 00 00 00\nFields:\n\tLatitude: 0.0000000\xC2\xB0\n\tLongitude: 0.0000000\xC2\xB0\n";
+    std::string expectedVerbose = "--------------------------------\nProtocol:    NMEA2000\nPriority:    0\nData Page:   1\nPDU Format:  0xf8 (PDU2 - broadcast)\nDestination: 255 (global)\nSource Addr: 0\nPGN:         129025 (0x1f801)\nFrame Len:   8 bytes\nFrame Data:  00 00 00 00 00 00 00 00\nFields:\n\tLatitude: 0.0000000\xC2\xB0\n\tLongitude: 0.0000000\xC2\xB0\n";
     std::string expectedNonVerbose = "[OK] NMEA2000 PGN129025: Latitude=0.0000000° Longitude=0.0000000°";
 
     EXPECT_EQ(pgn.getStringContent(true), expectedVerbose);

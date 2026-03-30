@@ -148,7 +148,7 @@ TEST(PGN129026, StringContent) {
                          Byte::fromValue(0),
                          Byte::fromValue(0));
 
-    std::string expectedVerbose = "--------------------------------\nProtocol: NMEA2000\nPGN: 129026(0x1f802)\nFrame Length: 8 bytes\nFrame Data: 01 00 00 00 00 00 00 00\nFields:\n\tSequence ID: 1\n\tCourse Over Ground: 0.0000rad, 0°\n\tSpeed Over Ground: 0 knots\n\tCOG Reference: True\n";
+    std::string expectedVerbose = "--------------------------------\nProtocol:    NMEA2000\nPriority:    0\nData Page:   1\nPDU Format:  0xf8 (PDU2 - broadcast)\nDestination: 255 (global)\nSource Addr: 0\nPGN:         129026 (0x1f802)\nFrame Len:   8 bytes\nFrame Data:  01 00 00 00 00 00 00 00\nFields:\n\tSequence ID: 1\n\tCourse Over Ground: 0.0000rad, 0\xC2\xB0\n\tSpeed Over Ground: 0 knots\n\tCOG Reference: True\n";
     std::string expectedNonVerbose = "[OK] NMEA2000 PGN129026: SeqID=1 COG=0° SOG=0 knots COGRef=0";
 
     EXPECT_EQ(pgn.getStringContent(true), expectedVerbose);
