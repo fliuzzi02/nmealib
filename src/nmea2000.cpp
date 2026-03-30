@@ -254,29 +254,29 @@ std::unique_ptr<nmealib::Message> Message2000::clone() const {
 
 // Priority is a 3-bit value in bits [4:2] of canId[0].
 uint8_t Message2000::getPriority() const noexcept {
-    return (canId_[0] >> 2) & 0x07;
+    return (getCanId()[0] >> 2) & 0x07;
 }
 
 // Individual priority bits (P3 is the MSB of the 3-bit priority field).
-bool Message2000::getPriority3() const noexcept { return (canId_[0] & 0x10) != 0; } // bit 4
-bool Message2000::getPriority2() const noexcept { return (canId_[0] & 0x08) != 0; } // bit 3
-bool Message2000::getPriority1() const noexcept { return (canId_[0] & 0x04) != 0; } // bit 2
+bool Message2000::getPriority3() const noexcept { return (getCanId()[0] & 0x10) != 0; } // bit 4
+bool Message2000::getPriority2() const noexcept { return (getCanId()[0] & 0x08) != 0; } // bit 3
+bool Message2000::getPriority1() const noexcept { return (getCanId()[0] & 0x04) != 0; } // bit 2
 
 // Reserved bit (R1) is bit 1 of canId[0].
-bool Message2000::getReserved() const noexcept  { return (canId_[0] & 0x02) != 0; }
+bool Message2000::getReserved() const noexcept  { return (getCanId()[0] & 0x02) != 0; }
 
 // Data Page (DP) is bit 0 of canId[0].
-bool Message2000::getDataPage() const noexcept  { return (canId_[0] & 0x01) != 0; }
+bool Message2000::getDataPage() const noexcept  { return (getCanId()[0] & 0x01) != 0; }
 
 // PDU Format is the full canId[1] byte.
-uint8_t Message2000::getPDUFormat() const noexcept   { return canId_[1]; }
+uint8_t Message2000::getPDUFormat() const noexcept   { return getCanId()[1]; }
 
 // PDU Specific is the full canId[2] byte.
 // When PF < 0xF0 this is the destination address; otherwise it is the PGN group extension.
-uint8_t Message2000::getPDUSpecific() const noexcept { return canId_[2]; }
+uint8_t Message2000::getPDUSpecific() const noexcept { return getCanId()[2]; }
 
 // Source Address is the full canId[3] byte.
-uint8_t Message2000::getSourceAddress() const noexcept { return canId_[3]; }
+uint8_t Message2000::getSourceAddress() const noexcept { return getCanId()[3]; }
 
 // Destination address: only meaningful for PDU1 messages (PF < 0xF0).
 // For PDU2 messages the destination is always global (255).
@@ -294,7 +294,7 @@ uint8_t Message2000::getDestinationAddress() const noexcept {
 // ---------------------------------------------------------------------------
 
 uint32_t Message2000::getPgn() const noexcept {
-    return extractPgnFromCanId(canId_);
+    return extractPgnFromCanId(getCanId());
 }
 
 // ---------------------------------------------------------------------------
@@ -310,7 +310,7 @@ const std::vector<uint8_t>& Message2000::getCanFrame() const noexcept {
 }
 
 uint8_t Message2000::getCanFrameLength() const noexcept {
-    return static_cast<uint8_t>(canFrame_.size());
+    return static_cast<uint8_t>(getCanFrame().size());
 }
 
 // ---------------------------------------------------------------------------
@@ -324,10 +324,10 @@ std::string Message2000::getStringContent(bool verbose) const noexcept {
         oss << toString(true) << "\n";
     } else {
         oss << toString(false) << "Data=";
-        for (size_t i = 0; i < canFrame_.size(); ++i) {
+        for (size_t i = 0; i < getCanFrame().size(); ++i) {
             if (i > 0) oss << " ";
             oss << std::hex << std::setfill('0') << std::setw(2)
-                << static_cast<int>(canFrame_[i]);
+                << static_cast<int>(getCanFrame()[i]);
         }
         oss << std::dec;
     }
@@ -360,10 +360,10 @@ std::string Message2000::toString(bool verbose) const noexcept {
             << " (0x" << std::hex << pgn << std::dec << ")\n";
         oss << "Frame Len:   " << static_cast<int>(getCanFrameLength()) << " bytes\n";
         oss << "Frame Data:  ";
-        for (size_t i = 0; i < canFrame_.size(); ++i) {
+        for (size_t i = 0; i < getCanFrame().size(); ++i) {
             if (i > 0) oss << " ";
             oss << std::hex << std::setfill('0') << std::setw(2)
-                << static_cast<int>(canFrame_[i]);
+                << static_cast<int>(getCanFrame()[i]);
         }
         oss << std::dec;
     } else {
@@ -381,13 +381,13 @@ std::string Message2000::serialize() const {
     std::ostringstream oss;
     oss << std::hex << std::setfill('0');
 
-    for (const auto byte : canId_) {
+    for (const auto byte : getCanId()) {
         oss << std::setw(2) << static_cast<int>(byte);
     }
 
     oss << ":";
 
-    for (const auto byte : canFrame_) {
+    for (const auto byte : getCanFrame()) {
         oss << std::setw(2) << static_cast<int>(byte);
     }
 
@@ -399,16 +399,16 @@ std::string Message2000::serialize() const {
 // ---------------------------------------------------------------------------
 
 bool Message2000::operator==(const Message2000& other) const noexcept {
-    return type_ == other.type_ &&
-           canId_ == other.canId_ &&
-           canFrame_ == other.canFrame_;
+    return getType() == other.getType() &&
+           getCanId() == other.getCanId() &&
+           getCanFrame() == other.getCanFrame();
 }
 
 bool Message2000::validate() const {
     if (!isValidPgn(getPgn())) {
         return false;
     }
-    if (canFrame_.size() > 223) {
+    if (getCanFrame().size() > 223) {
         return false;
     }
     return true;
