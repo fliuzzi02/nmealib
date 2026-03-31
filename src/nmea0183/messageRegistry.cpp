@@ -1,14 +1,17 @@
 #include "messageRegistry.hpp"
 #include "nmealib/nmea0183/apb.h"
 #include "nmealib/nmea0183/dbt.h"
+#include "nmealib/nmea0183/dpt.h"
 #include "nmealib/nmea0183/gga.h"
 #include "nmealib/nmea0183/gll.h"
 #include "nmealib/nmea0183/gsa.h"
 #include "nmealib/nmea0183/gsv.h"
+#include "nmealib/nmea0183/hdg.h"
 #include "nmealib/nmea0183/hdm.h"
 #include "nmealib/nmea0183/mtw.h"
 #include "nmealib/nmea0183/mwv.h"
 #include "nmealib/nmea0183/rmb.h"
+#include "nmealib/nmea0183/rma.h"
 #include "nmealib/nmea0183/rmc.h"
 #include "nmealib/nmea0183/vhw.h"
 #include "nmealib/nmea0183/vtg.h"
@@ -32,6 +35,8 @@ std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentence
         return APB::create(std::move(baseMessage));
     } else if (sentenceType == "DBT") {
         return DBT::create(std::move(baseMessage));
+    } else if (sentenceType == "DPT") {
+        return DPT::create(std::move(baseMessage));
     } else if (sentenceType == "GGA") {
         return GGA::create(std::move(baseMessage));
     } else if (sentenceType == "GLL") {
@@ -40,6 +45,8 @@ std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentence
         return GSA::create(std::move(baseMessage));
     } else if (sentenceType == "GSV") {
         return GSV::create(std::move(baseMessage));
+    } else if (sentenceType == "HDG") {
+        return HDG::create(std::move(baseMessage));
     } else if (sentenceType == "HDM") {
         return HDM::create(std::move(baseMessage));
     } else if (sentenceType == "MTW") {
@@ -48,6 +55,8 @@ std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentence
         return MWV::create(std::move(baseMessage));
     } else if (sentenceType == "RMB") {
         return RMB::create(std::move(baseMessage));
+    } else if (sentenceType == "RMA") {
+        return RMA::create(std::move(baseMessage));
     } else if (sentenceType == "RMC") {
         return RMC::create(std::move(baseMessage));
     } else if (sentenceType == "VHW") {

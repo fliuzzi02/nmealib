@@ -2,14 +2,17 @@ add_executable(nmea0183_tests
     test_nmea0183.cpp
     test_APB.cpp
     test_DBT.cpp
+    test_DPT.cpp
     test_GGA.cpp
     test_GLL.cpp
     test_GSA.cpp
     test_GSV.cpp
+    test_HDG.cpp
     test_HDM.cpp
     test_MTW.cpp
     test_MWV.cpp
     test_RMB.cpp
+    test_RMA.cpp
     test_RMC.cpp
     test_VHW.cpp
     test_VTG.cpp
