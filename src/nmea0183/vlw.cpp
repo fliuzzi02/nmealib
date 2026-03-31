@@ -47,13 +47,13 @@ std::unique_ptr<VLW> VLW::create(std::unique_ptr<Message0183> baseMessage) {
     char totalWaterDistanceUnit = fields[1].empty() ? '\0' : fields[1][0];
     char waterDistanceSinceResetUnit = fields[3].empty() ? '\0' : fields[3][0];
 
-    bool hasGroundDistanceData = fields.size() == 8;
+    bool hasGroundDistanceFields = fields.size() == 8;
     double totalGroundDistanceNm = 0.0;
     char totalGroundDistanceUnit = '\0';
     double groundDistanceSinceResetNm = 0.0;
     char groundDistanceSinceResetUnit = '\0';
 
-    if (hasGroundDistanceData) {
+    if (hasGroundDistanceFields) {
         if (!detail::parseOptionalDouble(fields[4], totalGroundDistanceNm) ||
             !detail::parseOptionalDouble(fields[6], groundDistanceSinceResetNm)) {
             NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing VLW ground-distance fields"));
@@ -68,7 +68,7 @@ std::unique_ptr<VLW> VLW::create(std::unique_ptr<Message0183> baseMessage) {
                                         totalWaterDistanceUnit,
                                         waterDistanceSinceResetNm,
                                         waterDistanceSinceResetUnit,
-                                        hasGroundDistanceData,
+                                        hasGroundDistanceFields,
                                         totalGroundDistanceNm,
                                         totalGroundDistanceUnit,
                                         groundDistanceSinceResetNm,
@@ -151,14 +151,14 @@ std::string VLW::composeRaw(const std::string& talkerId,
                             double waterDistanceSinceResetNm,
                             std::optional<double> totalGroundDistanceNm,
                             std::optional<double> groundDistanceSinceResetNm) {
-    const bool hasGroundDistanceData = totalGroundDistanceNm.has_value() && groundDistanceSinceResetNm.has_value();
+    const bool hasGroundDistanceFields = totalGroundDistanceNm.has_value() && groundDistanceSinceResetNm.has_value();
 
     std::ostringstream payloadStream;
     payloadStream << talkerId << "VLW,";
     payloadStream << std::fixed << std::setprecision(1) << totalWaterDistanceNm << ",N,";
     payloadStream << std::fixed << std::setprecision(1) << waterDistanceSinceResetNm << ",N";
 
-    if (hasGroundDistanceData) {
+    if (hasGroundDistanceFields) {
         payloadStream << ",";
         payloadStream << std::fixed << std::setprecision(1) << totalGroundDistanceNm.value() << ",N,";
         payloadStream << std::fixed << std::setprecision(1) << groundDistanceSinceResetNm.value() << ",N";
