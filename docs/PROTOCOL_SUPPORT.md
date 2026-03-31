@@ -6,17 +6,26 @@ This page tracks message/PGN support and implementation details.
 
 | Message | Implemented | Tested| Notes |
 |---|---|---|---|
+| APB | ✅ Yes | ✅ Yes | Autopilot Sentence "B" |
 | [DBT](#dbt--depth-below-transducer) | ✅ Yes | ✅ Yes | Depth Below Transducer |
+| DPT | ✅ Yes | ✅ Yes | Depth of Water |
 | [GGA](#gga--global-positioning-system-fix-data) | ✅ Yes | ✅ Yes | Global Positioning System Fix Data |
 | [GLL](#gll--geographic-position---latitudelongitude) | ✅ Yes | ✅ Yes | Geographic Position |
 | [GSA](#gsa--gps-dop-and-active-satellites) | ✅ Yes | ✅ Yes | GPS DOP and Active Satellites |
+| GSV | ✅ Yes | ✅ Yes | GPS Satellites in View |
 | [HDG](#hdg--heading-deviation--variation) | ✅ Yes | ✅ Yes | Heading, Deviation and Variation |
+| HDM | ✅ Yes | ✅ Yes | Heading, Magnetic |
 | [MTW](#mtw--mean-temperature-of-water) | ✅ Yes | ✅ Yes | Mean Temperature of Water |
 | [MWV](#mwv--wind-speed-and-angle) | ✅ Yes | ✅ Yes | Wind Speed and Angle |
+| RMA | ✅ Yes | ✅ Yes | Recommended Minimum Specific Loran-C Data |
+| RMB | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Information |
 | [RMC](#rmc--recommended-minimum-navigation-information) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Data |
 | [VHW](#vhw--water-speed-and-heading) | ✅ Yes | ✅ Yes | Water Speed and Heading |
+| VLW | ✅ Yes | ✅ Yes | Distance Traveled Through Water |
 | [VTG](#vtg--track-made-good-and-ground-speed) | ✅ Yes | ✅ Yes | Course Over Ground and Ground Speed |
 | [VWR](#vwr--relative-wind-speed-and-angle) | ✅ Yes | ✅ Yes | Relative Wind Speed and Angle |
+| XDR | ✅ Yes | ✅ Yes | Transducer Measurements |
+| XTE | ✅ Yes | ✅ Yes | Cross-Track Error, Measured |
 | [ZDA](#zda--time--date-utc-day-month-year-local-time-zone) | ✅ Yes | ✅ Yes | Time and Date |
 
 ## NMEA 2000
