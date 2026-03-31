@@ -141,7 +141,8 @@ TEST(GSV, SerializeRoundTripFromFields)
     EXPECT_EQ(satellite->snr.value(), 40u);
 
     const std::string wire = source.serialize();
-    EXPECT_NE(wire.find("$GPGSV,1,1,1,10,45,123,40,6"), std::string::npos);
+    EXPECT_EQ(wire.rfind("$GPGSV,1,1,1,10,45,123,40,6", 0), 0u);
+    EXPECT_EQ(wire.substr(wire.size() - 2), "\r\n");
 }
 
 TEST(GSV, ClonePreservesGsvContent)

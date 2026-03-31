@@ -10,6 +10,10 @@ namespace nmealib {
 namespace nmea0183 {
 
 std::unique_ptr<GSV> GSV::create(std::unique_ptr<Message0183> baseMessage) {
+    constexpr std::size_t GSV_HEADER_FIELDS = 3U;
+    constexpr std::size_t GSV_FIELDS_PER_SATELLITE = 4U;
+    constexpr std::size_t GSV_OPTIONAL_SIGNAL_ID_REMAINDER = 1U;
+
     std::string context = "GSV::create";
     if (baseMessage->getSentenceType() != "GSV") {
         NMEALIB_RETURN_ERROR(NotGSVException(context, "Expected sentence type 'GSV', got " + baseMessage->getSentenceType()));
@@ -32,7 +36,7 @@ std::unique_ptr<GSV> GSV::create(std::unique_ptr<Message0183> baseMessage) {
         fields.erase(fields.begin());
     }
 
-    if (fields.size() < 3) {
+    if (fields.size() < GSV_HEADER_FIELDS) {
         NMEALIB_RETURN_ERROR(NotGSVException(context, "Invalid fields in GSV payload: expected at least 3, got " + std::to_string(fields.size()) + ". Payload: " + payload));
     }
 
@@ -45,16 +49,16 @@ std::unique_ptr<GSV> GSV::create(std::unique_ptr<Message0183> baseMessage) {
         NMEALIB_RETURN_ERROR(NmeaException(context, "Error parsing GSV fields"));
     }
 
-    const std::size_t remainingAfterHeader = fields.size() - 3U;
-    const std::size_t remainder = remainingAfterHeader % 4U;
+    const std::size_t remainingAfterHeader = fields.size() - GSV_HEADER_FIELDS;
+    const std::size_t remainder = remainingAfterHeader % GSV_FIELDS_PER_SATELLITE;
 
-    if (remainder != 0U && remainder != 1U) {
+    if (remainder != 0U && remainder != GSV_OPTIONAL_SIGNAL_ID_REMAINDER) {
         NMEALIB_RETURN_ERROR(NotGSVException(context, "Invalid fields in GSV payload: expected satellite quadruplets with optional trailing signal ID. Payload: " + payload));
     }
 
     std::size_t satelliteFieldEnd = fields.size();
     std::optional<unsigned int> signalId = std::nullopt;
-    if (remainder == 1U) {
+    if (remainder == GSV_OPTIONAL_SIGNAL_ID_REMAINDER) {
         satelliteFieldEnd = fields.size() - 1U;
         if (!fields.back().empty()) {
             unsigned int parsedSignalId = 0U;
@@ -66,7 +70,7 @@ std::unique_ptr<GSV> GSV::create(std::unique_ptr<Message0183> baseMessage) {
     }
 
     std::vector<SatelliteInfo> satellites;
-    for (std::size_t index = 3; index < satelliteFieldEnd; index += 4) {
+    for (std::size_t index = GSV_HEADER_FIELDS; index < satelliteFieldEnd; index += GSV_FIELDS_PER_SATELLITE) {
         SatelliteInfo satellite;
 
         if (!detail::parseOptionalUnsigned(fields[index], satellite.satelliteId)) {
