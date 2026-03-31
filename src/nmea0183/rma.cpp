@@ -212,7 +212,18 @@ double RMA::getMagneticVariation() const noexcept { return magneticVariation_; }
 char RMA::getVariationDirection() const noexcept { return variationDirection_; }
 
 bool RMA::operator==(const RMA& other) const noexcept {
-    return Message0183::operator==(other);
+    return Message0183::operator==(other) &&
+           status_ == other.status_ &&
+           latitude_ == other.latitude_ &&
+           latitudeDirection_ == other.latitudeDirection_ &&
+           longitude_ == other.longitude_ &&
+           longitudeDirection_ == other.longitudeDirection_ &&
+           timeDifferenceA_ == other.timeDifferenceA_ &&
+           timeDifferenceB_ == other.timeDifferenceB_ &&
+           speedOverGround_ == other.speedOverGround_ &&
+           trackMadeGood_ == other.trackMadeGood_ &&
+           magneticVariation_ == other.magneticVariation_ &&
+           variationDirection_ == other.variationDirection_;
 }
 
 } // namespace nmea0183

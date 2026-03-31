@@ -108,6 +108,17 @@ TEST(RMA, FactoryDoesNotPromoteNonRmaSentence)
     EXPECT_EQ(rma, nullptr);
 }
 
+TEST(RMA, FactoryDoesNotPromoteRmaSentenceToOtherTypes)
+{
+    auto base = Nmea0183Factory::create(RMA_SENTENCE);
+    ASSERT_NE(base, nullptr);
+
+    auto rmc = dynamic_cast<RMC*>(base.get());
+    auto rmb = dynamic_cast<RMB*>(base.get());
+    EXPECT_EQ(rmc, nullptr);
+    EXPECT_EQ(rmb, nullptr);
+}
+
 TEST(RMA, FactoryThrowsOnMalformedRmaSentence)
 {
     EXPECT_THROW(Nmea0183Factory::create(MALFORMED_RMA_SENTENCE), NotRMAException);
