@@ -10,6 +10,7 @@ This page tracks message/PGN support and implementation details.
 | [GGA](#gga--global-positioning-system-fix-data) | ✅ Yes | ✅ Yes | Global Positioning System Fix Data |
 | [GLL](#gll--geographic-position---latitudelongitude) | ✅ Yes | ✅ Yes | Geographic Position |
 | [GSA](#gsa--gps-dop-and-active-satellites) | ✅ Yes | ✅ Yes | GPS DOP and Active Satellites |
+| [HDG](#hdg--heading-deviation--variation) | ✅ Yes | ✅ Yes | Heading, Deviation and Variation |
 | [MTW](#mtw--mean-temperature-of-water) | ✅ Yes | ✅ Yes | Mean Temperature of Water |
 | [MWV](#mwv--wind-speed-and-angle) | ✅ Yes | ✅ Yes | Wind Speed and Angle |
 | [RMC](#rmc--recommended-minimum-navigation-information) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Data |
@@ -257,6 +258,27 @@ $--VHW,x.x,T,x.x,M,x.x,N,x.x,K*hh<CR><LF>
 9. **Checksum** — `*hh`
 
 > [GLOBALSAT] describes a different format in which the first three fields are water-temperature measurements. It’s not clear which is correct.
+
+### HDG — Heading, Deviation & Variation
+
+Provides heading from a magnetic sensor plus magnetic deviation and variation.
+
+**Sentence format**
+
+```text
+        1   2   3 4   5 6
+        |   |   | |   | |
+$--HDG,x.x,x.x,a,x.x,a*hh<CR><LF>
+```
+
+#### Field definitions
+
+1. **Magnetic sensor heading** — degrees  
+2. **Magnetic deviation** — degrees  
+3. **Deviation direction** — `E` = Easterly, `W` = Westerly  
+4. **Magnetic variation** — degrees  
+5. **Variation direction** — `E` = Easterly, `W` = Westerly  
+6. **Checksum** — `*hh`
 
 ### DBT — Depth Below Transducer
  
