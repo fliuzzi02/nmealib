@@ -10,6 +10,7 @@
 #include "nmealib/nmea0183/rmb.h"
 #include "nmealib/nmea0183/rmc.h"
 #include "nmealib/nmea0183/vhw.h"
+#include "nmealib/nmea0183/vlw.h"
 #include "nmealib/nmea0183/vtg.h"
 #include "nmealib/nmea0183/vwr.h"
 #include "nmealib/nmea0183/xdr.h"
@@ -49,6 +50,8 @@ std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentence
         return RMC::create(std::move(baseMessage));
     } else if (sentenceType == "VHW") {
         return VHW::create(std::move(baseMessage));
+    } else if (sentenceType == "VLW") {
+        return VLW::create(std::move(baseMessage));
     } else if (sentenceType == "VTG") {
         return VTG::create(std::move(baseMessage));
     } else if (sentenceType == "VWR") {
