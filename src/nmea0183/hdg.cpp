@@ -96,15 +96,17 @@ std::string HDG::getStringContent(bool verbose) const noexcept {
     std::ostringstream ss;
     ss << this->toString(verbose);
     ss << std::fixed << std::setprecision(1);
+    const char deviationDirection = (deviationDirection_ == '\0') ? '-' : deviationDirection_;
+    const char variationDirection = (variationDirection_ == '\0') ? '-' : variationDirection_;
 
     if (verbose) {
         ss << "\tMagnetic Heading: " << magneticHeading_ << "\n";
-        ss << "\tMagnetic Deviation: " << magneticDeviation_ << " " << deviationDirection_ << "\n";
-        ss << "\tMagnetic Variation: " << magneticVariation_ << " " << variationDirection_ << "\n";
+        ss << "\tMagnetic Deviation: " << magneticDeviation_ << " " << deviationDirection << "\n";
+        ss << "\tMagnetic Variation: " << magneticVariation_ << " " << variationDirection << "\n";
     } else {
         ss << "HeadingM=" << magneticHeading_
-           << ", Dev=" << magneticDeviation_ << deviationDirection_
-           << ", Var=" << magneticVariation_ << variationDirection_;
+           << ", Dev=" << magneticDeviation_ << deviationDirection
+           << ", Var=" << magneticVariation_ << variationDirection;
     }
 
     return ss.str();
