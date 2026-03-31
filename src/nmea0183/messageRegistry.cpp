@@ -5,6 +5,7 @@
 #include "nmealib/nmea0183/gga.h"
 #include "nmealib/nmea0183/gll.h"
 #include "nmealib/nmea0183/gsa.h"
+#include "nmealib/nmea0183/hdg.h"
 #include "nmealib/nmea0183/hdm.h"
 #include "nmealib/nmea0183/mtw.h"
 #include "nmealib/nmea0183/mwv.h"
@@ -40,6 +41,8 @@ std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentence
         return GLL::create(std::move(baseMessage));
     } else if (sentenceType == "GSA") {
         return GSA::create(std::move(baseMessage));
+    } else if (sentenceType == "HDG") {
+        return HDG::create(std::move(baseMessage));
     } else if (sentenceType == "HDM") {
         return HDM::create(std::move(baseMessage));
     } else if (sentenceType == "MTW") {

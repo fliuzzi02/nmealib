@@ -13,6 +13,7 @@ add_library(nmealib0183 STATIC
     gga.cpp
     gll.cpp
     gsa.cpp
+    hdg.cpp
     hdm.cpp
     mwv.cpp
     mtw.cpp
@@ -39,6 +40,7 @@ set(NMEALIB_NMEA0183_SOURCES
     nmea0183/gga.cpp
     nmea0183/gll.cpp
     nmea0183/gsa.cpp
+    nmea0183/hdg.cpp
     nmea0183/hdm.cpp
     nmea0183/mwv.cpp
     nmea0183/mtw.cpp

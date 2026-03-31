@@ -161,6 +161,7 @@ nmealib/
 | [GGA](docs/PROTOCOL_SUPPORT.md#gga--global-positioning-system-fix-data) | ✅ Yes | ✅ Yes | Global Positioning System Fix Data |
 | [GLL](docs/PROTOCOL_SUPPORT.md#gll--geographic-position---latitudelongitude) | ✅ Yes | ✅ Yes | Geographic Position |
 | [GSA](docs/PROTOCOL_SUPPORT.md#gsa--gps-dop-and-active-satellites) | ✅ Yes | ✅ Yes | GPS DOP and Active Satellites |
+| [HDG](docs/PROTOCOL_SUPPORT.md#hdg--heading-deviation--variation) | ✅ Yes | ✅ Yes | Heading, Deviation and Variation |
 | [MTW](docs/PROTOCOL_SUPPORT.md#mtw--mean-temperature-of-water) | ✅ Yes | ✅ Yes | Mean Temperature of Water |
 | [MWV](docs/PROTOCOL_SUPPORT.md#mwv--wind-speed-and-angle) | ✅ Yes | ✅ Yes | Wind Speed and Angle |
 | [RMC](docs/PROTOCOL_SUPPORT.md#rmc--recommended-minimum-navigation-information) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Data |
