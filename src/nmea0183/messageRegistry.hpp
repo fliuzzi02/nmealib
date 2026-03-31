@@ -50,6 +50,7 @@ private:
     friend class GGA;
     friend class GLL;
     friend class GSA;
+    friend class GSV;
     friend class HDM;
     friend class MTW;
     friend class MWV;
