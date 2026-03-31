@@ -13,6 +13,7 @@ static const std::string INCOMPLETE_RMC_SENTENCE = "$GPRMC,123519,A,,N,01131.000
 static const std::string NOT_RMC_SENTENCE = "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47\r\n";
 static const std::string MALFORMED_RMC_SENTENCE = "$GPRMC,123519,A\r\n";
 static const std::string HIGH_PRECISION_RMC_SENTENCE_NO_CHECKSUM = "$GPRMC,123519,A,4807.0381234,N,01131.0009876,E,022.4,084.4,230394,003.1,W,A,V\r\n";
+static const std::string RMC_SENTENCE_WITHOUT_MODE_AND_NAV = "$GPRMC,094400,A,5800.613,N,01145.796,E,002.7,022.6,200715,000.0,E\r\n";
 
 // Test RMC creation through parent class factory method
 TEST(RMC, CreateFromMessage0183Factory)
@@ -184,6 +185,28 @@ TEST(RMC, ConvertsCoordinatesWithHighPrecision)
 
     EXPECT_NEAR(rmcMsg->getLatitude(), expectedLatitude, 1e-12);
     EXPECT_NEAR(rmcMsg->getLongitude(), expectedLongitude, 1e-12);
+}
+
+TEST(RMC, AcceptsSentenceWithoutModeIndicatorAndNavigationStatus)
+{
+    auto msg = Nmea0183Factory::create(RMC_SENTENCE_WITHOUT_MODE_AND_NAV);
+    ASSERT_NE(msg, nullptr);
+    auto rmcMsg = dynamic_cast<RMC*>(msg.get());
+    ASSERT_NE(rmcMsg, nullptr);
+
+    EXPECT_EQ(rmcMsg->getUtcFix(), 94400u);
+    EXPECT_EQ(rmcMsg->getStatus(), 'A');
+    EXPECT_NEAR(rmcMsg->getLatitude(), 58.0102166667, 1e-9);
+    EXPECT_EQ(rmcMsg->getLatitudeDirection(), 'N');
+    EXPECT_NEAR(rmcMsg->getLongitude(), 11.7632666667, 1e-9);
+    EXPECT_EQ(rmcMsg->getLongitudeDirection(), 'E');
+    EXPECT_DOUBLE_EQ(rmcMsg->getSpeedOverGround(), 2.7);
+    EXPECT_DOUBLE_EQ(rmcMsg->getCourseOverGround(), 22.6);
+    EXPECT_EQ(rmcMsg->getDate(), 200715u);
+    EXPECT_DOUBLE_EQ(rmcMsg->getMagneticVariation(), 0.0);
+    EXPECT_EQ(rmcMsg->getMagneticVariationDirection(), 'E');
+    EXPECT_EQ(rmcMsg->getModeIndicator(), '\0');
+    EXPECT_EQ(rmcMsg->getNavigationStatus(), '\0');
 }
 
 // Additional tests for full coverage

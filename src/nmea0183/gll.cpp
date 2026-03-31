@@ -36,8 +36,8 @@ std::unique_ptr<GLL> GLL::create(std::unique_ptr<Message0183> baseMessage) {
         fields.erase(fields.begin());
     }
 
-    if (fields.size() != 7) {
-        NMEALIB_RETURN_ERROR(NotGLLException(context, "Insufficient fields in GLL payload: expected 7, got " + std::to_string(fields.size()) + ". Payload: " + payload));
+    if (fields.size() != 6 && fields.size() != 7) {
+        NMEALIB_RETURN_ERROR(NotGLLException(context, "Insufficient fields in GLL payload: expected 6 or 7, got " + std::to_string(fields.size()) + ". Payload: " + payload));
     }
 
     double latitude = 0.0;
@@ -52,7 +52,7 @@ std::unique_ptr<GLL> GLL::create(std::unique_ptr<Message0183> baseMessage) {
     char latitudeDirection = fields[1].empty() ? '\0' : fields[1][0];
     char longitudeDirection = fields[3].empty() ? '\0' : fields[3][0];
     char status = fields[5].empty() ? '\0' : fields[5][0];
-    char modeIndicator = fields[6].empty() ? '\0' : fields[6][0];
+    char modeIndicator = (fields.size() > 6 && !fields[6].empty()) ? fields[6][0] : '\0';
 
     return std::unique_ptr<GLL>(new GLL(std::move(*baseMessage),
                                         latitude,

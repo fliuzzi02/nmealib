@@ -10,6 +10,7 @@ using namespace nmealib::nmea0183;
 static const std::string RMA_SENTENCE = "$GPRMA,A,4917.24,N,12309.57,W,0.0,0.0,0.5,54.7,20.3,E*67\r\n";
 static const std::string RMA_SENTENCE_NO_CHECKSUM = "$GPRMA,A,4917.24,N,12309.57,W,0.0,0.0,0.5,54.7,20.3,E\r\n";
 static const std::string INCOMPLETE_RMA_SENTENCE = "$GPRMA,V,,S,,E,,,,,,W\r\n";
+static const std::string RMA_SENTENCE_WITH_TRAILING_MODE = "$IIRMA,A,5800.617,N,01145.801,E,,,2.3,22.5,0.0,E,A\r\n";
 static const std::string NOT_RMA_SENTENCE = "$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W,A,V*6A\r\n";
 static const std::string MALFORMED_RMA_SENTENCE = "$GPRMA,A,4917.24,N\r\n";
 
@@ -122,4 +123,22 @@ TEST(RMA, FactoryDoesNotPromoteRmaSentenceToOtherTypes)
 TEST(RMA, FactoryThrowsOnMalformedRmaSentence)
 {
     EXPECT_THROW(Nmea0183Factory::create(MALFORMED_RMA_SENTENCE), NotRMAException);
+}
+
+TEST(RMA, AcceptsSentenceWithTrailingOptionalField)
+{
+    auto msg = Nmea0183Factory::create(RMA_SENTENCE_WITH_TRAILING_MODE);
+    ASSERT_NE(msg, nullptr);
+
+    auto rmaMsg = dynamic_cast<RMA*>(msg.get());
+    ASSERT_NE(rmaMsg, nullptr);
+    EXPECT_EQ(rmaMsg->getStatus(), 'A');
+    EXPECT_NEAR(rmaMsg->getLatitude(), 58.0102833333, 1e-9);
+    EXPECT_EQ(rmaMsg->getLatitudeDirection(), 'N');
+    EXPECT_NEAR(rmaMsg->getLongitude(), 11.76335, 1e-9);
+    EXPECT_EQ(rmaMsg->getLongitudeDirection(), 'E');
+    EXPECT_DOUBLE_EQ(rmaMsg->getSpeedOverGround(), 2.3);
+    EXPECT_DOUBLE_EQ(rmaMsg->getTrackMadeGood(), 22.5);
+    EXPECT_DOUBLE_EQ(rmaMsg->getMagneticVariation(), 0.0);
+    EXPECT_EQ(rmaMsg->getVariationDirection(), 'E');
 }

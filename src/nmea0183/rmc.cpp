@@ -34,8 +34,8 @@ std::unique_ptr<RMC> RMC::create(std::unique_ptr<Message0183> baseMessage) {
     }
 
     size_t messageSize = fields.size();
-    if (messageSize != 12 && messageSize != 13) {
-        NMEALIB_RETURN_ERROR(NotRMCException(context, "Insufficient fields in RMC payload: expected 12 or 13, got " + std::to_string(fields.size()) + ". Payload: " + payload));
+    if (messageSize != 11 && messageSize != 12 && messageSize != 13) {
+        NMEALIB_RETURN_ERROR(NotRMCException(context, "Insufficient fields in RMC payload: expected 11, 12 or 13, got " + std::to_string(fields.size()) + ". Payload: " + payload));
     }
 
     unsigned int utcFix = 0U;
@@ -60,12 +60,14 @@ std::unique_ptr<RMC> RMC::create(std::unique_ptr<Message0183> baseMessage) {
     char lonDirection = fields[5].empty() ? '\0' : fields[5][0];
     char magneticVariationDirection = fields[10].empty() ? '\0' : fields[10][0];
     char modeIndicator = '\0';
-    char navigationStatus = (messageSize == 12)
-                                ? (fields[11].empty() ? '\0' : fields[11][0])
-                                : (fields[12].empty() ? '\0' : fields[12][0]);
+    char navigationStatus = '\0';
 
-    if (messageSize != 12) {
+    if (messageSize >= 12) {
         modeIndicator = fields[11].empty() ? '\0' : fields[11][0];
+    }
+
+    if (messageSize == 13) {
+        navigationStatus = fields[12].empty() ? '\0' : fields[12][0];
     }
 
     return std::unique_ptr<RMC>(new RMC(std::move(*baseMessage), utcFix, status, latitude, latDirection, longitude, lonDirection, speedOverGround, courseOverGround, date, magneticVariation, magneticVariationDirection, modeIndicator, navigationStatus));

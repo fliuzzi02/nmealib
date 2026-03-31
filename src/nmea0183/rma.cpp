@@ -30,8 +30,8 @@ std::unique_ptr<RMA> RMA::create(std::unique_ptr<Message0183> baseMessage) {
         fields.erase(fields.begin());
     }
 
-    if (fields.size() != 11) {
-        NMEALIB_RETURN_ERROR(NotRMAException(context, "Invalid fields in RMA payload: expected 11, got " + std::to_string(fields.size()) + ". Payload: " + payload));
+    if (fields.size() != 11 && fields.size() != 12) {
+        NMEALIB_RETURN_ERROR(NotRMAException(context, "Invalid fields in RMA payload: expected 11 or 12, got " + std::to_string(fields.size()) + ". Payload: " + payload));
     }
 
     double latitude = 0.0;
