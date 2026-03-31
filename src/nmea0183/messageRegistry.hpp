@@ -59,6 +59,7 @@ private:
     friend class RMA;
     friend class RMC;
     friend class VHW;
+    friend class VLW;
     friend class VTG;
     friend class VWR;
     friend class XDR;

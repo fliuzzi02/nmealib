@@ -42,6 +42,7 @@
 #include "nmealib/nmea0183/rmb.h"
 #include "nmealib/nmea0183/rma.h"
 #include "nmealib/nmea0183/vhw.h"
+#include "nmealib/nmea0183/vlw.h"
 #include "nmealib/nmea0183/vtg.h"
 #include "nmealib/nmea0183/vwr.h"
 #include "nmealib/nmea0183/xdr.h"

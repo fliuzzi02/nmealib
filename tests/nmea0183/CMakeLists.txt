@@ -15,6 +15,7 @@ add_executable(nmea0183_tests
     test_RMA.cpp
     test_RMC.cpp
     test_VHW.cpp
+    test_VLW.cpp
     test_VTG.cpp
     test_VWR.cpp
     test_XDR.cpp
