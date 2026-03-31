@@ -105,7 +105,16 @@ TEST(DPT, FactoryThrowsOnMalformedDptSentence)
 TEST(DPT, GetStringContent)
 {
     DPT dpt("IN", 2.3, 0.0, 100.0);
-    std::string expectedVerbose = "--------------------------------\nProtocol: NMEA0183\nTalker: IN\nSentence Type: DPT\nChecksum: None\nFields:\n\tWater depth: 2.30 m\n\tTransducer offset: 0.00 m\n\tMax range scale: 100.00 m\n";
+    std::string expectedVerbose = R"(--------------------------------
+Protocol: NMEA0183
+Talker: IN
+Sentence Type: DPT
+Checksum: None
+Fields:
+	Water depth: 2.30 m
+	Transducer offset: 0.00 m
+	Max range scale: 100.00 m
+)";
     std::string expectedOneLiner = "[OK] NMEA0183 IN DPT: Depth=2.30m, Offset=0.00m, MaxRange=100.00m";
     std::string actualVerbose = dpt.getStringContent(true);
     std::string actualOneLiner = dpt.getStringContent(false);

@@ -121,7 +121,10 @@ double DPT::getMaxRangeScale() const noexcept {
 }
 
 bool DPT::operator==(const DPT& other) const noexcept {
-    return Message0183::operator==(other);
+    return Message0183::operator==(other) &&
+           waterDepthMeters_ == other.waterDepthMeters_ &&
+           transducerOffset_ == other.transducerOffset_ &&
+           maxRangeScale_ == other.maxRangeScale_;
 }
 
 } // namespace nmea0183
