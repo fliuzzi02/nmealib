@@ -53,6 +53,7 @@ private:
     friend class HDM;
     friend class MTW;
     friend class MWV;
+    friend class RMA;
     friend class RMC;
     friend class VHW;
     friend class VTG;
