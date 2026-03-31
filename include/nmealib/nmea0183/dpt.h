@@ -82,7 +82,7 @@ public:
     /**
      * @brief Compare two DPT messages for equality.
      *
-     * Equality delegates to Message0183::operator==.
+     * Equality checks both Message0183 base fields and DPT-specific fields.
      *
      * @param other The DPT message to compare with.
      * @return bool true if equal, false otherwise.
