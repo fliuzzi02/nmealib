@@ -135,19 +135,26 @@ Companion usage repository: [using-nmealib](https://github.com/fliuzzi02/using-n
 ```text
 nmealib/
 ├── .github/                  # CI workflow files
+├── app/                      # CLI entrypoint
+├── docs/                     # Documentation
+├── examples/                 # Usage examples (including PlatformIO)
 ├── include/
 │   ├── nmealib.h             # Main umbrella header
 │   └── nmealib/
-│       ├── nmeaExceptions.h  # Custom exception classes
+│       ├── nmeaException.h   # Custom exception class
 │       ├── message.h         # Base Message class and utilities
 │       ├── nmea0183.h        # Base NMEA 0183 class and utilities
 │       ├── nmea2000.h        # Base NMEA 2000 class and utilities
+│       ├── detail/           # Internal shared parsing/error helpers
 │       ├── nmea0183/         # NMEA 0183 message type headers
 │       └── nmea2000/         # NMEA 2000 message type headers
+├── scripts/                  # CI/dev utility scripts
 ├── src/                      # Library implementation and parsing logic
 ├── tests/                    # Unit tests
-├── scripts/                  # CI/dev utility scripts
-└── docs/                     # Documentation
+├── CMakeLists.txt            # Root CMake project configuration
+├── CMakePresets.json         # Preset build/test configurations
+├── README.md                 # This file
+└── library.json              # PlatformIO package manifest
 ```
 
 ---
@@ -155,28 +162,38 @@ nmealib/
 ## Supported Protocols
 
 ### NMEA 0183
-| Message | Implemented | Tested| Notes |
-|---|---|---|---|
-| [DBT](docs/PROTOCOL_SUPPORT.md#dbt--depth-below-transducer) | ✅ Yes | ✅ Yes | Depth Below Transducer |
-| [GGA](docs/PROTOCOL_SUPPORT.md#gga--global-positioning-system-fix-data) | ✅ Yes | ✅ Yes | Global Positioning System Fix Data |
-| [GLL](docs/PROTOCOL_SUPPORT.md#gll--geographic-position---latitudelongitude) | ✅ Yes | ✅ Yes | Geographic Position |
-| [GSA](docs/PROTOCOL_SUPPORT.md#gsa--gps-dop-and-active-satellites) | ✅ Yes | ✅ Yes | GPS DOP and Active Satellites |
-| [HDG](docs/PROTOCOL_SUPPORT.md#hdg--heading-deviation--variation) | ✅ Yes | ✅ Yes | Heading, Deviation and Variation |
-| [MTW](docs/PROTOCOL_SUPPORT.md#mtw--mean-temperature-of-water) | ✅ Yes | ✅ Yes | Mean Temperature of Water |
-| [MWV](docs/PROTOCOL_SUPPORT.md#mwv--wind-speed-and-angle) | ✅ Yes | ✅ Yes | Wind Speed and Angle |
-| [RMC](docs/PROTOCOL_SUPPORT.md#rmc--recommended-minimum-navigation-information) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Data |
-| [VHW](docs/PROTOCOL_SUPPORT.md#vhw--water-speed-and-heading) | ✅ Yes | ✅ Yes | Water Speed and Heading |
-| [VTG](docs/PROTOCOL_SUPPORT.md#vtg--track-made-good-and-ground-speed) | ✅ Yes | ✅ Yes | Course Over Ground and Ground Speed |
-| [VWR](docs/PROTOCOL_SUPPORT.md#vwr--relative-wind-speed-and-angle) | ✅ Yes | ✅ Yes | Relative Wind Speed and Angle |
-| [ZDA](docs/PROTOCOL_SUPPORT.md#zda--time--date-utc-day-month-year-local-time-zone) | ✅ Yes | ✅ Yes | Time and Date |
+| Message | Notes |
+|---|---|
+| [APB](docs/PROTOCOL_SUPPORT.md) | Autopilot Sentence "B" |
+| [DBT](docs/PROTOCOL_SUPPORT.md) | Depth Below Transducer |
+| [DPT](docs/PROTOCOL_SUPPORT.md) | Depth of Water |
+| [GGA](docs/PROTOCOL_SUPPORT.md) | Global Positioning System Fix Data |
+| [GLL](docs/PROTOCOL_SUPPORT.md) | Geographic Position |
+| [GSA](docs/PROTOCOL_SUPPORT.md) | GPS DOP and Active Satellites |
+| [GSV](docs/PROTOCOL_SUPPORT.md) | GPS Satellites in View |
+| [HDG](docs/PROTOCOL_SUPPORT.md) | Heading, Deviation and Variation |
+| [HDM](docs/PROTOCOL_SUPPORT.md) | Heading, Magnetic |
+| [MTW](docs/PROTOCOL_SUPPORT.md) | Mean Temperature of Water |
+| [MWV](docs/PROTOCOL_SUPPORT.md) | Wind Speed and Angle |
+| [RMA](docs/PROTOCOL_SUPPORT.md) | Recommended Minimum Specific Loran-C Data |
+| [RMB](docs/PROTOCOL_SUPPORT.md) | Recommended Minimum Navigation Information |
+| [RMC](docs/PROTOCOL_SUPPORT.md) | Recommended Minimum Navigation Data |
+| [VHW](docs/PROTOCOL_SUPPORT.md) | Water Speed and Heading |
+| [VLW](docs/PROTOCOL_SUPPORT.md) | Distance Traveled Through Water |
+| [VTG](docs/PROTOCOL_SUPPORT.md) | Course Over Ground and Ground Speed |
+| [VWR](docs/PROTOCOL_SUPPORT.md) | Relative Wind Speed and Angle |
+| [XDR](docs/PROTOCOL_SUPPORT.md) | Transducer Measurements |
+| [XTE](docs/PROTOCOL_SUPPORT.md) | Cross-Track Error, Measured |
+| [ZDA](docs/PROTOCOL_SUPPORT.md) | Time and Date |
 
 ### NMEA 2000
-| Message / Transport | Implemented | Tested | Notes |
-|---|---|---|---|
-| [Single-frame messages](docs/PROTOCOL_SUPPORT.md#nmea-2000-single-frame-messages) | ✅ Yes | ✅ yes | Standard one-frame CAN payloads |
-| [PGN 127250](docs/PROTOCOL_SUPPORT.md#nmea-2000) | ✅ Yes | ✅ Yes | Vessel Heading |
-| [PGN 128259](docs/PROTOCOL_SUPPORT.md#nmea-2000) | ✅ Yes | ✅ Yes | Speed, Water Referenced |
-| [PGN 130306](docs/PROTOCOL_SUPPORT.md#nmea-2000) | ✅ Yes | ✅ Yes | Wind Data |
+| Message / Transport | Notes |
+|---|---|
+| [Single-frame messages](docs/PROTOCOL_SUPPORT.md) | Standard one-frame CAN payloads |
+| [Fast-packet transport](docs/PROTOCOL_SUPPORT.md) | Multi-frame transport handling |
+| [PGN 127250](docs/PROTOCOL_SUPPORT.md) | Vessel Heading |
+| [PGN 128259](docs/PROTOCOL_SUPPORT.md) | Speed, Water Referenced |
+| [PGN 130306](docs/PROTOCOL_SUPPORT.md) | Wind Data |
 
 
 > Messages/PGNs not listed are currently considered **not implemented**.
