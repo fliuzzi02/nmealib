@@ -1,6 +1,7 @@
 #include "messageRegistry.hpp"
 #include "nmealib/nmea0183/apb.h"
 #include "nmealib/nmea0183/dbt.h"
+#include "nmealib/nmea0183/dpt.h"
 #include "nmealib/nmea0183/gga.h"
 #include "nmealib/nmea0183/gll.h"
 #include "nmealib/nmea0183/gsa.h"
@@ -31,6 +32,8 @@ std::unique_ptr<Message0183> MessageRegistry::create(const std::string& sentence
         return APB::create(std::move(baseMessage));
     } else if (sentenceType == "DBT") {
         return DBT::create(std::move(baseMessage));
+    } else if (sentenceType == "DPT") {
+        return DPT::create(std::move(baseMessage));
     } else if (sentenceType == "GGA") {
         return GGA::create(std::move(baseMessage));
     } else if (sentenceType == "GLL") {
