@@ -135,19 +135,26 @@ Companion usage repository: [using-nmealib](https://github.com/fliuzzi02/using-n
 ```text
 nmealib/
 ├── .github/                  # CI workflow files
+├── app/                      # CLI entrypoint
+├── docs/                     # Documentation
+├── examples/                 # Usage examples (including PlatformIO)
 ├── include/
 │   ├── nmealib.h             # Main umbrella header
 │   └── nmealib/
-│       ├── nmeaExceptions.h  # Custom exception classes
+│       ├── nmeaException.h   # Custom exception class
 │       ├── message.h         # Base Message class and utilities
 │       ├── nmea0183.h        # Base NMEA 0183 class and utilities
 │       ├── nmea2000.h        # Base NMEA 2000 class and utilities
+│       ├── detail/           # Internal shared parsing/error helpers
 │       ├── nmea0183/         # NMEA 0183 message type headers
 │       └── nmea2000/         # NMEA 2000 message type headers
+├── scripts/                  # CI/dev utility scripts
 ├── src/                      # Library implementation and parsing logic
 ├── tests/                    # Unit tests
-├── scripts/                  # CI/dev utility scripts
-└── docs/                     # Documentation
+├── CMakeLists.txt            # Root CMake project configuration
+├── CMakePresets.json         # Preset build/test configurations
+├── README.md                 # This file
+└── library.json              # PlatformIO package manifest
 ```
 
 ---
