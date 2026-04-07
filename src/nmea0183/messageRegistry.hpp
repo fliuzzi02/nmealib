@@ -47,14 +47,19 @@ private:
 
     // Forward declarations for friend declarations in message classes
     friend class DBT;
+    friend class DPT;
     friend class GGA;
     friend class GLL;
     friend class GSA;
+    friend class GSV;
+    friend class HDG;
     friend class HDM;
     friend class MTW;
     friend class MWV;
+    friend class RMA;
     friend class RMC;
     friend class VHW;
+    friend class VLW;
     friend class VTG;
     friend class VWR;
     friend class XDR;
