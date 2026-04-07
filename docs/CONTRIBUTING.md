@@ -10,12 +10,6 @@
 
 ## Submitting Changes
 
-### Creating a Branch
-
-### Making Changes
-
-### Creating a Pull Request
-
 ## Testing
 
 The project includes a suite of unit tests. To run the tests, you can use the CMake presets provided in the repository.
@@ -43,16 +37,25 @@ To evaluate code coverage, use the coverage preset:
 TODO: add coverage instructions
 ```
 
+## Uploading the library
+TODO: These steps should be automated by a CD pipeline, but here are the steps to upload the library to the registries.
 
-### Writing Tests
+### PlatformIO registry
 
-### Code Coverage
+After releasing a new version throught the CI pipeline (it will be tagged and have a proper version number), you can upload the library to the PlatformIO registry by running the following command:
 
-## Documentation
+```bash
+# Install platformio if you haven't already
+sudo apt-get update
+sudo apt install pipx -y
+pipx ensurepath
+pipx install platformio
 
-## Reporting Issues
+# Login to your PlatformIO account
+pio account login
 
-## Code Review Process
+# Upload the library to the PlatformIO registry
+pio package publish
+```
 
-## License
-
+### PyPI registry
