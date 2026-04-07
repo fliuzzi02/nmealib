@@ -32,7 +32,7 @@ TEST(PGN129026, GettersReturnCorrectValues) {
 
     EXPECT_EQ(pgn.getSequenceId(), 7U);
     EXPECT_EQ(pgn.getCogReference(), HalfByte::fromValue(1));
-    EXPECT_EQ(pgn.getReserved(), Byte::fromValue(0));
+    EXPECT_EQ(pgn.getReserved1(), Byte::fromValue(0));
     EXPECT_NEAR(pgn.getCog().getValue(), 1.5707f, 0.02f);
     EXPECT_NEAR(pgn.getSog().getValue(), 5.0f, 0.02f);
     EXPECT_EQ(pgn.getReserved2(), Byte::fromValue(0x12));
@@ -68,7 +68,7 @@ TEST(PGN129026, DataFieldLimits) {
 
     EXPECT_NEAR(max.getCog().getValue(), 2.0f * static_cast<float>(M_PI), 0.02f);
     EXPECT_NEAR(max.getSog().getValue(), 655.32f, 0.05f);
-    EXPECT_EQ(max.getReserved(), Byte::fromValue(63));
+    EXPECT_EQ(max.getReserved1(), Byte::fromValue(63));
 }
 
 TEST(PGN129026, FactoryConstruction) {
@@ -80,7 +80,7 @@ TEST(PGN129026, FactoryConstruction) {
 
     EXPECT_EQ(pgn->getSequenceId(), 1U);
     EXPECT_EQ(pgn->getCogReference(), HalfByte::fromValue(1));
-    EXPECT_EQ(pgn->getReserved(), Byte::fromValue(0));
+    EXPECT_EQ(pgn->getReserved1(), Byte::fromValue(0));
     EXPECT_EQ(pgn->getCog(), Angle::fromRaw(0x4000));
     EXPECT_EQ(pgn->getSog(), Speed::fromRaw(0x01F4));
     EXPECT_EQ(pgn->getReserved2(), Byte::fromValue(0));
@@ -103,7 +103,7 @@ TEST(PGN129026, FactoryParsesReservedAndReferenceFields) {
 
     EXPECT_EQ(pgn->getSequenceId(), 7U);
     EXPECT_EQ(pgn->getCogReference(), HalfByte::fromValue(2));
-    EXPECT_EQ(pgn->getReserved(), Byte::fromValue(42));
+    EXPECT_EQ(pgn->getReserved1(), Byte::fromValue(42));
     EXPECT_EQ(pgn->getReserved2(), Byte::fromValue(0x12));
     EXPECT_EQ(pgn->getReserved3(), Byte::fromValue(0xAB));
 }
@@ -166,7 +166,7 @@ TEST(PGN129026, SerializeRoundTrip) {
 
     auto toSerialize = PGN129026(pgn->getSequenceId(),
                                  pgn->getCogReference(),
-                                 pgn->getReserved(),
+                                 pgn->getReserved1(),
                                  pgn->getCog(),
                                  pgn->getSog(),
                                  pgn->getReserved2(),

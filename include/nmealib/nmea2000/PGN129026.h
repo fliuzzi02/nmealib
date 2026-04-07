@@ -63,8 +63,8 @@ public:
     Angle getCog() const noexcept;
     /** @returns the speed over ground in m/s. */
     Speed getSog() const noexcept;
-    /** @returns the reserved field. */
-    Byte getReserved() const noexcept;
+    /** @returns the PGN payload reserved field (bits 7..2 of byte 1). */
+    Byte getReserved1() const noexcept;
     /** @returns the second reserved field. */
     Byte getReserved2() const noexcept;
     /** @returns the third reserved field. */

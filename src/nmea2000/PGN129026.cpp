@@ -159,7 +159,7 @@ Speed PGN129026::getSog() const noexcept {
     return sog_;
 }
 
-Byte PGN129026::getReserved() const noexcept {
+Byte PGN129026::getReserved1() const noexcept {
     return reserved_;
 }
 
