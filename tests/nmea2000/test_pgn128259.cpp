@@ -375,3 +375,24 @@ TEST(PGN128259, StringContentVerboseSpeedDirReserved) {
                   Byte::fromValue(0), HalfByte::fromValue(0));
     EXPECT_NE(pgn.getStringContent(true).find("Unavailable"), std::string::npos);
 }
+
+// Test Round-trip serialization
+TEST(PGN128259, SerializeRoundTrip) {
+    auto msg = Nmea2000Factory::create(
+        FRAME_STANDARD
+    );
+    ASSERT_NE(msg, nullptr);
+    auto* pgn = dynamic_cast<PGN128259*>(msg.get());
+    ASSERT_NE(pgn, nullptr);
+
+    auto toSerialize = PGN128259(pgn->getSequenceId(),
+                                 pgn->getSpeedWaterReferenced(),
+                                 pgn->getSpeedGroundReferenced(),
+                                 pgn->getSpeedWaterReferencedType(),
+                                 pgn->getSpeedDirection(),
+                                 pgn->getReserved1(),
+                                 pgn->getReserved2());
+
+    EXPECT_EQ(pgn->serialize(), FRAME_STANDARD);
+    EXPECT_EQ(toSerialize.serialize(), FRAME_STANDARD);
+}

@@ -133,3 +133,24 @@ TEST(PGN127250, StringContent) {
     EXPECT_EQ(pgn.getStringContent(true), expectedVerbose);
     EXPECT_EQ(pgn.getStringContent(false), expectedNonVerbose);
 }
+
+// Test Round-trip serialization
+TEST(PGN127250, SerializeRoundTrip) {
+    std::string VALID_MESSAGE = "01F11200:342C71FF7FFF7FC1";
+    auto msg = Nmea2000Factory::create(
+        VALID_MESSAGE
+    );
+    ASSERT_NE(msg, nullptr);
+    auto* pgn = dynamic_cast<PGN127250*>(msg.get());
+    ASSERT_NE(pgn, nullptr);
+
+    auto toSerialize = PGN127250(pgn->getSequenceId(),
+                                 pgn->getHeading(),
+                                 pgn->getDeviation(),
+                                 pgn->getVariation(),
+                                 pgn->getHeadingReference(),
+                                 Byte::fromRaw((pgn->getCanFrame()[7] >> 6) & 0x3F));
+
+    EXPECT_EQ(pgn->serialize(), VALID_MESSAGE);
+    EXPECT_EQ(toSerialize.serialize(), VALID_MESSAGE);
+}

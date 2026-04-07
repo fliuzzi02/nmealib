@@ -83,3 +83,20 @@ TEST(PGN129025, StringContent) {
     EXPECT_EQ(pgn.getStringContent(true), expectedVerbose);
     EXPECT_EQ(pgn.getStringContent(false), expectedNonVerbose);
 }
+
+// Test Round-trip serialization
+TEST(PGN129025, SerializeRoundTrip) {
+    std::string VALID_MESSAGE = "01F80100:0000000000000000";
+    auto msg = Nmea2000Factory::create(
+        VALID_MESSAGE
+    );
+    ASSERT_NE(msg, nullptr);
+    auto* pgn = dynamic_cast<PGN129025*>(msg.get());
+    ASSERT_NE(pgn, nullptr);
+
+    auto toSerialize = PGN129025(pgn->getLatitude(),
+                                 pgn->getLongitude());
+
+    EXPECT_EQ(pgn->serialize(), VALID_MESSAGE);
+    EXPECT_EQ(toSerialize.serialize(), VALID_MESSAGE);
+}

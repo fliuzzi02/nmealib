@@ -154,3 +154,24 @@ TEST(PGN129026, StringContent) {
     EXPECT_EQ(pgn.getStringContent(true), expectedVerbose);
     EXPECT_EQ(pgn.getStringContent(false), expectedNonVerbose);
 }
+
+// Test Round-trip serialization
+TEST(PGN129026, SerializeRoundTrip) {
+    auto msg = Nmea2000Factory::create(
+        FRAME_STANDARD
+    );
+    ASSERT_NE(msg, nullptr);
+    auto* pgn = dynamic_cast<PGN129026*>(msg.get());
+    ASSERT_NE(pgn, nullptr);
+
+    auto toSerialize = PGN129026(pgn->getSequenceId(),
+                                 pgn->getCogReference(),
+                                 pgn->getReserved(),
+                                 pgn->getCog(),
+                                 pgn->getSog(),
+                                 pgn->getReserved2(),
+                                 pgn->getReserved3());
+    
+    EXPECT_EQ(pgn->serialize(), FRAME_STANDARD);
+    EXPECT_EQ(toSerialize.serialize(), FRAME_STANDARD);
+}

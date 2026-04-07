@@ -379,7 +379,7 @@ std::string Message2000::toString(bool verbose) const noexcept {
 
 std::string Message2000::serialize() const {
     std::ostringstream oss;
-    oss << std::hex << std::setfill('0');
+    oss << std::hex << std::uppercase << std::setfill('0');
 
     for (const auto byte : getCanId()) {
         oss << std::setw(2) << static_cast<int>(byte);
