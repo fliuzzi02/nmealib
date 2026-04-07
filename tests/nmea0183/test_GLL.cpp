@@ -11,6 +11,7 @@ using namespace nmealib::nmea0183;
 static const std::string GLL_SENTENCE = "$GNGLL,3150.788156,N,11711.922383,E,062735.00,A,A*76\r\n";
 static const std::string GLL_SENTENCE_NO_CHECKSUM = "$GNGLL,3150.788156,N,11711.922383,E,062735.00,A,A\r\n";
 static const std::string INCOMPLETE_GLL_SENTENCE = "$GNGLL,,N,11711.922383,E,,V,N\r\n";
+static const std::string GLL_SENTENCE_WITHOUT_MODE_INDICATOR = "$GPGLL,5800.618,N,01145.802,E,094408,A\r\n";
 static const std::string NOT_GLL_SENTENCE = "$GNGGA,062735.00,3150.788156,N,11711.922383,E,1,12,2.0,90.0,M,,M,,*55\r\n";
 static const std::string MALFORMED_GLL_SENTENCE = "$GPGLL,3150.788156,N,11711.922383,E\r\n";
 static const std::string HIGH_PRECISION_GLL_SENTENCE_NO_CHECKSUM = "$GNGLL,3150.7881569,N,11711.9223839,E,062735.00,A,A\r\n";
@@ -138,6 +139,22 @@ TEST(GLL, ConvertsCoordinatesWithHighPrecision)
 
     EXPECT_NEAR(gllMsg->getLatitude(), expectedLatitude, 1e-12);
     EXPECT_NEAR(gllMsg->getLongitude(), expectedLongitude, 1e-12);
+}
+
+TEST(GLL, AcceptsSentenceWithoutOptionalModeIndicator)
+{
+    auto msg = Nmea0183Factory::create(GLL_SENTENCE_WITHOUT_MODE_INDICATOR);
+    ASSERT_NE(msg, nullptr);
+    auto gllMsg = dynamic_cast<GLL*>(msg.get());
+    ASSERT_NE(gllMsg, nullptr);
+
+    EXPECT_NEAR(gllMsg->getLatitude(), 58.0103, 1e-9);
+    EXPECT_EQ(gllMsg->getLatitudeDirection(), 'N');
+    EXPECT_NEAR(gllMsg->getLongitude(), 11.7633666667, 1e-9);
+    EXPECT_EQ(gllMsg->getLongitudeDirection(), 'E');
+    EXPECT_DOUBLE_EQ(gllMsg->getUtcTime(), 94408.0);
+    EXPECT_EQ(gllMsg->getStatus(), 'A');
+    EXPECT_EQ(gllMsg->getModeIndicator(), '\0');
 }
 
 // Additional tests for full coverage
