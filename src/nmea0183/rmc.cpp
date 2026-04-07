@@ -4,6 +4,7 @@
 #include "nmealib/detail/parse.h"
 #include <cmath>
 #include <iomanip>
+#include <limits>
 #include <sstream>
 #include <vector>
 
@@ -45,7 +46,24 @@ std::unique_ptr<RMC> RMC::create(std::unique_ptr<Message0183> baseMessage) {
     double courseOverGround = 0.0;
     unsigned int date = 0U;
     double magneticVariation = 0.0;
-    if (!detail::parseOptionalUnsigned(fields[0], utcFix) ||
+
+    auto parseUtcFix = [](const std::string& utcField, unsigned int& outUtcFix) {
+        if (utcField.empty()) {
+            outUtcFix = 0U;
+            return true;
+        }
+
+        double utcDouble = 0.0;
+        if (!detail::parseOptionalDouble(utcField, utcDouble) || utcDouble < 0.0 ||
+            utcDouble > static_cast<double>(std::numeric_limits<unsigned int>::max())) {
+            return false;
+        }
+
+        outUtcFix = static_cast<unsigned int>(utcDouble);
+        return true;
+    };
+
+    if (!parseUtcFix(fields[0], utcFix) ||
         !detail::parseNmeaCoordinate(fields[2], latitude) ||
         !detail::parseNmeaCoordinate(fields[4], longitude) ||
         !detail::parseOptionalDouble(fields[6], speedOverGround) ||
