@@ -38,7 +38,34 @@ TODO: add coverage instructions
 ```
 
 ## Uploading the library
-TODO: These steps should be automated by a CD pipeline, but here are the steps to upload the library to the registries.
+
+The project now includes a release-wired CI/CD skeleton for publishing artifacts and packages.
+
+Current topology:
+
+1. `prepare`
+2. Linux release build (existing tarball artifacts)
+3. Linux publishing matrix skeleton (manylinux x86_64 + aarch64)
+4. GitHub Release publish (existing)
+5. TestPyPI skeleton stage
+6. PyPI skeleton stage
+7. PlatformIO skeleton stages (validate metadata, publish placeholder, verify placeholder)
+
+This is intentionally a skeleton-only phase. The publish jobs are wired and gated, but their implementation commands are still placeholders.
+
+### CI/CD skeleton files
+
+- `.github/workflows/BuildLinuxMatrix.yml`
+- `.github/workflows/PublishPython.yml`
+- `.github/workflows/PublishPlatformIO.yml`
+
+Release orchestration wiring is in `.github/workflows/Release.yml`.
+
+### Publish gating policy
+
+- Publishing stages run only in release context (`workflow_dispatch` or `publish=true` in reusable release calls).
+- Python publish skeleton keeps a staged order: TestPyPI before PyPI.
+- PlatformIO publish skeleton validates `library.json` version against release version before publish placeholder stage.
 
 ### PlatformIO registry
 
@@ -59,3 +86,5 @@ pio package publish
 ```
 
 ### PyPI registry
+
+Publishing is now wired through CI skeleton stages; implementation commands will be added in the next pass.
