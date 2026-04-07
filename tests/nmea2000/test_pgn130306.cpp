@@ -115,9 +115,31 @@ TEST(PGN130306, StringContent) {
         Angle::fromValue(1.5707f),
         HalfByte::fromValue(1));
 
-    std::string expectedVerbose = "--------------------------------\nProtocol: NMEA2000\nPGN: 130306(0x1fd02)\nFrame Length: 8 bytes\nFrame Data: 01 f4 01 fe 3f 01 00 00\nFields:\n\tSequence ID: 1\n\tWind Speed: 5.00 knots\n\tWind Direction: 1.5706rad, 89.9904\xC2\xB0\n\tWind Reference: Magnetic(North)\n";
+    std::string expectedVerbose = "--------------------------------\nProtocol:    NMEA2000\nPriority:    0\nData Page:   1\nPDU Format:  0xfd (PDU2 - broadcast)\nDestination: 255 (global)\nSource Addr: 0\nPGN:         130306 (0x1fd02)\nFrame Len:   8 bytes\nFrame Data:  01 f4 01 fe 3f 01 00 00\nFields:\n\tSequence ID: 1\n\tWind Speed: 5.00 knots\n\tWind Direction: 1.5706rad, 89.9904\xC2\xB0\n\tWind Reference: Magnetic(North)\n";
     std::string expectedNonVerbose = "[OK] NMEA2000 PGN130306: SeqID=1 WindSpeed=4.99977 knots WindDirection=89.9904° WindReference=1";
 
     EXPECT_EQ(pgn.getStringContent(true), expectedVerbose);
     EXPECT_EQ(pgn.getStringContent(false), expectedNonVerbose);
+}
+
+// Test Round-trip serialization
+TEST(PGN130306, SerializeRoundTrip) {
+    std::string VALID_MESSAGE = "01FD0200:8C2C010479FAFFFF";
+    auto msg = Nmea2000Factory::create(
+        VALID_MESSAGE
+    );
+    ASSERT_NE(msg, nullptr);
+    auto* pgn = dynamic_cast<PGN130306*>(msg.get());
+    ASSERT_NE(pgn, nullptr);
+
+    auto toSerialize = PGN130306(pgn->getSequenceId(),
+                                 pgn->getWindSpeed(),
+                                 pgn->getWindDirection(),
+                                 pgn->getWindReference(),
+                                 pgn->getReserved1(),
+                                 pgn->getReserved2(),
+                                 pgn->getReserved3());
+
+    EXPECT_EQ(pgn->serialize(), VALID_MESSAGE);
+    EXPECT_EQ(toSerialize.serialize(), VALID_MESSAGE);
 }

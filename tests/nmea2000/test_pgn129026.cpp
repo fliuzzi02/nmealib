@@ -32,7 +32,7 @@ TEST(PGN129026, GettersReturnCorrectValues) {
 
     EXPECT_EQ(pgn.getSequenceId(), 7U);
     EXPECT_EQ(pgn.getCogReference(), HalfByte::fromValue(1));
-    EXPECT_EQ(pgn.getReserved(), Byte::fromValue(0));
+    EXPECT_EQ(pgn.getReserved1(), Byte::fromValue(0));
     EXPECT_NEAR(pgn.getCog().getValue(), 1.5707f, 0.02f);
     EXPECT_NEAR(pgn.getSog().getValue(), 5.0f, 0.02f);
     EXPECT_EQ(pgn.getReserved2(), Byte::fromValue(0x12));
@@ -68,7 +68,7 @@ TEST(PGN129026, DataFieldLimits) {
 
     EXPECT_NEAR(max.getCog().getValue(), 2.0f * static_cast<float>(M_PI), 0.02f);
     EXPECT_NEAR(max.getSog().getValue(), 655.32f, 0.05f);
-    EXPECT_EQ(max.getReserved(), Byte::fromValue(63));
+    EXPECT_EQ(max.getReserved1(), Byte::fromValue(63));
 }
 
 TEST(PGN129026, FactoryConstruction) {
@@ -80,7 +80,7 @@ TEST(PGN129026, FactoryConstruction) {
 
     EXPECT_EQ(pgn->getSequenceId(), 1U);
     EXPECT_EQ(pgn->getCogReference(), HalfByte::fromValue(1));
-    EXPECT_EQ(pgn->getReserved(), Byte::fromValue(0));
+    EXPECT_EQ(pgn->getReserved1(), Byte::fromValue(0));
     EXPECT_EQ(pgn->getCog(), Angle::fromRaw(0x4000));
     EXPECT_EQ(pgn->getSog(), Speed::fromRaw(0x01F4));
     EXPECT_EQ(pgn->getReserved2(), Byte::fromValue(0));
@@ -103,7 +103,7 @@ TEST(PGN129026, FactoryParsesReservedAndReferenceFields) {
 
     EXPECT_EQ(pgn->getSequenceId(), 7U);
     EXPECT_EQ(pgn->getCogReference(), HalfByte::fromValue(2));
-    EXPECT_EQ(pgn->getReserved(), Byte::fromValue(42));
+    EXPECT_EQ(pgn->getReserved1(), Byte::fromValue(42));
     EXPECT_EQ(pgn->getReserved2(), Byte::fromValue(0x12));
     EXPECT_EQ(pgn->getReserved3(), Byte::fromValue(0xAB));
 }
@@ -148,9 +148,30 @@ TEST(PGN129026, StringContent) {
                          Byte::fromValue(0),
                          Byte::fromValue(0));
 
-    std::string expectedVerbose = "--------------------------------\nProtocol: NMEA2000\nPGN: 129026(0x1f802)\nFrame Length: 8 bytes\nFrame Data: 01 00 00 00 00 00 00 00\nFields:\n\tSequence ID: 1\n\tCourse Over Ground: 0.0000rad, 0°\n\tSpeed Over Ground: 0 knots\n\tCOG Reference: True\n";
+    std::string expectedVerbose = "--------------------------------\nProtocol:    NMEA2000\nPriority:    0\nData Page:   1\nPDU Format:  0xf8 (PDU2 - broadcast)\nDestination: 255 (global)\nSource Addr: 0\nPGN:         129026 (0x1f802)\nFrame Len:   8 bytes\nFrame Data:  01 00 00 00 00 00 00 00\nFields:\n\tSequence ID: 1\n\tCourse Over Ground: 0.0000rad, 0\xC2\xB0\n\tSpeed Over Ground: 0 knots\n\tCOG Reference: True\n";
     std::string expectedNonVerbose = "[OK] NMEA2000 PGN129026: SeqID=1 COG=0° SOG=0 knots COGRef=0";
 
     EXPECT_EQ(pgn.getStringContent(true), expectedVerbose);
     EXPECT_EQ(pgn.getStringContent(false), expectedNonVerbose);
+}
+
+// Test Round-trip serialization
+TEST(PGN129026, SerializeRoundTrip) {
+    auto msg = Nmea2000Factory::create(
+        FRAME_STANDARD
+    );
+    ASSERT_NE(msg, nullptr);
+    auto* pgn = dynamic_cast<PGN129026*>(msg.get());
+    ASSERT_NE(pgn, nullptr);
+
+    auto toSerialize = PGN129026(pgn->getSequenceId(),
+                                 pgn->getCogReference(),
+                                 pgn->getReserved1(),
+                                 pgn->getCog(),
+                                 pgn->getSog(),
+                                 pgn->getReserved2(),
+                                 pgn->getReserved3());
+    
+    EXPECT_EQ(pgn->serialize(), FRAME_STANDARD);
+    EXPECT_EQ(toSerialize.serialize(), FRAME_STANDARD);
 }

@@ -77,9 +77,26 @@ TEST(PGN129025, StringContent) {
         Latitude::fromRaw(0),
         Longitude::fromRaw(0));
 
-    std::string expectedVerbose = "--------------------------------\nProtocol: NMEA2000\nPGN: 129025(0x1f801)\nFrame Length: 8 bytes\nFrame Data: 00 00 00 00 00 00 00 00\nFields:\n\tLatitude: 0.0000000\xC2\xB0\n\tLongitude: 0.0000000\xC2\xB0\n";
+    std::string expectedVerbose = "--------------------------------\nProtocol:    NMEA2000\nPriority:    0\nData Page:   1\nPDU Format:  0xf8 (PDU2 - broadcast)\nDestination: 255 (global)\nSource Addr: 0\nPGN:         129025 (0x1f801)\nFrame Len:   8 bytes\nFrame Data:  00 00 00 00 00 00 00 00\nFields:\n\tLatitude: 0.0000000\xC2\xB0\n\tLongitude: 0.0000000\xC2\xB0\n";
     std::string expectedNonVerbose = "[OK] NMEA2000 PGN129025: Latitude=0.0000000° Longitude=0.0000000°";
 
     EXPECT_EQ(pgn.getStringContent(true), expectedVerbose);
     EXPECT_EQ(pgn.getStringContent(false), expectedNonVerbose);
+}
+
+// Test Round-trip serialization
+TEST(PGN129025, SerializeRoundTrip) {
+    std::string VALID_MESSAGE = "01F80100:0000000000000000";
+    auto msg = Nmea2000Factory::create(
+        VALID_MESSAGE
+    );
+    ASSERT_NE(msg, nullptr);
+    auto* pgn = dynamic_cast<PGN129025*>(msg.get());
+    ASSERT_NE(pgn, nullptr);
+
+    auto toSerialize = PGN129025(pgn->getLatitude(),
+                                 pgn->getLongitude());
+
+    EXPECT_EQ(pgn->serialize(), VALID_MESSAGE);
+    EXPECT_EQ(toSerialize.serialize(), VALID_MESSAGE);
 }
