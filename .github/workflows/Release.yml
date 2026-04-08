@@ -275,12 +275,51 @@ jobs:
       with:
         path: dist
 
+    - name: Generate release notes from previous release
+      id: release_notes
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const owner = context.repo.owner;
+          const repo = context.repo.repo;
+          const tagName = '${{ needs.prepare.outputs.tag }}';
+
+          let previousTagName;
+          try {
+            const latest = await github.rest.repos.getLatestRelease({ owner, repo });
+            if (latest.data.tag_name && latest.data.tag_name !== tagName) {
+              previousTagName = latest.data.tag_name;
+            }
+          } catch (error) {
+            if (error.status !== 404) {
+              throw error;
+            }
+          }
+
+          const params = { owner, repo, tag_name: tagName };
+          if (previousTagName) {
+            params.previous_tag_name = previousTagName;
+          }
+
+          const notes = await github.rest.repos.generateReleaseNotes(params);
+          core.setOutput('body', notes.data.body || '');
+          core.setOutput('previous_tag', previousTagName || '');
+
+    - name: Log release notes range
+      shell: bash
+      run: |
+        if [[ -n "${{ steps.release_notes.outputs.previous_tag }}" ]]; then
+          echo "Generated notes from ${{ steps.release_notes.outputs.previous_tag }} to ${{ needs.prepare.outputs.tag }}"
+        else
+          echo "Generated notes for ${{ needs.prepare.outputs.tag }} (no previous release found)"
+        fi
+
     - name: Publish GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ needs.prepare.outputs.tag }}
         name: ${{ needs.prepare.outputs.tag }}
-        generate_release_notes: true
+        body: ${{ steps.release_notes.outputs.body }}
         files: |
           dist/**/*-linux64.tar.gz
 
