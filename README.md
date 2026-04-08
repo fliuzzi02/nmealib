@@ -17,6 +17,7 @@ Modern C++20 library for parsing **NMEA 0183** sentences and **NMEA 2000** CAN m
 ## Why nmealib
 
 - Unified parsing for **NMEA 0183** and **NMEA 2000**
+- Python and C++ libraries with consistent APIs
 - Typed message classes for safer integrations
 - Built-in validation (including NMEA 0183 checksum handling)
 - Extensible architecture for new sentence/PGN support
