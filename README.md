@@ -27,7 +27,7 @@ Modern C++20 library for parsing **NMEA 0183** sentences and **NMEA 2000** CAN m
 
 ## Quick Start
 
-### CLI Usage
+### CLI
 
 Download the latest release from [GitHub Releases](https://github.com/fliuzzi02/nmealib/releases), then parse a sentence:
 
@@ -41,7 +41,9 @@ Parse from a file/pipe:
 cat nmea_sentences.txt | ./nmealib-cli
 ```
 
-### Use the library in your C++ project
+### C++ Library
+
+Add the library to your CMake project (see [Installation Guide](docs/INSTALLATION.md#installation-as-a-library)), then include and use it:
 
 ```cpp
 #include <nmealib.h>
@@ -62,60 +64,54 @@ int main() {
 
 See [using-nmealib](https://github.com/fliuzzi02/using-nmealib) for a full example project demonstrating library usage.
 
-### Use the library in PlatformIO
+### Python Library (PyPI)
+
+Install from PyPI:
+
+```bash
+python -m pip install nmealib
+```
+
+Quick usage example:
+
+```python
+import nmealib
+
+raw_0183 = "$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W,A,V*6A\r\n"
+raw_2000 = "09F11260:342C71FF7FFF7FFD"
+
+try:
+    msg_0183 = nmealib.nmea0183.Nmea0183Factory.create(raw_0183)
+    print(type(msg_0183).__name__)  # RMC
+    print(msg_0183.get_latitude(), msg_0183.get_longitude())
+
+    msg_2000 = nmealib.nmea2000.Nmea2000Factory.create(raw_2000)
+    print(type(msg_2000).__name__)  # PGN127250
+except nmealib.NmeaException as exc:
+    print(f"Parse error: {exc}")
+```
+
+
+### Use in PlatformIO
+
+The library is published on the PlatformIO registry:
+
+https://registry.platformio.org/libraries/fliuzzi02/nmealib
 
 Add the dependency in your `platformio.ini`:
 
 ```ini
-lib_deps = fliuzzi02/nmealib
+lib_deps =
+    fliuzzi02/nmealib
 ```
 
-The published PlatformIO package is built with exceptions disabled:
+Or install it with the PlatformIO CLI:
 
-- `-fno-exceptions`
-- `-DNMEALIB_NO_EXCEPTIONS`
-
-In that configuration, parse failures do not throw. Factory methods return `nullptr`.
-
-```cpp
-#include <nmealib.h>
-
-auto message = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
-if (!message) {
-    return;
-}
+```bash
+pio pkg install --library "fliuzzi02/nmealib"
 ```
 
 An embedded reference example is available in `examples/platformio-esp32`.
-
----
-
-## Build from Source
-
-### Requirements
-
-- CMake 3.20+
-- C++20 compiler:
-  - GCC 10+
-  - Clang 12+
-  - MSVC 2019+
-- Build system: Ninja, GNU Make, or Visual Studio
-- Optional (development): GoogleTest, clang-tidy, cppcheck
-
-### Build
-
-```bash
-git clone https://github.com/fliuzzi02/nmealib.git
-cd nmealib
-
-cmake --preset gcc-release
-cmake --build --preset build-release
-cmake --install out/build/gcc-release --prefix out/install/gcc-release
-```
-
-Artifacts are installed under:
-
-`out/install/gcc-release`
 
 ---
 
@@ -197,19 +193,6 @@ nmealib/
 
 
 > Messages/PGNs not listed are currently considered **not implemented**.
-
----
-
-## Compatibility
-
-| Platform | Compiler | Standard |
-|---|---|---|
-| Linux | GCC 10+, Clang 12+ | C++20 |
-| Windows | MSVC 2019+ | C++20 |
-| macOS | Clang 12+ | C++20 |
-
-PlatformIO support is also available through `library.json` with broad platform/framework declaration (`*`).
-Target toolchains must support C++20.
 
 ---
 
