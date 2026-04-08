@@ -37,6 +37,7 @@ def test_all_supported_nmea0183_factory_dispatch(raw, expected_type):
 @pytest.mark.parametrize(
     ("raw", "expected_type"),
     [
+        ("01F10D00:0101FEBF0060FFFF", nmealib.nmea2000.PGN127245),
         ("09F11260:342C71FF7FFF7FFD", nmealib.nmea2000.PGN127250),
         ("01F11900:02FE3F0060FE9F00", nmealib.nmea2000.PGN127257),
         ("01F50300:01F4012C01000000", nmealib.nmea2000.PGN128259),

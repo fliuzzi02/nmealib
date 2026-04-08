@@ -8,6 +8,7 @@ add_library(nmealib2000 STATIC
     messageRegistry.cpp
     nmea2000Factory.cpp
     PGN128259.cpp
+    PGN127245.cpp
     PGN127250.cpp
     PGN127257.cpp
     PGN129025.cpp
@@ -23,6 +24,7 @@ set(NMEALIB_NMEA2000_SOURCES
     nmea2000/messageRegistry.cpp
     nmea2000/nmea2000Factory.cpp
     nmea2000/PGN128259.cpp
+    nmea2000/PGN127245.cpp
     nmea2000/PGN127250.cpp
     nmea2000/PGN127257.cpp
     nmea2000/PGN129025.cpp
