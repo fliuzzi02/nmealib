@@ -253,6 +253,15 @@ struct LongitudeTraits {
     static constexpr RawType RAW_MIN = -180 * static_cast<RawType>(1e7);
     static constexpr RawType RAW_MAX = 180 * static_cast<RawType>(1e7);
 };
+struct AngularRateTraits {
+    static constexpr double MIN = -67;
+    static constexpr double MAX = 67;
+    static constexpr double RESOLUTION = (1 / 32) * 1e-6;
+    using RawType = int32_t;
+    using TargetType = double;
+    static constexpr RawType RAW_MIN = std::numeric_limits<RawType>::min();
+    static constexpr RawType RAW_MAX = std::numeric_limits<RawType>::max();
+};
 
 /**
  * @brief Custom type representing distances in meters.
@@ -357,6 +366,19 @@ using Latitude = DataType<LatitudeTraits>;
  * - Target type: float (for use in higher-level fields that expect a longitude value)
  */
 using Longitude = DataType<LongitudeTraits>;
+
+/**
+ * @brief Custom type representing angular rates in radians per second.
+ * 
+ * - Range: [-67, 67] rad/s
+ * 
+ * - Resolution: 0.00000003125 rad/s (1/32 micro-radian per second)
+ * 
+ * - Raw type: int32_t
+ * 
+ * - Target type: double (for use in higher-level fields that expect an angular rate value) 
+ */
+using AngularRate = DataType<AngularRateTraits>;
 
 } // namespace nmea2000
 } // namespace nmealib

@@ -52,6 +52,7 @@
 #include "nmealib/nmea2000/dataTypes.h"
 #include "nmealib/nmea2000/PGN128259.h"
 #include "nmealib/nmea2000/PGN127250.h"
+#include "nmealib/nmea2000/PGN127251.h"
 #include "nmealib/nmea2000/PGN127257.h"
 #include "nmealib/nmea2000/PGN129025.h"
 #include "nmealib/nmea2000/PGN129026.h"
