@@ -35,6 +35,13 @@ endif()
 
 add_subdirectory(src)
 
+# Optionally build Python bindings
+option(BUILD_PYTHON_BINDINGS "Build Python bindings" OFF)
+if(BUILD_PYTHON_BINDINGS)
+    message(STATUS "Python bindings enabled (BUILD_PYTHON_BINDINGS=ON)")
+    add_subdirectory(python)
+endif()
+
 # Optionally build the CLI app
 option(BUILD_CLI "Build the CLI app" ON)
 if(BUILD_CLI)

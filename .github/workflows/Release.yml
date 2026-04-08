@@ -213,6 +213,57 @@ jobs:
         name: nmealib-cli-linux64
         path: ${{ steps.strings.outputs.build-cli-dir }}/nmealib-cli-${{ needs.prepare.outputs.version }}-linux64.tar.gz
 
+    - name: Prepare cross-linux skeleton artifacts
+      shell: bash
+      run: |
+        mkdir -p out/skeleton
+        for target in manylinux_2_17_x86_64 manylinux_2_17_aarch64 musllinux_1_2_x86_64 musllinux_1_2_aarch64; do
+          cat > "out/skeleton/python-wheel-skeleton-${target}.txt" <<EOF
+        Skeleton only: Linux wheel build implementation will be added in a follow-up pass.
+        This lane represents target ${target} for version ${{ needs.prepare.outputs.version }} (${{ needs.prepare.outputs.tag }}).
+        EOF
+
+          cat > "out/skeleton/platformio-package-skeleton-${target}.txt" <<EOF
+        Skeleton only: PlatformIO package preparation for target ${target} will be added in a follow-up pass.
+        Version ${{ needs.prepare.outputs.version }} (${{ needs.prepare.outputs.tag }}).
+        EOF
+        done
+
+    - name: Upload python wheel skeleton artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: python-wheel-skeleton-linux
+        path: out/skeleton/python-wheel-skeleton-*.txt
+
+    - name: Upload PlatformIO skeleton artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: platformio-package-skeleton-linux
+        path: out/skeleton/platformio-package-skeleton-*.txt
+
+    - name: Set up Python for wheel build
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Build Python manylinux wheel artifact
+      shell: bash
+      env:
+        CIBW_PLATFORM: linux
+        CIBW_ARCHS_LINUX: x86_64
+        CIBW_BUILD: cp312-manylinux_x86_64
+        CIBW_SKIP: "*-musllinux*"
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install cibuildwheel
+        python -m cibuildwheel --output-dir dist/python
+
+    - name: Upload Python distribution artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: python-dist-linux
+        path: dist/python/*.whl
+
   publish:
     runs-on: ubuntu-latest
     needs: [prepare, build-linux]
@@ -224,11 +275,163 @@ jobs:
       with:
         path: dist
 
+    - name: Generate release notes from previous release
+      id: release_notes
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const owner = context.repo.owner;
+          const repo = context.repo.repo;
+          const tagName = '${{ needs.prepare.outputs.tag }}';
+
+          let previousTagName;
+          try {
+            const latest = await github.rest.repos.getLatestRelease({ owner, repo });
+            if (latest.data.tag_name && latest.data.tag_name !== tagName) {
+              previousTagName = latest.data.tag_name;
+            }
+          } catch (error) {
+            if (error.status !== 404) {
+              throw error;
+            }
+          }
+
+          const params = { owner, repo, tag_name: tagName };
+          if (previousTagName) {
+            params.previous_tag_name = previousTagName;
+          }
+
+          const notes = await github.rest.repos.generateReleaseNotes(params);
+          core.setOutput('body', notes.data.body || '');
+          core.setOutput('previous_tag', previousTagName || '');
+
+    - name: Log release notes range
+      shell: bash
+      run: |
+        if [[ -n "${{ steps.release_notes.outputs.previous_tag }}" ]]; then
+          echo "Generated notes from ${{ steps.release_notes.outputs.previous_tag }} to ${{ needs.prepare.outputs.tag }}"
+        else
+          echo "Generated notes for ${{ needs.prepare.outputs.tag }} (no previous release found)"
+        fi
+
     - name: Publish GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ needs.prepare.outputs.tag }}
         name: ${{ needs.prepare.outputs.tag }}
-        generate_release_notes: true
+        body: ${{ steps.release_notes.outputs.body }}
         files: |
           dist/**/*-linux64.tar.gz
+
+  collect-python-dist:
+    runs-on: ubuntu-latest
+    needs: [prepare, build-linux]
+    if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
+    permissions:
+      contents: read
+    steps:
+    - name: Download Linux wheel artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: python-dist-*
+        path: dist/python-wheels
+        merge-multiple: true
+
+    - name: Validate collected wheel artifacts
+      shell: bash
+      run: |
+        echo "Release tag: ${{ needs.prepare.outputs.tag }}"
+        echo "Version: ${{ needs.prepare.outputs.version }}"
+        ls -la dist/python-wheels || true
+
+        wheel_count=$(find dist/python-wheels -maxdepth 1 -name '*.whl' | wc -l)
+        if [ "$wheel_count" -eq 0 ]; then
+          echo "No wheel artifacts found to publish."
+          exit 1
+        fi
+
+        python -m pip install --upgrade pip
+        python -m pip install twine
+        python -m twine check dist/python-wheels/*.whl
+
+  publish-testpypi:
+    runs-on: ubuntu-latest
+    needs: [prepare, collect-python-dist]
+    if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ needs.prepare.outputs.tag }}
+
+    - name: Build TestPyPI-only manylinux wheel as nmealib-test
+      shell: bash
+      env:
+        CIBW_PLATFORM: linux
+        CIBW_ARCHS_LINUX: x86_64
+        CIBW_BUILD: cp312-manylinux_x86_64
+        CIBW_SKIP: "*-musllinux*"
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install cibuildwheel
+
+        python - <<'PY'
+        from pathlib import Path
+
+        pyproject = Path("pyproject.toml")
+        text = pyproject.read_text(encoding="utf-8")
+        if 'name = "nmealib"' not in text:
+            raise SystemExit("Could not find 'name = \"nmealib\"' in pyproject.toml")
+        pyproject.write_text(text.replace('name = "nmealib"', 'name = "nmealib-test"', 1), encoding="utf-8")
+        print("Temporarily set project.name to nmealib-test for TestPyPI build")
+        PY
+
+        python -m cibuildwheel --output-dir dist/python-wheels-test
+
+    - name: Validate TestPyPI wheel
+      shell: bash
+      run: |
+        python -m pip install twine
+        python -m twine check dist/python-wheels-test/*.whl
+
+    - name: Publish to TestPyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
+        packages-dir: dist/python-wheels-test
+        attestations: false
+        user: __token__
+        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+
+  publish-pypi:
+    runs-on: ubuntu-latest
+    needs: publish-testpypi
+    if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
+    permissions:
+      contents: read
+    steps:
+    - name: Download Linux wheel artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: python-dist-*
+        path: dist/python-wheels
+        merge-multiple: true
+
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: dist/python-wheels
+        attestations: false
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
+
+  publish-platformio-skeleton:
+    needs: [prepare, build-linux]
+    if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
+    uses: ./.github/workflows/PublishPlatformIO.yml
+    with:
+      version: ${{ needs.prepare.outputs.version }}
+      tag: ${{ needs.prepare.outputs.tag }}
+      source_ref: ${{ needs.prepare.outputs.tag }}
+      publish: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
