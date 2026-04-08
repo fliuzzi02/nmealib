@@ -75,6 +75,7 @@ using nmealib::nmea2000::Longitude;
 using nmealib::nmea2000::Message2000;
 using nmealib::nmea2000::Nmea2000Factory;
 using nmealib::nmea2000::PGN127250;
+using nmealib::nmea2000::PGN127257;
 using nmealib::nmea2000::PGN128259;
 using nmealib::nmea2000::PGN129025;
 using nmealib::nmea2000::PGN129026;
@@ -537,6 +538,33 @@ PYBIND11_MODULE(_core, m) {
         .def("get_deviation_degrees", &PGN127250::getDeviationDegrees)
         .def("get_variation_degrees", &PGN127250::getVariationDegrees)
         .def("get_string_content", &PGN127250::getStringContent, py::arg("verbose") = false);
+
+        py::class_<PGN127257, Message2000>(m2000, "PGN127257")
+           .def(py::init<uint8_t, SignedAngle, SignedAngle, SignedAngle, Byte>(),
+               py::arg("sequence_id"), py::arg("yaw"), py::arg("pitch"), py::arg("roll"), py::arg("reserved"))
+           .def(py::init([](uint8_t sequenceId,
+                        float yaw,
+                        float pitch,
+                        float roll,
+                        uint8_t reserved) {
+              return PGN127257(
+                 sequenceId,
+                 SignedAngle::fromValue(yaw),
+                 SignedAngle::fromValue(pitch),
+                 SignedAngle::fromValue(roll),
+                 Byte::fromValue(reserved));
+           }),
+               py::arg("sequence_id"), py::arg("yaw_radians"), py::arg("pitch_radians"),
+               py::arg("roll_radians"), py::arg("reserved") = 0)
+           .def("get_sequence_id", &PGN127257::getSequenceId)
+           .def("get_yaw", &PGN127257::getYaw)
+           .def("get_pitch", &PGN127257::getPitch)
+           .def("get_roll", &PGN127257::getRoll)
+           .def("get_reserved", &PGN127257::getReserved)
+           .def("get_yaw_degrees", &PGN127257::getYawDegrees)
+           .def("get_pitch_degrees", &PGN127257::getPitchDegrees)
+           .def("get_roll_degrees", &PGN127257::getRollDegrees)
+           .def("get_string_content", &PGN127257::getStringContent, py::arg("verbose") = false);
 
     py::class_<PGN129026, Message2000>(m2000, "PGN129026")
         .def(py::init<uint8_t, HalfByte, Angle, Speed>(),

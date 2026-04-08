@@ -35,6 +35,7 @@ This page tracks message/PGN support and implementation details.
 | [Single-frame messages](#nmea-2000-single-frame-messages) | ✅ Yes | ❌ No | Standard one-frame CAN payloads |
 | [Fast-packet transport](#nmea-2000-fast-packet-transport) | ✅ Yes | ❌ No | Multi-frame transport handling |
 | [PGN 127250](#pgn-127250--vessel-heading) | ✅ Yes | ✅ Yes | Vessel Heading |
+| [PGN 127257](#pgn-127257--attitude) | ✅ Yes | ✅ Yes | Attitude (yaw, pitch, roll) |
 | [PGN 128259](#pgn-128259--speed-water-referenced) | ✅ Yes | ✅ Yes | Speed, Water Referenced |
 | [PGN 130306](#pgn-130306--wind-data) | ✅ Yes | ✅ Yes | Wind Data |
 
@@ -786,6 +787,18 @@ Reports vessel heading and related magnetic correction values.
 3. **Deviation** — signed radians, resolution 1e-4  
 4. **Variation** — signed radians, resolution 1e-4  
 5. **Heading reference** — true or magnetic reference selector
+
+### PGN 127257 — Attitude
+
+Reports vessel attitude in yaw, pitch, and roll.
+
+#### Field definitions
+
+1. **Sequence ID** — message sequence counter  
+2. **Yaw** — signed radians, resolution 1e-4  
+3. **Pitch** — signed radians, resolution 1e-4  
+4. **Roll** — signed radians, resolution 1e-4  
+5. **Reserved** — reserved byte for future use
 
 ### PGN 128259 — Speed, Water Referenced
 
