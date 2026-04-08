@@ -74,6 +74,7 @@ using nmealib::nmea2000::Latitude;
 using nmealib::nmea2000::Longitude;
 using nmealib::nmea2000::Message2000;
 using nmealib::nmea2000::Nmea2000Factory;
+using nmealib::nmea2000::PGN127245;
 using nmealib::nmea2000::PGN127250;
 using nmealib::nmea2000::PGN127257;
 using nmealib::nmea2000::PGN128259;
@@ -508,6 +509,29 @@ PYBIND11_MODULE(_core, m) {
 
     py::class_<Nmea2000Factory>(m2000, "Nmea2000Factory")
         .def_static("create", &Nmea2000Factory::create, py::arg("raw"), py::arg("timestamp") = std::chrono::system_clock::now());
+
+    py::class_<PGN127245, Message2000>(m2000, "PGN127245")
+        .def(py::init<uint8_t, HalfByte, SignedAngle, SignedAngle>(),
+             py::arg("rudder_id"), py::arg("direction"), py::arg("angle_order"), py::arg("position"))
+        .def(py::init([](uint8_t rudderId,
+                         uint8_t direction,
+                         float angleOrder,
+                         float position) {
+            return PGN127245(
+                rudderId,
+                HalfByte::fromValue(direction),
+                SignedAngle::fromValue(angleOrder),
+                SignedAngle::fromValue(position));
+        }),
+             py::arg("rudder_id"), py::arg("direction"), py::arg("angle_order_radians"), py::arg("position_radians"))
+        .def("get_rudder_id", &PGN127245::getRudderId)
+        .def("get_direction", &PGN127245::getDirection)
+        .def("get_angle_order", &PGN127245::getAngleOrder)
+        .def("get_position", &PGN127245::getPosition)
+        .def("get_angle_order_degrees", &PGN127245::getAngleOrderDegrees)
+        .def("get_position_degrees", &PGN127245::getPositionDegrees)
+        .def("get_direction_string", &PGN127245::getDirectionString)
+        .def("get_string_content", &PGN127245::getStringContent, py::arg("verbose") = false);
 
     py::class_<PGN127250, Message2000>(m2000, "PGN127250")
         .def(py::init<uint8_t, Angle, SignedAngle, SignedAngle, HalfByte, Byte>(),

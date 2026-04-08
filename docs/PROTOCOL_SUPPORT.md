@@ -33,7 +33,8 @@ This page tracks message/PGN support and implementation details.
 | Message / Transport | Implemented | Tested | Notes |
 |---|---|---|---|
 | [Single-frame messages](#nmea-2000-single-frame-messages) | ✅ Yes | ❌ No | Standard one-frame CAN payloads |
-| [Fast-packet transport](#nmea-2000-fast-packet-transport) | ✅ Yes | ❌ No | Multi-frame transport handling |
+| [Fast-packet transport](#nmea-2000-fast-packet-transport) | ❌ No | ❌ No | Multi-frame transport handling |
+| [PGN 127245](#pgn-127245--rudder) | ✅ Yes | ✅ Yes | Rudder |
 | [PGN 127250](#pgn-127250--vessel-heading) | ✅ Yes | ✅ Yes | Vessel Heading |
 | [PGN 127257](#pgn-127257--attitude) | ✅ Yes | ✅ Yes | Attitude (yaw, pitch, roll) |
 | [PGN 128259](#pgn-128259--speed-water-referenced) | ✅ Yes | ✅ Yes | Speed, Water Referenced |
@@ -775,6 +776,18 @@ $GLGSV,3,3,09,88,07,028*51
 > ℹ️ **Signal ID (NMEA 4.10+):** Systems such as u-blox 9 and Quectel LC79 may include an extra Signal ID field immediately before the checksum.
 
 ## NMEA 2000
+
+### PGN 127245 — Rudder
+
+Reports rudder command/feedback values for a specific rudder channel.
+
+#### Field definitions
+
+1. **Rudder ID** — rudder instance identifier
+2. **Direction** — rudder direction selector (`0=none`, `1=starboard`, `2=port`)
+3. **Angle order** — signed radians, resolution 1e-4
+4. **Position** — signed radians, resolution 1e-4
+5. **Reserved** — protocol-reserved bits/bytes for future use
 
 ### PGN 127250 — Vessel Heading
 
