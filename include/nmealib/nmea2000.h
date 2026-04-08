@@ -115,7 +115,7 @@ public:
     /**
      * @brief Returns the Reserved bit (R1). Always 0 in NMEA 2000; non-zero in J1939.
      */
-    bool getReserved()  const noexcept;  ///< Bit 1 of canId_[0]
+    bool getHeaderReserved()  const noexcept;  ///< Bit 1 of canId_[0]
 
     /**
      * @brief Returns the Data Page bit (DP).
