@@ -10,6 +10,7 @@ add_library(nmealib2000 STATIC
     PGN128259.cpp
     PGN127245.cpp
     PGN127250.cpp
+    PGN127251.cpp
     PGN127257.cpp
     PGN129025.cpp
     PGN129026.cpp
@@ -26,6 +27,7 @@ set(NMEALIB_NMEA2000_SOURCES
     nmea2000/PGN128259.cpp
     nmea2000/PGN127245.cpp
     nmea2000/PGN127250.cpp
+    nmea2000/PGN127251.cpp
     nmea2000/PGN127257.cpp
     nmea2000/PGN129025.cpp
     nmea2000/PGN129026.cpp

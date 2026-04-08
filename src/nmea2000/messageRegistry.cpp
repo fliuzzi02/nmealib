@@ -3,6 +3,7 @@
 #include "nmealib/nmea2000/PGN128259.h"
 #include "nmealib/nmea2000/PGN127245.h"
 #include "nmealib/nmea2000/PGN127250.h"
+#include "nmealib/nmea2000/PGN127251.h"
 #include "nmealib/nmea2000/PGN127257.h"
 #include "nmealib/nmea2000/PGN129025.h"
 #include "nmealib/nmea2000/PGN129026.h"
@@ -24,6 +25,8 @@ std::unique_ptr<Message2000> MessageRegistry::create(std::uint32_t pgn,
         return PGN127245::create(std::move(baseMessage));
     } else if (pgn == 127250) {
         return PGN127250::create(std::move(baseMessage));
+    } else if (pgn == 127251) {
+        return PGN127251::create(std::move(baseMessage));
     } else if (pgn == 127257) {
         return PGN127257::create(std::move(baseMessage));
     } else if (pgn == 129025) {

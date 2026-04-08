@@ -65,6 +65,7 @@ using nmealib::nmea0183::XDR;
 using nmealib::nmea0183::XTE;
 using nmealib::nmea0183::ZDA;
 using nmealib::nmea2000::Angle;
+using nmealib::nmea2000::AngularRate;
 using nmealib::nmea2000::Byte;
 using nmealib::nmea2000::FrameTooLongException;
 using nmealib::nmea2000::HalfByte;
@@ -76,6 +77,7 @@ using nmealib::nmea2000::Message2000;
 using nmealib::nmea2000::Nmea2000Factory;
 using nmealib::nmea2000::PGN127245;
 using nmealib::nmea2000::PGN127250;
+using nmealib::nmea2000::PGN127251;
 using nmealib::nmea2000::PGN127257;
 using nmealib::nmea2000::PGN128259;
 using nmealib::nmea2000::PGN129025;
@@ -490,6 +492,7 @@ PYBIND11_MODULE(_core, m) {
     bindDataType<Speed>(m2000, "Speed");
     bindDataType<HalfByte>(m2000, "HalfByte");
     bindDataType<Byte>(m2000, "Byte");
+    bindDataType<AngularRate>(m2000, "AngularRate");
     bindDataType<Latitude>(m2000, "Latitude");
     bindDataType<Longitude>(m2000, "Longitude");
 
@@ -498,7 +501,7 @@ PYBIND11_MODULE(_core, m) {
         .def("get_can_frame", &Message2000::getCanFrame)
         .def("get_can_frame_length", &Message2000::getCanFrameLength)
         .def("get_priority", &Message2000::getPriority)
-        .def("get_reserved", &Message2000::getReserved)
+        .def("get_reserved", &Message2000::getHeaderReserved)
         .def("get_data_page", &Message2000::getDataPage)
         .def("get_pdu_format", &Message2000::getPDUFormat)
         .def("get_pdu_specific", &Message2000::getPDUSpecific)
@@ -563,7 +566,32 @@ PYBIND11_MODULE(_core, m) {
         .def("get_variation_degrees", &PGN127250::getVariationDegrees)
         .def("get_string_content", &PGN127250::getStringContent, py::arg("verbose") = false);
 
-        py::class_<PGN127257, Message2000>(m2000, "PGN127257")
+    py::class_<PGN127251, Message2000>(m2000, "PGN127251")
+        .def(py::init<uint8_t, AngularRate, Byte, Byte, Byte>(),
+             py::arg("sequence_id"), py::arg("rate"),
+             py::arg("reserved1"), py::arg("reserved2"), py::arg("reserved3"))
+        .def(py::init([](uint8_t sequenceId,
+                         double rate,
+                         uint8_t reserved1,
+                         uint8_t reserved2,
+                         uint8_t reserved3) {
+            return PGN127251(
+                sequenceId,
+                AngularRate::fromValue(rate),
+                Byte::fromValue(reserved1),
+                Byte::fromValue(reserved2),
+                Byte::fromValue(reserved3));
+        }),
+             py::arg("sequence_id"), py::arg("rate_radians_per_second"),
+             py::arg("reserved1") = 0, py::arg("reserved2") = 0, py::arg("reserved3") = 0)
+        .def("get_sequence_id", &PGN127251::getSequenceId)
+        .def("get_rate", &PGN127251::getRate)
+        .def("get_reserved1", &PGN127251::getReserved1)
+        .def("get_reserved2", &PGN127251::getReserved2)
+        .def("get_reserved3", &PGN127251::getReserved3)
+        .def("get_string_content", &PGN127251::getStringContent, py::arg("verbose") = false);
+
+    py::class_<PGN127257, Message2000>(m2000, "PGN127257")
            .def(py::init<uint8_t, SignedAngle, SignedAngle, SignedAngle, Byte>(),
                py::arg("sequence_id"), py::arg("yaw"), py::arg("pitch"), py::arg("roll"), py::arg("reserved"))
            .def(py::init([](uint8_t sequenceId,

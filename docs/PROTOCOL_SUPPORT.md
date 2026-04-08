@@ -36,6 +36,7 @@ This page tracks message/PGN support and implementation details.
 | [Fast-packet transport](#nmea-2000-fast-packet-transport) | ❌ No | ❌ No | Multi-frame transport handling |
 | [PGN 127245](#pgn-127245--rudder) | ✅ Yes | ✅ Yes | Rudder |
 | [PGN 127250](#pgn-127250--vessel-heading) | ✅ Yes | ✅ Yes | Vessel Heading |
+| [PGN 127251](#pgn-127251--rate-of-turn) | ✅ Yes | ✅ Yes | Rate of Turn |
 | [PGN 127257](#pgn-127257--attitude) | ✅ Yes | ✅ Yes | Attitude (yaw, pitch, roll) |
 | [PGN 128259](#pgn-128259--speed-water-referenced) | ✅ Yes | ✅ Yes | Speed, Water Referenced |
 | [PGN 130306](#pgn-130306--wind-data) | ✅ Yes | ✅ Yes | Wind Data |
@@ -800,6 +801,18 @@ Reports vessel heading and related magnetic correction values.
 3. **Deviation** — signed radians, resolution 1e-4  
 4. **Variation** — signed radians, resolution 1e-4  
 5. **Heading reference** — true or magnetic reference selector
+
+### PGN 127251 — Rate of Turn
+
+Reports vessel rate of turn.
+
+#### Field definitions
+
+1. **Sequence ID** — message sequence counter  
+2. **Rate** — angular rate in rad/s  
+3. **Reserved1** — reserved byte for future use  
+4. **Reserved2** — reserved byte for future use  
+5. **Reserved3** — reserved byte for future use
 
 ### PGN 127257 — Attitude
 

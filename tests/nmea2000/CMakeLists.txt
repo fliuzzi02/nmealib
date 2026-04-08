@@ -4,6 +4,7 @@ add_executable(nmea2000_tests
 	test_pgn128259.cpp
 	test_pgn127245.cpp
 	test_pgn127250.cpp
+	test_pgn127251.cpp
 	test_pgn127257.cpp
 	test_pgn129025.cpp
 	test_pgn129026.cpp
