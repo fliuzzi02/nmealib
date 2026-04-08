@@ -222,11 +222,6 @@ jobs:
         Skeleton only: Linux wheel build implementation will be added in a follow-up pass.
         This lane represents target ${target} for version ${{ needs.prepare.outputs.version }} (${{ needs.prepare.outputs.tag }}).
         EOF
-
-          cat > "out/skeleton/platformio-package-skeleton-${target}.txt" <<EOF
-        Skeleton only: PlatformIO package preparation for target ${target} will be added in a follow-up pass.
-        Version ${{ needs.prepare.outputs.version }} (${{ needs.prepare.outputs.tag }}).
-        EOF
         done
 
     - name: Upload python wheel skeleton artifacts
@@ -234,12 +229,6 @@ jobs:
       with:
         name: python-wheel-skeleton-linux
         path: out/skeleton/python-wheel-skeleton-*.txt
-
-    - name: Upload PlatformIO skeleton artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: platformio-package-skeleton-linux
-        path: out/skeleton/platformio-package-skeleton-*.txt
 
     - name: Set up Python for wheel build
       uses: actions/setup-python@v5
@@ -426,7 +415,7 @@ jobs:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
 
-  publish-platformio-skeleton:
+  publish-platformio:
     needs: [prepare, build-linux]
     if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
     uses: ./.github/workflows/PublishPlatformIO.yml
@@ -434,4 +423,7 @@ jobs:
       version: ${{ needs.prepare.outputs.version }}
       tag: ${{ needs.prepare.outputs.tag }}
       source_ref: ${{ needs.prepare.outputs.tag }}
+      owner: ${{ github.repository_owner }}
       publish: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
+    secrets:
+      PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
