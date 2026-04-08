@@ -1,6 +1,6 @@
 {
   "name": "nmealib",
-  "version": "99.99.2",
+  "version": "99.99.3",
   "description": "Modern C++20 library for parsing NMEA 0183 sentences and NMEA 2000 CAN messages.",
   "keywords": [
     "nmea",
