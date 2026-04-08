@@ -270,7 +270,7 @@ TEST(Message2000_ControlBits, ReservedAndDataPageBothClear) {
     // 0x18EA1234 → b0=0x18=0b00011000 → R1=0, DP=0
     auto msg = make("18EA1234:AABB");
     ASSERT_NE(msg, nullptr);
-    EXPECT_FALSE(msg->getReserved());
+    EXPECT_FALSE(msg->getHeaderReserved());
     EXPECT_FALSE(msg->getDataPage());
 }
 
@@ -278,7 +278,7 @@ TEST(Message2000_ControlBits, ReservedAndDataPageBothSet) {
     // 0x1FFFFFFF → b0=0x1F=0b00011111 → R1=1, DP=1
     auto msg = make("1FFFFFFF:01");
     ASSERT_NE(msg, nullptr);
-    EXPECT_TRUE(msg->getReserved());
+    EXPECT_TRUE(msg->getHeaderReserved());
     EXPECT_TRUE(msg->getDataPage());
 }
 
@@ -287,7 +287,7 @@ TEST(Message2000_ControlBits, ReservedSetDataPageClear) {
     // PF=0xF0 (PDU2), PS=0x01, SA=0x05
     auto msg = make("1AF00105:01");
     ASSERT_NE(msg, nullptr);
-    EXPECT_TRUE(msg->getReserved());
+    EXPECT_TRUE(msg->getHeaderReserved());
     EXPECT_FALSE(msg->getDataPage());
 }
 

@@ -263,7 +263,7 @@ bool Message2000::getPriority2() const noexcept { return (getCanId()[0] & 0x08) 
 bool Message2000::getPriority1() const noexcept { return (getCanId()[0] & 0x04) != 0; } // bit 2
 
 // Reserved bit (R1) is bit 1 of canId[0].
-bool Message2000::getReserved() const noexcept  { return (getCanId()[0] & 0x02) != 0; }
+bool Message2000::getHeaderReserved() const noexcept  { return (getCanId()[0] & 0x02) != 0; }
 
 // Data Page (DP) is bit 0 of canId[0].
 bool Message2000::getDataPage() const noexcept  { return (getCanId()[0] & 0x01) != 0; }

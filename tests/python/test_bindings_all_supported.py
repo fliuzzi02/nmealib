@@ -38,6 +38,7 @@ def test_all_supported_nmea0183_factory_dispatch(raw, expected_type):
     ("raw", "expected_type"),
     [
         ("09F11260:342C71FF7FFF7FFD", nmealib.nmea2000.PGN127250),
+        ("01F11900:02FE3F0060FE9F00", nmealib.nmea2000.PGN127257),
         ("01F50300:01F4012C01000000", nmealib.nmea2000.PGN128259),
         ("01F80100:0000000000000000", nmealib.nmea2000.PGN129025),
         ("01F80200:01010040F4010000", nmealib.nmea2000.PGN129026),
