@@ -125,18 +125,17 @@ jobs:
       env:
         PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
       run: |
-        package_spec="${{ inputs.owner }}/${{ needs.validate-platformio-metadata.outputs.library_name }}@${{ inputs.version }}"
-        pio pkg show --type library --json-output "$package_spec" > platformio_package.json
+        package_name="${{ inputs.owner }}/${{ needs.validate-platformio-metadata.outputs.library_name }}"
+        expected_version="${{ inputs.version }}"
 
-        python3 - <<'PY'
-        import json
-        from pathlib import Path
+        pio pkg show --type library "$package_name" > platformio_package.txt
 
-        payload = json.loads(Path("platformio_package.json").read_text(encoding="utf-8"))
-        spec = "${{ inputs.owner }}/${{ needs.validate-platformio-metadata.outputs.library_name }}@${{ inputs.version }}"
+        if ! grep -Fq "$expected_version" platformio_package.txt; then
+          echo "Expected version $expected_version was not found in PlatformIO output for $package_name"
+          echo "---- pio pkg show output ----"
+          cat platformio_package.txt
+          echo "-----------------------------"
+          exit 1
+        fi
 
-        if not payload:
-            raise SystemExit(f"PlatformIO package lookup returned empty payload for {spec}")
-
-        print(f"PlatformIO package verified: {spec}")
-        PY
+        echo "PlatformIO package verified: $package_name (found version $expected_version)"
