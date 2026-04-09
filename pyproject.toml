@@ -27,9 +27,21 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/fliuzzi02/nmealib"
 
+[project.optional-dependencies]
+dev = [
+    "pybind11-stubgen>=2.5",
+]
+
 [tool.scikit-build]
 cmake.version = ">=3.20"
 wheel.packages = ["python/nmealib"]
+
+[tool.scikit-build.sdist]
+include = [
+    "python/nmealib/**/*.pyi",
+    "python/nmealib/py.typed",
+    "scripts/generate_python_stubs.py",
+]
 
 [tool.scikit-build.cmake.define]
 BUILD_PYTHON_BINDINGS = "ON"

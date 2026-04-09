@@ -28,6 +28,14 @@ jobs:
     - name: Build
       run: cmake --build build --config Release
 
+    - name: Verify Python stubs are up to date
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pybind11-stubgen
+        python -m pip install -e .
+        python scripts/generate_python_stubs.py --module nmealib._core --package-dir python/nmealib --python python
+        git diff --exit-code -- python/nmealib/__init__.pyi python/nmealib/_core python/nmealib/py.typed
+
     - name: Run all tests
       working-directory: build
       run: ctest --output-on-failure --no-tests=error
