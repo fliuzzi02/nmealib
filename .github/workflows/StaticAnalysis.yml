@@ -2,6 +2,10 @@ name: Static Analysis
 
 on:
   workflow_call:
+    inputs:
+      ref:
+        required: false
+        type: string
     outputs:
       cppcheck_exit_code:
         description: "Cppcheck exit code (0 means success)"
@@ -12,6 +16,12 @@ on:
       report_file:
         description: "Absolute path of the generated cppcheck XML report"
         value: ${{ jobs.static-analysis.outputs.report_file }}
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref (branch, tag, or SHA) to analyze"
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -26,6 +36,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.ref != '' && inputs.ref || github.sha }}
 
     - name: Set reusable strings
       id: strings

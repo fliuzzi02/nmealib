@@ -1,8 +1,6 @@
-name: CI
+name: PullRequest
 
 on:
-  push:
-    branches: [ "release/**" ]
   pull_request:
     branches: [ "main" ]
 
@@ -138,22 +136,3 @@ jobs:
             labels: ['release', 'ci', 'failure']
           });
 
-  # Only build the cross platforms if tests are passed, for now it will be disabled
-  # build:
-  #   needs: test
-  #   if: ${{ needs.test.result == 'success' }}
-  #   uses: ./.github/workflows/Build.yml
-
-  # Run release only if we are in a release/ branch and all tests passed
-  release:
-    needs: test
-    if: ${{ needs.test.result == 'success' && (startsWith(github.ref_name, 'release/') || startsWith(github.head_ref, 'release/')) }}
-    permissions:
-      contents: write
-      id-token: write
-    uses: ./.github/workflows/Release.yml
-    with:
-      branch: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
-      sha: ${{ github.sha }}
-      publish: ${{ github.event_name == 'push' }}
-    secrets: inherit
