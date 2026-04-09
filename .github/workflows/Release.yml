@@ -1,27 +1,18 @@
 name: Release
 
 on:
+  create:
   workflow_dispatch:
     inputs:
       version:
         description: "Release version (X.Y.Z). Leave empty to derive from release/vX.Y.Z branch."
         required: false
         type: string
-  workflow_call:
-    inputs:
-      version:
-        required: false
-        type: string
-      branch:
-        required: true
-        type: string
-      sha:
-        required: true
-        type: string
       publish:
+        description: "Publish outputs (false runs release checks/build only)"
         required: false
         type: boolean
-        default: false
+        default: true
 
 permissions:
   contents: read
@@ -29,59 +20,67 @@ permissions:
 jobs:
   prepare:
     runs-on: ubuntu-latest
-    if: ${{ github.actor != 'github-actions[bot]' }}
+    if: ${{ github.actor != 'github-actions[bot]' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'create' && github.event.ref_type == 'branch' && startsWith(github.event.ref, 'release/'))) }}
     permissions:
       contents: write
     outputs:
-      version: ${{ steps.version.outputs.version }}
-      tag: ${{ steps.version.outputs.tag }}
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
+      branch: ${{ steps.meta.outputs.branch }}
+      publish: ${{ steps.meta.outputs.publish }}
+      source_ref: ${{ steps.source_ref.outputs.source_ref }}
 
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        ref: ${{ github.event_name == 'workflow_call' && inputs.sha || github.sha }}
+        ref: ${{ github.event_name == 'create' && format('refs/heads/{0}', github.event.ref) || github.ref }}
 
-    - name: Derive version
-      id: version
+    - name: Derive release metadata
+      id: meta
       shell: bash
       run: |
+        if [[ "${{ github.event_name }}" == "create" ]]; then
+          branch="${{ github.event.ref }}"
+        else
+          branch="${GITHUB_REF_NAME}"
+        fi
+
         if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.version }}" ]]; then
           version="${{ github.event.inputs.version }}"
-        elif [[ "${{ github.event_name }}" == "workflow_call" && -n "${{ inputs.version }}" ]]; then
-          version="${{ inputs.version }}"
         else
-          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
-            branch="${{ inputs.branch }}"
-          else
-            branch="${GITHUB_REF_NAME}"
-          fi
           version="${branch#release/}"
           version="${version#v}"
         fi
+
         if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
           echo "Invalid version: $version" >&2
           exit 1
         fi
+
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          publish="${{ github.event.inputs.publish }}"
+        else
+          publish="true"
+        fi
+
         echo "version=$version" >> "$GITHUB_OUTPUT"
         echo "tag=v$version" >> "$GITHUB_OUTPUT"
+        echo "branch=$branch" >> "$GITHUB_OUTPUT"
+        echo "publish=$publish" >> "$GITHUB_OUTPUT"
 
     - name: Update VERSION
-      if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
+      if: ${{ steps.meta.outputs.publish == 'true' }}
       shell: bash
       run: |
-        if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
-          branch="${{ inputs.branch }}"
-        else
-          branch="${GITHUB_REF_NAME}"
-        fi
+        branch="${{ steps.meta.outputs.branch }}"
         git fetch origin "$branch" || true
         if git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
           git checkout -B "$branch" "origin/$branch"
         else
           git checkout -B "$branch"
         fi
-        python3 scripts/update_version.py "${{ steps.version.outputs.version }}"
+        python3 scripts/update_version.py "${{ steps.meta.outputs.version }}"
 
         if git diff --quiet; then
           echo "VERSION already up to date."
@@ -89,291 +88,99 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add VERSION library.json
-          git commit -m "chore(release): set version ${{ steps.version.outputs.version }}"
+          git commit -m "chore(release): set version ${{ steps.meta.outputs.version }}"
           git push origin "$branch"
         fi
 
     - name: Create tag
-      if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
+      if: ${{ steps.meta.outputs.publish == 'true' }}
       shell: bash
       run: |
-        tag="${{ steps.version.outputs.tag }}"
+        tag="${{ steps.meta.outputs.tag }}"
         if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
           echo "Tag already exists: $tag"
           exit 0
         fi
-        git tag -a "$tag" -m "Release ${{ steps.version.outputs.version }}"
+        git tag -a "$tag" -m "Release ${{ steps.meta.outputs.version }}"
         git push origin "$tag"
 
-  build-linux:
-    runs-on: ubuntu-latest
-    needs: prepare
-    permissions:
-      contents: read
-    steps:
-    - uses: actions/checkout@v4
-      if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
-      with:
-        ref: ${{ needs.prepare.outputs.tag }}
-
-    - uses: actions/checkout@v4
-      if: ${{ github.event_name == 'workflow_call' && !inputs.publish }}
-      with:
-        ref: ${{ inputs.sha }}
-
-    - name: Set reusable strings
-      id: strings
+    - name: Resolve source ref
+      id: source_ref
       shell: bash
       run: |
-        echo "build-lib-dir=${{ github.workspace }}/build-lib" >> "$GITHUB_OUTPUT"
-        echo "build-cli-dir=${{ github.workspace }}/build-cli" >> "$GITHUB_OUTPUT"
-
-    - name: Configure CMake (library only)
-      run: >
-        cmake -B ${{ steps.strings.outputs.build-lib-dir }}
-        -DCMAKE_CXX_COMPILER=g++
-        -DCMAKE_C_COMPILER=gcc
-        -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++ -static-libgcc"
-        -DCMAKE_SHARED_LINKER_FLAGS="-static-libstdc++ -static-libgcc"
-        -DBUILD_CLI=OFF
-        -S ${{ github.workspace }}
-
-    - name: Build release (library only)
-      run: cmake --build ${{ steps.strings.outputs.build-lib-dir }} --config Release
-
-    - name: Configure CMake (library + cli)
-      run: >
-        cmake -B ${{ steps.strings.outputs.build-cli-dir }}
-        -DCMAKE_CXX_COMPILER=g++
-        -DCMAKE_C_COMPILER=gcc
-        -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++ -static-libgcc"
-        -DCMAKE_SHARED_LINKER_FLAGS="-static-libstdc++ -static-libgcc"
-        -DBUILD_CLI=ON
-        -S ${{ github.workspace }}
-
-    - name: Build release (library + cli)
-      run: cmake --build ${{ steps.strings.outputs.build-cli-dir }} --config Release
-
-    - name: Prepare library package
-      working-directory: ${{ steps.strings.outputs.build-lib-dir }}
-      run: |
-        # Install library to dist directory (no component filter since CLI is not built)
-        cmake --install . --prefix dist
-        
-        # Verify library was installed
-        if [ ! -f "dist/lib/libnmealib.a" ]; then
-          echo "ERROR: libnmealib.a was not installed!"
-          echo "Contents of dist/lib:"
-          ls -la dist/lib/ || echo "dist/lib/ does not exist"
-          exit 1
-        fi
-        
-        # Create versioned package directory with proper structure
-        mkdir -p nmealib-${{ needs.prepare.outputs.version }}/{lib/cmake/nmealib,include}
-        
-        # Copy library files
-        cp dist/lib/libnmealib.a nmealib-${{ needs.prepare.outputs.version }}/lib/
-        
-        # Copy headers
-        cp -r dist/include/* nmealib-${{ needs.prepare.outputs.version }}/include/
-        
-        # Copy cmake config file
-        cp dist/lib/cmake/nmealib/nmealibConfig.cmake nmealib-${{ needs.prepare.outputs.version }}/lib/cmake/nmealib/
-        
-        # Copy documentation and license
-        cp ${{ github.workspace }}/README.md nmealib-${{ needs.prepare.outputs.version }}/
-        cp ${{ github.workspace }}/LICENSE nmealib-${{ needs.prepare.outputs.version }}/
-        
-        # Create tarball
-        tar -czf nmealib-${{ needs.prepare.outputs.version }}-linux64.tar.gz nmealib-${{ needs.prepare.outputs.version }}/
-
-    - name: Package cli release
-      working-directory: ${{ steps.strings.outputs.build-cli-dir }}
-      run: |
-        cmake --install . --prefix nmealib-cli-dist
-        mkdir -p nmealib-cli-${{ needs.prepare.outputs.version }}
-        cp -r nmealib-cli-dist/lib nmealib-cli-${{ needs.prepare.outputs.version }}/
-        cp -r nmealib-cli-dist/include nmealib-cli-${{ needs.prepare.outputs.version }}/
-        cp -r nmealib-cli-dist/bin nmealib-cli-${{ needs.prepare.outputs.version }}/
-        cp ${{ github.workspace }}/README.md nmealib-cli-${{ needs.prepare.outputs.version }}/
-        cp ${{ github.workspace }}/LICENSE nmealib-cli-${{ needs.prepare.outputs.version }}/
-        tar -czf nmealib-cli-${{ needs.prepare.outputs.version }}-linux64.tar.gz nmealib-cli-${{ needs.prepare.outputs.version }}/
-
-    - name: Upload library artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: nmealib-linux64
-        path: ${{ steps.strings.outputs.build-lib-dir }}/nmealib-${{ needs.prepare.outputs.version }}-linux64.tar.gz
-
-    - name: Upload cli artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: nmealib-cli-linux64
-        path: ${{ steps.strings.outputs.build-cli-dir }}/nmealib-cli-${{ needs.prepare.outputs.version }}-linux64.tar.gz
-
-    - name: Prepare cross-linux skeleton artifacts
-      shell: bash
-      run: |
-        mkdir -p out/skeleton
-        for target in manylinux_2_17_x86_64 manylinux_2_17_aarch64 musllinux_1_2_x86_64 musllinux_1_2_aarch64; do
-          cat > "out/skeleton/python-wheel-skeleton-${target}.txt" <<EOF
-        Skeleton only: Linux wheel build implementation will be added in a follow-up pass.
-        This lane represents target ${target} for version ${{ needs.prepare.outputs.version }} (${{ needs.prepare.outputs.tag }}).
-        EOF
-        done
-
-    - name: Upload python wheel skeleton artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: python-wheel-skeleton-linux
-        path: out/skeleton/python-wheel-skeleton-*.txt
-
-    - name: Set up Python for wheel build
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
-
-    - name: Build Python manylinux wheel artifact
-      shell: bash
-      env:
-        CIBW_PLATFORM: linux
-        CIBW_ARCHS_LINUX: x86_64
-        CIBW_BUILD: cp312-manylinux_x86_64
-        CIBW_SKIP: "*-musllinux*"
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install cibuildwheel
-        python -m cibuildwheel --output-dir dist/python
-
-    - name: Upload Python distribution artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: python-dist-linux
-        path: dist/python/*.whl
-
-  publish:
-    runs-on: ubuntu-latest
-    needs: [prepare, build-linux]
-    if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
-    permissions:
-      contents: write
-    steps:
-    - uses: actions/download-artifact@v4
-      with:
-        path: dist
-
-    - name: Generate release notes from previous release
-      id: release_notes
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const owner = context.repo.owner;
-          const repo = context.repo.repo;
-          const tagName = '${{ needs.prepare.outputs.tag }}';
-
-          let previousTagName;
-          try {
-            const latest = await github.rest.repos.getLatestRelease({ owner, repo });
-            if (latest.data.tag_name && latest.data.tag_name !== tagName) {
-              previousTagName = latest.data.tag_name;
-            }
-          } catch (error) {
-            if (error.status !== 404) {
-              throw error;
-            }
-          }
-
-          const params = { owner, repo, tag_name: tagName };
-          if (previousTagName) {
-            params.previous_tag_name = previousTagName;
-          }
-
-          const notes = await github.rest.repos.generateReleaseNotes(params);
-          core.setOutput('body', notes.data.body || '');
-          core.setOutput('previous_tag', previousTagName || '');
-
-    - name: Log release notes range
-      shell: bash
-      run: |
-        if [[ -n "${{ steps.release_notes.outputs.previous_tag }}" ]]; then
-          echo "Generated notes from ${{ steps.release_notes.outputs.previous_tag }} to ${{ needs.prepare.outputs.tag }}"
+        if [[ "${{ steps.meta.outputs.publish }}" == "true" ]]; then
+          echo "source_ref=refs/tags/${{ steps.meta.outputs.tag }}" >> "$GITHUB_OUTPUT"
         else
-          echo "Generated notes for ${{ needs.prepare.outputs.tag }} (no previous release found)"
+          echo "source_ref=refs/heads/${{ steps.meta.outputs.branch }}" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: Publish GitHub Release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ needs.prepare.outputs.tag }}
-        name: ${{ needs.prepare.outputs.tag }}
-        body: ${{ steps.release_notes.outputs.body }}
-        files: |
-          dist/**/*-linux64.tar.gz
+  tests:
+    needs: prepare
+    uses: ./.github/workflows/Test.yml
+    with:
+      ref: ${{ needs.prepare.outputs.source_ref }}
 
-  collect-python-dist:
-    runs-on: ubuntu-latest
-    needs: [prepare, build-linux]
-    if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
-    permissions:
-      contents: read
-    steps:
-    - name: Download Linux wheel artifacts
-      uses: actions/download-artifact@v4
-      with:
-        pattern: python-dist-*
-        path: dist/python-wheels
-        merge-multiple: true
+  build:
+    needs: [prepare, tests]
+    if: ${{ needs.prepare.outputs.publish == 'true' }}
+    uses: ./.github/workflows/Build.yml
+    with:
+      version: ${{ needs.prepare.outputs.version }}
+      source_ref: ${{ needs.prepare.outputs.source_ref }}
+      publish: true
 
-    - name: Validate collected wheel artifacts
-      shell: bash
-      run: |
-        echo "Release tag: ${{ needs.prepare.outputs.tag }}"
-        echo "Version: ${{ needs.prepare.outputs.version }}"
-        ls -la dist/python-wheels || true
+  publish-github:
+    needs: [prepare, build, tests]
+    if: ${{ needs.prepare.outputs.publish == 'true' }}
+    uses: ./.github/workflows/PublishGitHub.yml
+    with:
+      tag: ${{ needs.prepare.outputs.tag }}
+      publish: true
 
-        wheel_count=$(find dist/python-wheels -maxdepth 1 -name '*.whl' | wc -l)
-        if [ "$wheel_count" -eq 0 ]; then
-          echo "No wheel artifacts found to publish."
-          exit 1
-        fi
-
-        python -m pip install --upgrade pip
-        python -m pip install twine
-        python -m twine check dist/python-wheels/*.whl
-
-  publish-pypi:
-    runs-on: ubuntu-latest
-    needs: [prepare, collect-python-dist]
-    if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
-    permissions:
-      contents: read
-    steps:
-    - name: Download Linux wheel artifacts
-      uses: actions/download-artifact@v4
-      with:
-        pattern: python-dist-*
-        path: dist/python-wheels
-        merge-multiple: true
-
-    - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        packages-dir: dist/python-wheels
-        attestations: false
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
+  publish-python:
+    needs: [prepare, build, tests]
+    if: ${{ needs.prepare.outputs.publish == 'true' }}
+    uses: ./.github/workflows/PublishPython.yml
+    with:
+      version: ${{ needs.prepare.outputs.version }}
+      tag: ${{ needs.prepare.outputs.tag }}
+      publish: true
+    secrets:
+      PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
 
   publish-platformio:
-    needs: [prepare, build-linux]
-    if: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
+    needs: [prepare, build, tests]
+    if: ${{ needs.prepare.outputs.publish == 'true' }}
     uses: ./.github/workflows/PublishPlatformIO.yml
     with:
       version: ${{ needs.prepare.outputs.version }}
       tag: ${{ needs.prepare.outputs.tag }}
-      source_ref: ${{ needs.prepare.outputs.tag }}
+      source_ref: ${{ needs.prepare.outputs.source_ref }}
       owner: ${{ github.repository_owner }}
-      publish: ${{ github.event_name == 'workflow_dispatch' || inputs.publish }}
+      publish: true
     secrets:
       PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
+
+  cleanup-release-branch:
+    runs-on: ubuntu-latest
+    needs: [prepare, publish-github, publish-python, publish-platformio]
+    if: ${{ always() && needs.prepare.outputs.publish == 'true' && github.event_name == 'create' && needs.publish-github.result == 'success' && needs.publish-python.result == 'success' && needs.publish-platformio.result == 'success' }}
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Delete release branch after successful publish
+      shell: bash
+      run: |
+        branch="${{ needs.prepare.outputs.branch }}"
+        if [[ -z "$branch" || "$branch" == "main" || "$branch" == "master" ]]; then
+          echo "Skipping branch deletion for protected or invalid branch: $branch"
+          exit 0
+        fi
+
+        git push origin --delete "$branch" \
+          && echo "Deleted release branch: $branch" \
+          || echo "Branch deletion skipped (likely protected)."
