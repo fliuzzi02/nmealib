@@ -1,7 +1,7 @@
 # nmealib
 
 <p align="center">
-    <img src="docs/nmealib.png" alt="nmealib logo" width="240"/>
+    <img src="https://fliuzzi02.github.io/nmealib/docs/nmealib.png" alt="nmealib logo" width="240"/>
 </p>
 
 [![License: GPL-3.0](https://img.shields.io/github/license/fliuzzi02/nmealib)](https://github.com/fliuzzi02/nmealib/blob/main/LICENSE)
