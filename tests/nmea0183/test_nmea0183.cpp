@@ -107,5 +107,33 @@ TEST(Message0183, ValidateBehavior)
     EXPECT_TRUE(no->validate());
 }
 
+TEST(Message0183, CloneBehavior) {
+    auto original = Nmea0183Factory::create(SAMPLE_WITH_CHECKSUM);
+    ASSERT_NE(original, nullptr);
 
+    auto clone = original->clone();
+    ASSERT_NE(clone, nullptr);
 
+    // The clone should be equal to the original
+    EXPECT_TRUE(*original == *clone);
+
+    // But they should not be the same object (different addresses)
+    EXPECT_NE(original.get(), clone.get());
+}
+
+TEST(Message0183, GetStringContent) {
+    std::string unimplemented = "$XXABC,123*00\r\n";
+    auto msg = Nmea0183Factory::create(unimplemented);
+    ASSERT_NE(msg, nullptr);
+
+    // Verbose should include all fields
+    std::string verbose = msg->getStringContent(true);
+    EXPECT_NE(verbose.find("Talker: XX"), std::string::npos);
+    EXPECT_NE(verbose.find("Sentence Type: ABC"), std::string::npos);
+    EXPECT_NE(verbose.find("Unimplemented sentence"), std::string::npos);
+
+    // Non-verbose should be a single line summary
+    std::string nonVerbose = msg->getStringContent(false);
+    EXPECT_NE(nonVerbose.find("XX ABC"), std::string::npos);
+    EXPECT_NE(nonVerbose.find("Unimplemented sentence"), std::string::npos);
+}
