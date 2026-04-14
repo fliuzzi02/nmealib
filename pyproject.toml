@@ -25,7 +25,7 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/fliuzzi02/nmealib"
+Homepage = "https://fliuzzi02.github.io/nmealib/"
 
 [project.optional-dependencies]
 dev = [
