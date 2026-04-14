@@ -6,21 +6,37 @@ Class `nmea0183.RMB` (Python) / `nmealib::nmea0183::RMB` (C++).
 Recommended minimum navigation data toward an active destination waypoint (GPSD: RMB - Recommended Minimum Navigation Information).
 
 ## Creation
-- Python direct:
-```python
-msg = nmealib.nmea0183.RMB(<fields...>)
-```
-- C++ direct:
+### C++
 ```cpp
-nmealib::nmea0183::RMB msg(/* fields */);
-```
-- Python factory:
-```python
-msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
-```
-- C++ factory:
-```cpp
+// Direct constructor:
+nmealib::nmea0183::RMB msg = nmealib::nmea0183::RMB(std::string talkerId,
+        char status,
+        double crossTrackErrorNm,
+        char directionToSteer,
+        std::string originWaypointId,
+        std::string destinationWaypointId,
+        double destinationLatitude,
+        char destinationLatitudeHemisphere,
+        double destinationLongitude,
+        char destinationLongitudeHemisphere,
+        double rangeToDestinationNm,
+        double bearingToDestinationTrue,
+        double destinationClosingVelocityKnots,
+        char arrivalStatus,
+        std::optional<char> faaModeIndicator = std::nullopt
+    );
+
+// Factory method from raw data:
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
+```
+
+### Python
+```python
+# Direct constructor:
+msg = nmealib.nmea0183.RMB(/* fields */)
+
+# Factory method from raw data:
+msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
 ```
 
 ## Public Methods

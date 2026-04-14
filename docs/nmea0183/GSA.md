@@ -6,21 +6,30 @@ Class `nmea0183.GSA` (Python) / `nmealib::nmea0183::GSA` (C++).
 GNSS DOP and active satellites used for the current fix solution (GPSD: GSA - GPS DOP and active satellites).
 
 ## Creation
-- Python direct:
-```python
-msg = nmealib.nmea0183.GSA(<fields...>)
-```
-- C++ direct:
+### C++
 ```cpp
-nmealib::nmea0183::GSA msg(/* fields */);
-```
-- Python factory:
-```python
-msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
-```
-- C++ factory:
-```cpp
+// Direct constructor:
+nmealib::nmea0183::GSA msg = nmealib::nmea0183::GSA(std::string talkerId,
+        char selectionMode,
+        unsigned int mode,
+        std::array<unsigned int, 12> satelliteIds,
+        double pdop,
+        double hdop,
+        double vdop,
+        std::optional<unsigned int> systemId = std::nullopt
+    );
+
+// Factory method from raw data:
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
+```
+
+### Python
+```python
+# Direct constructor:
+msg = nmealib.nmea0183.GSA(/* fields */)
+
+# Factory method from raw data:
+msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
 ```
 
 ## Public Methods

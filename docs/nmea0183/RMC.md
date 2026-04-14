@@ -6,21 +6,36 @@ Class `nmea0183.RMC` (Python) / `nmealib::nmea0183::RMC` (C++).
 Recommended minimum GNSS data with time, status, position, speed, course, and date (GPSD: RMC - Recommended Minimum Navigation Information).
 
 ## Creation
-- Python direct:
-```python
-msg = nmealib.nmea0183.RMC(<fields...>)
-```
-- C++ direct:
+### C++
 ```cpp
-nmealib::nmea0183::RMC msg(/* fields */);
-```
-- Python factory:
-```python
-msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
-```
-- C++ factory:
-```cpp
+// Direct constructor:
+nmealib::nmea0183::RMC msg = nmealib::nmea0183::RMC(std::string talkerId,
+        unsigned int utcFix,
+        char status,
+        double latitude,
+        char latitudeDirection,
+        double longitude,
+        char longitudeDirection,
+        double speedOverGround,
+        double courseOverGround,
+        unsigned int date,
+        double magneticVariation,
+        char magneticVariationDirection,
+        char modeIndicator,
+        char navigationStatus
+    );
+
+// Factory method from raw data:
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
+```
+
+### Python
+```python
+# Direct constructor:
+msg = nmealib.nmea0183.RMC(/* fields */)
+
+# Factory method from raw data:
+msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
 ```
 
 ## Public Methods

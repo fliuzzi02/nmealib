@@ -6,21 +6,34 @@ Class `nmea0183.RMA` (Python) / `nmealib::nmea0183::RMA` (C++).
 Recommended minimum navigation information in legacy format (GPSD: RMA - Recommended Minimum Navigation Information).
 
 ## Creation
-- Python direct:
-```python
-msg = nmealib.nmea0183.RMA(<fields...>)
-```
-- C++ direct:
+### C++
 ```cpp
-nmealib::nmea0183::RMA msg(/* fields */);
-```
-- Python factory:
-```python
-msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
-```
-- C++ factory:
-```cpp
+// Direct constructor:
+nmealib::nmea0183::RMA msg = nmealib::nmea0183::RMA(std::string talkerId,
+        char status,
+        double latitude,
+        char latitudeDirection,
+        double longitude,
+        char longitudeDirection,
+        double timeDifferenceA,
+        double timeDifferenceB,
+        double speedOverGround,
+        double trackMadeGood,
+        double magneticVariation,
+        char variationDirection
+    );
+
+// Factory method from raw data:
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
+```
+
+### Python
+```python
+# Direct constructor:
+msg = nmealib.nmea0183.RMA(/* fields */)
+
+# Factory method from raw data:
+msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
 ```
 
 ## Public Methods

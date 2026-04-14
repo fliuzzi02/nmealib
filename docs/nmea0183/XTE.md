@@ -6,21 +6,29 @@ Class `nmea0183.XTE` (Python) / `nmealib::nmea0183::XTE` (C++).
 Cross-track error and recommended steering direction (GPSD: XTE - Cross-Track Error, Measured).
 
 ## Creation
-- Python direct:
-```python
-msg = nmealib.nmea0183.XTE(<fields...>)
-```
-- C++ direct:
+### C++
 ```cpp
-nmealib::nmea0183::XTE msg(/* fields */);
-```
-- Python factory:
-```python
-msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
-```
-- C++ factory:
-```cpp
+// Direct constructor:
+nmealib::nmea0183::XTE msg = nmealib::nmea0183::XTE(std::string talkerId,
+        char status1,
+        char status2,
+        double crossTrackError,
+        char steerDirection,
+        char crossTrackUnits,
+        std::optional<char> faaModeIndicator = std::nullopt
+    );
+
+// Factory method from raw data:
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
+```
+
+### Python
+```python
+# Direct constructor:
+msg = nmealib.nmea0183.XTE(/* fields */)
+
+# Factory method from raw data:
+msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
 ```
 
 ## Public Methods

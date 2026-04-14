@@ -6,21 +6,28 @@ Class `nmea0183.HDG` (Python) / `nmealib::nmea0183::HDG` (C++).
 Magnetic heading with deviation and variation components (GPSD: HDG - Heading - Deviation & Variation).
 
 ## Creation
-- Python direct:
-```python
-msg = nmealib.nmea0183.HDG(<fields...>)
-```
-- C++ direct:
+### C++
 ```cpp
-nmealib::nmea0183::HDG msg(/* fields */);
-```
-- Python factory:
-```python
-msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
-```
-- C++ factory:
-```cpp
+// Direct constructor:
+nmealib::nmea0183::HDG msg = nmealib::nmea0183::HDG(std::string talkerId,
+        double magneticHeading,
+        double magneticDeviation,
+        char deviationDirection,
+        double magneticVariation,
+        char variationDirection
+    );
+
+// Factory method from raw data:
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
+```
+
+### Python
+```python
+# Direct constructor:
+msg = nmealib.nmea0183.HDG(/* fields */)
+
+# Factory method from raw data:
+msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
 ```
 
 ## Public Methods

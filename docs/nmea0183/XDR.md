@@ -6,21 +6,22 @@ Class `nmea0183.XDR` (Python) / `nmealib::nmea0183::XDR` (C++).
 Transducer measurements as typed sensor/value/unit/name groups (GPSD: XDR - Transducer Measurement).
 
 ## Creation
-- Python direct:
-```python
-msg = nmealib.nmea0183.XDR(<fields...>)
-```
-- C++ direct:
+### C++
 ```cpp
-nmealib::nmea0183::XDR msg(/* fields */);
-```
-- Python factory:
-```python
-msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
-```
-- C++ factory:
-```cpp
+// Direct constructor:
+nmealib::nmea0183::XDR msg = nmealib::nmea0183::XDR(std::string talkerId, std::vector<TransducerMeasurement> transducers);
+
+// Factory method from raw data:
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
+```
+
+### Python
+```python
+# Direct constructor:
+msg = nmealib.nmea0183.XDR(/* fields */)
+
+# Factory method from raw data:
+msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
 ```
 
 ## Public Methods

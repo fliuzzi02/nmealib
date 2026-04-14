@@ -6,21 +6,28 @@ Class `nmea0183.MWV` (Python) / `nmealib::nmea0183::MWV` (C++).
 Wind speed and angle with reference (relative/true) and status (GPSD: MWV - Wind Speed and Angle).
 
 ## Creation
-- Python direct:
-```python
-msg = nmealib.nmea0183.MWV(<fields...>)
-```
-- C++ direct:
+### C++
 ```cpp
-nmealib::nmea0183::MWV msg(/* fields */);
-```
-- Python factory:
-```python
-msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
-```
-- C++ factory:
-```cpp
+// Direct constructor:
+nmealib::nmea0183::MWV msg = nmealib::nmea0183::MWV(std::string talkerId,
+        double windAngle,
+        char reference,
+        double windSpeed,
+        char windSpeedUnits,
+        char status
+    );
+
+// Factory method from raw data:
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
+```
+
+### Python
+```python
+# Direct constructor:
+msg = nmealib.nmea0183.MWV(/* fields */)
+
+# Factory method from raw data:
+msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
 ```
 
 ## Public Methods

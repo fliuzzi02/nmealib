@@ -6,21 +6,29 @@ Class `nmea0183.VTG` (Python) / `nmealib::nmea0183::VTG` (C++).
 Track made good and ground speed, including true/magnetic course and speed units (GPSD: VTG - Track made good and Ground speed).
 
 ## Creation
-- Python direct:
-```python
-msg = nmealib.nmea0183.VTG(<fields...>)
-```
-- C++ direct:
+### C++
 ```cpp
-nmealib::nmea0183::VTG msg(/* fields */);
-```
-- Python factory:
-```python
-msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
-```
-- C++ factory:
-```cpp
+// Direct constructor:
+nmealib::nmea0183::VTG msg = nmealib::nmea0183::VTG(std::string talkerId,
+        double courseOverGroundTrue,
+        double courseOverGroundMagnetic,
+        double speedOverGroundKnots,
+        double speedOverGroundKph,
+        std::optional<char> faaModeIndicator = std::nullopt,
+        bool legacyFormat = false
+    );
+
+// Factory method from raw data:
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
+```
+
+### Python
+```python
+# Direct constructor:
+msg = nmealib.nmea0183.VTG(/* fields */)
+
+# Factory method from raw data:
+msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
 ```
 
 ## Public Methods

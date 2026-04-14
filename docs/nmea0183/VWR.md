@@ -6,21 +6,28 @@ Class `nmea0183.VWR` (Python) / `nmealib::nmea0183::VWR` (C++).
 Relative wind speed and angle with multiple speed units (GPSD: VWR - Relative Wind Speed and Angle).
 
 ## Creation
-- Python direct:
-```python
-msg = nmealib.nmea0183.VWR(<fields...>)
-```
-- C++ direct:
+### C++
 ```cpp
-nmealib::nmea0183::VWR msg(/* fields */);
-```
-- Python factory:
-```python
-msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
-```
-- C++ factory:
-```cpp
+// Direct constructor:
+nmealib::nmea0183::VWR msg = nmealib::nmea0183::VWR(std::string talkerId,
+        double windAngle,
+        char windSide,
+        double speedKnots,
+        double speedMps,
+        double speedKph
+    );
+
+// Factory method from raw data:
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
+```
+
+### Python
+```python
+# Direct constructor:
+msg = nmealib.nmea0183.VWR(/* fields */)
+
+# Factory method from raw data:
+msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
 ```
 
 ## Public Methods

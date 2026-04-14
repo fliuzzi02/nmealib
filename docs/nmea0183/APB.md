@@ -6,21 +6,37 @@ Class `nmea0183.APB` (Python) / `nmealib::nmea0183::APB` (C++).
 Autopilot sentence with cross-track error, steering direction, waypoint arrival status, and bearings for navigation guidance (GPSD: APB - Autopilot Sentence "B").
 
 ## Creation
-- Python direct:
-```python
-msg = nmealib.nmea0183.APB(<fields...>)
-```
-- C++ direct:
+### C++
 ```cpp
-nmealib::nmea0183::APB msg(/* fields */);
-```
-- Python factory: 
-```python
-msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
-```
-- C++ factory: 
-```cpp
+// Direct constructor:
+nmealib::nmea0183::APB msg = nmealib::nmea0183::APB(std::string talkerId,
+        char status1,
+        char status2,
+        double crossTrackErrorMagnitude,
+        char directionToSteer,
+        char crossTrackUnits,
+        char arrivalCircleStatus,
+        char perpendicularPassedAtWaypoint,
+        double bearingOriginToDestination,
+        char bearingOriginToDestinationType,
+        std::string destinationWaypointId,
+        double bearingPresentToDestination,
+        char bearingPresentToDestinationType,
+        double headingToSteerToDestinationWaypoint,
+        char headingToSteerToDestinationWaypointType
+    );
+
+// Factory method from raw data:
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
+```
+
+### Python
+```python
+# Direct constructor:
+msg = nmealib.nmea0183.APB(/* fields */)
+
+# Factory method from raw data:
+msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
 ```
 
 ## Public Methods

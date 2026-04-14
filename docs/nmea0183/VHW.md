@@ -6,21 +6,27 @@ Class `nmea0183.VHW` (Python) / `nmealib::nmea0183::VHW` (C++).
 Water-referenced vessel heading and speed in knots and km/h (GPSD: VHW - Water speed and heading).
 
 ## Creation
-- Python direct:
-```python
-msg = nmealib.nmea0183.VHW(<fields...>)
-```
-- C++ direct:
+### C++
 ```cpp
-nmealib::nmea0183::VHW msg(/* fields */);
-```
-- Python factory:
-```python
-msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
-```
-- C++ factory:
-```cpp
+// Direct constructor:
+nmealib::nmea0183::VHW msg = nmealib::nmea0183::VHW(std::string talkerId,
+        double headingTrue,
+        double headingMagnetic,
+        double speedKnots,
+        double speedKph
+    );
+
+// Factory method from raw data:
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
+```
+
+### Python
+```python
+# Direct constructor:
+msg = nmealib.nmea0183.VHW(/* fields */)
+
+# Factory method from raw data:
+msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
 ```
 
 ## Public Methods

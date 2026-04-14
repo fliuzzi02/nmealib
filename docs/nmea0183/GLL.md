@@ -6,21 +6,30 @@ Class `nmea0183.GLL` (Python) / `nmealib::nmea0183::GLL` (C++).
 Geographic latitude/longitude position with UTC time and validity/mode flags (GPSD: GLL - Geographic Position - Latitude/Longitude).
 
 ## Creation
-- Python direct:
-```python
-msg = nmealib.nmea0183.GLL(<fields...>)
-```
-- C++ direct:
+### C++
 ```cpp
-nmealib::nmea0183::GLL msg(/* fields */);
-```
-- Python factory:
-```python
-msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
-```
-- C++ factory:
-```cpp
+// Direct constructor:
+nmealib::nmea0183::GLL msg = nmealib::nmea0183::GLL(std::string talkerId,
+        double latitude,
+        char latitudeDirection,
+        double longitude,
+        char longitudeDirection,
+        double timestamp,
+        char status,
+        char modeIndicator
+    );
+
+// Factory method from raw data:
 auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
+```
+
+### Python
+```python
+# Direct constructor:
+msg = nmealib.nmea0183.GLL(/* fields */)
+
+# Factory method from raw data:
+msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
 ```
 
 ## Public Methods
