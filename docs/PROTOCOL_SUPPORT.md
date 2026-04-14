@@ -6,40 +6,40 @@ This page tracks message/PGN support and implementation details.
 
 | Message | Implemented | Tested| Notes |
 |---|---|---|---|
-| [APB](nmea0183/APB.md) | ✅ Yes | ✅ Yes | Autopilot Sentence "B" |
-| [DBT](nmea0183/DBT.md) | ✅ Yes | ✅ Yes | Depth Below Transducer |
-| [DPT](nmea0183/DPT.md) | ✅ Yes | ✅ Yes | Depth of Water |
-| [GGA](nmea0183/GGA.md) | ✅ Yes | ✅ Yes | Global Positioning System Fix Data |
-| [GLL](nmea0183/GLL.md) | ✅ Yes | ✅ Yes | Geographic Position |
-| [GSA](nmea0183/GSA.md) | ✅ Yes | ✅ Yes | GPS DOP and Active Satellites |
-| [GSV](nmea0183/GSV.md) | ✅ Yes | ✅ Yes | GPS Satellites in View |
-| [HDG](nmea0183/HDG.md) | ✅ Yes | ✅ Yes | Heading, Deviation and Variation |
-| [HDM](nmea0183/HDM.md) | ✅ Yes | ✅ Yes | Heading, Magnetic |
-| [MTW](nmea0183/MTW.md) | ✅ Yes | ✅ Yes | Mean Temperature of Water |
-| [MWV](nmea0183/MWV.md) | ✅ Yes | ✅ Yes | Wind Speed and Angle |
-| [RMA](nmea0183/RMA.md) | ✅ Yes | ✅ Yes | Recommended Minimum Specific Loran-C Data |
-| [RMB](nmea0183/RMB.md) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Information |
-| [RMC](nmea0183/RMC.md) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Data |
-| [VHW](nmea0183/VHW.md) | ✅ Yes | ✅ Yes | Water Speed and Heading |
-| [VLW](nmea0183/VLW.md) | ✅ Yes | ✅ Yes | Distance Traveled Through Water |
-| [VTG](nmea0183/VTG.md) | ✅ Yes | ✅ Yes | Course Over Ground and Ground Speed |
-| [VWR](nmea0183/VWR.md) | ✅ Yes | ✅ Yes | Relative Wind Speed and Angle |
-| [XDR](nmea0183/XDR.md) | ✅ Yes | ✅ Yes | Transducer Measurements |
-| [XTE](nmea0183/XTE.md) | ✅ Yes | ✅ Yes | Cross-Track Error, Measured |
-| [ZDA](nmea0183/ZDA.md) | ✅ Yes | ✅ Yes | Time and Date |
+| [APB](#apb) | ✅ Yes | ✅ Yes | Autopilot Sentence "B" |
+| [DBT](#dbt) | ✅ Yes | ✅ Yes | Depth Below Transducer |
+| [DPT](#dpt) | ✅ Yes | ✅ Yes | Depth of Water |
+| [GGA](#gga) | ✅ Yes | ✅ Yes | Global Positioning System Fix Data |
+| [GLL](#gll) | ✅ Yes | ✅ Yes | Geographic Position |
+| [GSA](#gsa) | ✅ Yes | ✅ Yes | GPS DOP and Active Satellites |
+| [GSV](#gsv) | ✅ Yes | ✅ Yes | GPS Satellites in View |
+| [HDG](#hdg) | ✅ Yes | ✅ Yes | Heading, Deviation and Variation |
+| [HDM](#hdm) | ✅ Yes | ✅ Yes | Heading, Magnetic |
+| [MTW](#mtw) | ✅ Yes | ✅ Yes | Mean Temperature of Water |
+| [MWV](#mwv) | ✅ Yes | ✅ Yes | Wind Speed and Angle |
+| [RMA](#rma) | ✅ Yes | ✅ Yes | Recommended Minimum Specific Loran-C Data |
+| [RMB](#rmb) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Information |
+| [RMC](#rmc) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Data |
+| [VHW](#vhw) | ✅ Yes | ✅ Yes | Water Speed and Heading |
+| [VLW](#vlw) | ✅ Yes | ✅ Yes | Distance Traveled Through Water |
+| [VTG](#vtg) | ✅ Yes | ✅ Yes | Course Over Ground and Ground Speed |
+| [VWR](#vwr) | ✅ Yes | ✅ Yes | Relative Wind Speed and Angle |
+| [XDR](#xdr) | ✅ Yes | ✅ Yes | Transducer Measurements |
+| [XTE](#xte) | ✅ Yes | ✅ Yes | Cross-Track Error, Measured |
+| [ZDA](#zda) | ✅ Yes | ✅ Yes | Time and Date |
 
 ## NMEA 2000
 
 | Message / Transport | Implemented | Tested | Notes |
 |---|---|---|---|
-| Single-frame messages | ✅ Yes | ❌ No | Standard one-frame CAN payloads |
-| Fast-packet transport | ❌ No | ❌ No | Multi-frame transport handling |
-| [PGN 127245](nmea2000/PGN127245.md) | ✅ Yes | ✅ Yes | Rudder |
-| [PGN 127250](nmea2000/PGN127250.md) | ✅ Yes | ✅ Yes | Vessel Heading |
-| [PGN 127251](nmea2000/PGN127251.md) | ✅ Yes | ✅ Yes | Rate of Turn |
-| [PGN 127257](nmea2000/PGN127257.md) | ✅ Yes | ✅ Yes | Attitude (yaw, pitch, roll) |
-| [PGN 128259](nmea2000/PGN128259.md) | ✅ Yes | ✅ Yes | Speed, Water Referenced |
-| [PGN 130306](nmea2000/PGN130306.md) | ✅ Yes | ✅ Yes | Wind Data |
+| [Single-frame messages](#single-frame-messages) | ✅ Yes | ❌ No | Standard one-frame CAN payloads |
+| [Fast-packet transport](#fast-packet-transport) | ❌ No | ❌ No | Multi-frame transport handling |
+| [PGN 127245](#pgn-127245) | ✅ Yes | ✅ Yes | Rudder |
+| [PGN 127250](#pgn-127250) | ✅ Yes | ✅ Yes | Vessel Heading |
+| [PGN 127251](#pgn-127251) | ✅ Yes | ✅ Yes | Rate of Turn |
+| [PGN 127257](#pgn-127257) | ✅ Yes | ✅ Yes | Attitude (yaw, pitch, roll) |
+| [PGN 128259](#pgn-128259) | ✅ Yes | ✅ Yes | Speed, Water Referenced |
+| [PGN 130306](#pgn-130306) | ✅ Yes | ✅ Yes | Wind Data |
 
 ---
 
@@ -49,6 +49,7 @@ This page tracks message/PGN support and implementation details.
 
 This information has beed sourced from the [gpsd](https://gpsd.gitlab.io/gpsd/NMEA.html) documentation. All credits go to Eric S. Raymond <esr@thyrsus.com>.
 
+<a id="gga"></a>
 ### GGA — Global Positioning System Fix Data
 
 Provides time, position, and fix-related data for a GPS receiver.
@@ -93,6 +94,7 @@ $GNGGA,001043.00,4404.14036,N,12118.85961,W,1,12,0.98,1113.0,M,-21.3,M*47
 > Note: Jackson Labs replaces the quality indicator with GPSDO status.
 
 
+<a id="gll"></a>
 ### GLL — Geographic Position - Latitude/Longitude
 
 Provides latitude, longitude, and time of position fix.
@@ -130,6 +132,7 @@ $--GLL,ddmm.mm,a,dddmm.mm,a,hhmmss.ss,a,m*hh<CR><LF>
 $GNGLL,4404.14012,N,12118.85993,W,001037.00,A,A*67
 ```
 
+<a id="rmc"></a>
 ### RMC — Recommended Minimum Navigation Information
 
 Provides essential minimum navigation data.
@@ -179,6 +182,7 @@ $--RMC,hhmmss.ss,A,ddmm.mm,a,dddmm.mm,a,x.x,x.x,xxxx,x.x,a,m,s*hh<CR><LF>
 $GNRMC,001031.00,A,4404.13993,N,12118.86023,W,0.146,,100117,,,A*7B
 ```
 
+<a id="vtg"></a>
 ### VTG — Track Made Good and Ground Speed
 
 Provides course over ground and ground speed information.
@@ -238,6 +242,7 @@ $--VTG,x.x,x,x.x,x.x*hh<CR><LF>
 $GPVTG,220.86,T,,M,2.550,N,4.724,K,A*34
 ```
 
+<a id="vhw"></a>
 ### VHW — Water Speed and Heading
 
 Provides vessel heading and speed relative to the water.
@@ -266,6 +271,7 @@ $--VHW,x.x,T,x.x,M,x.x,N,x.x,K*hh<CR><LF>
 
 > [GLOBALSAT] describes a different format in which the first three fields are water-temperature measurements. It’s not clear which is correct.
 
+<a id="hdg"></a>
 ### HDG — Heading, Deviation & Variation
 
 ## Sentence Structure
@@ -287,6 +293,7 @@ $--VHW,x.x,T,x.x,M,x.x,N,x.x,K*hh<CR><LF>
 | 5 | Variation direction | — | `E` = Easterly, `W` = Westerly |
 | 6 | Checksum | — | `*hh` |
 
+<a id="dbt"></a>
 ### DBT — Depth Below Transducer
  
 Reports water depth below the transducer in multiple units.
@@ -320,6 +327,7 @@ $--DBT,x.x,f,x.x,M,x.x,F*hh<CR><LF>
 $SDDBT,7.8,f,2.4,M,1.3,F*0D
 ```
 
+<a id="dpt"></a>
 ### DPT — Depth of Water
 
 ## Sentence Structure
@@ -349,6 +357,7 @@ $INDPT,2.3,0.0*46
 >
 > Reference: [Humminbird DPT Documentation](http://www.humminbird.com/normal.asp?id=853)
 
+<a id="mwv"></a>
 ### MWV — Wind Speed and Angle
   
 Reports wind angle and speed, with reference and validity.
@@ -378,6 +387,7 @@ $--MWV,x.x,a,x.x,a*hh<CR><LF>
 $WIMWV,45.0,R,10.5,N,A*1F
 ```
 
+<a id="gsa"></a>
 ### GSA — GPS DOP and Active Satellites
 
 Reports DOP (Dilution of Precision) and active satellites used for the fix.
@@ -422,6 +432,7 @@ $--GSA,a,a,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x.x,x.x,x.x*hh<CR><LF>
 $GNGSA,A,3,80,71,73,79,69,,,,,,,,1.83,1.09,1.47*17
 ```
 
+<a id="mtw"></a>
 ### MTW — Mean Temperature of Water
 
 Reports the mean water temperature.
@@ -450,6 +461,7 @@ $--MTW,x.x,C*hh<CR><LF>
 $INMTW,17.9,C*1B
 ```
 
+<a id="vwr"></a>
 ### VWR — Relative Wind Speed and Angle
 
 Reports relative wind direction and speed in multiple units.
@@ -476,6 +488,7 @@ $--VWR,x.x,a,x.x,N,x.x,M,x.x,K*hh<CR><LF>
 | 8 | `K` | Kilometers per hour unit indicator |
 | 9 | Checksum | `*hh` |
 
+<a id="zda"></a>
 ### ZDA — Time & Date (UTC, Day, Month, Year, Local Time Zone)
 
 Reports UTC time, date, and local time zone offset.
@@ -506,6 +519,7 @@ $--ZDA,hhmmss.ss,xx,xx,xxxx,xx,xx*hh<CR><LF>
 $GPZDA,160012.71,11,03,2004,-1,00*7D
 ```
 
+<a id="apb"></a>
 ### APB — Autopilot Sentence "B"
 
 This is a fixed form of the **APA** sentence with some ambiguities removed.
@@ -549,6 +563,7 @@ $--APB,A,A,x.x,a,N,A,A,x.x,a,c--c,x.x,a,x.x,a*hh<CR><LF>
 $GPAPB,A,A,0.10,R,N,V,V,011,M,DEST,011,M,011,M*82
 ```
 
+<a id="rmb"></a>
 ### RMB — Recommended Minimum Navigation Information
 
 Sent by a navigation receiver when a **destination waypoint is active**.
@@ -594,6 +609,7 @@ $--RMB,A,x.x,a,c--c,c--c,llll.ll,a,yyyyy.yy,a,x.x,x.x,x.x,A,m*hh<CR><LF>
 $GPRMB,A,0.66,L,003,004,4917.24,N,12309.57,W,001.3,052.5,000.5,V*0B
 ```
 
+<a id="xdr"></a>
 ### XDR — Transducer Measurement
 
 ```text
@@ -639,6 +655,7 @@ $HCXDR,A,171,D,PITCH,A,-37,D,ROLL,G,367,,MAGX,G,2420,,MAGY,G,-8984,,MAGZ*41
 
 This sentence contains five quadruplets: pitch, roll, and three magnetic field components (X, Y, Z).
 
+<a id="hdm"></a>
 ### HDM — Heading, Magnetic
 
 Vessel heading in degrees with respect to magnetic north produced by any device or system producing magnetic heading.
@@ -655,6 +672,7 @@ $--HDM,x.x,M*hh
 | 2 | `M` | Magnetic reference indicator |
 | 3 | Checksum | `*hh` |
 
+<a id="xte"></a>
 ### XTE — Cross-Track Error, Measured
 
 XTE Sentencies are formatted as:
@@ -680,6 +698,7 @@ or, in NMEA 2.3 standard:
 
 Example: `$GPXTE,V,V,,,N,S*43`
 
+<a id="vlw"></a>
 ### VLW — Distance Traveled through Water
 
 ## Sentence Structure
@@ -703,6 +722,7 @@ Example: `$GPXTE,V,V,,,N,S*43`
 | 8 | Unit | — | `N` = Nautical Miles *(NMEA 3.0 and above)* |
 | 9 | Checksum | — | `*hh` |
 
+<a id="rma"></a>
 ### RMA — Recommended Minimum Navigation Information
 
 ## Sentence Structure
@@ -730,6 +750,7 @@ Example: `$GPXTE,V,V,,,N,S*43`
 | 11 | Variation direction | — | `E` = Easterly, `W` = Westerly |
 | 12 | Checksum | — | `*hh` |
 
+<a id="gsv"></a>
 ### GSV — Satellites in View
 
 > One of the sentences commonly emitted by GPS units. Describes the sky position of GPS satellites currently in view. Typically transmitted in a group of 2 or 3 sentences.
@@ -778,6 +799,17 @@ $GLGSV,3,3,09,88,07,028*51
 
 ## NMEA 2000
 
+<a id="single-frame-messages"></a>
+### Single-frame messages
+
+Standard NMEA 2000 messages that fit in one CAN frame and can be parsed directly without transport reassembly.
+
+<a id="fast-packet-transport"></a>
+### Fast-packet transport
+
+Multi-frame transport for payloads larger than 8 bytes. Support is currently marked as not implemented in this matrix.
+
+<a id="pgn-127245"></a>
 ### PGN 127245 — Rudder
 
 Reports rudder command/feedback values for a specific rudder channel.
@@ -790,6 +822,7 @@ Reports rudder command/feedback values for a specific rudder channel.
 4. **Position** — signed radians, resolution 1e-4
 5. **Reserved** — protocol-reserved bits/bytes for future use
 
+<a id="pgn-127250"></a>
 ### PGN 127250 — Vessel Heading
 
 Reports vessel heading and related magnetic correction values.
@@ -802,6 +835,7 @@ Reports vessel heading and related magnetic correction values.
 4. **Variation** — signed radians, resolution 1e-4  
 5. **Heading reference** — true or magnetic reference selector
 
+<a id="pgn-127251"></a>
 ### PGN 127251 — Rate of Turn
 
 Reports vessel rate of turn.
@@ -814,6 +848,7 @@ Reports vessel rate of turn.
 4. **Reserved2** — reserved byte for future use  
 5. **Reserved3** — reserved byte for future use
 
+<a id="pgn-127257"></a>
 ### PGN 127257 — Attitude
 
 Reports vessel attitude in yaw, pitch, and roll.
@@ -826,6 +861,7 @@ Reports vessel attitude in yaw, pitch, and roll.
 4. **Roll** — signed radians, resolution 1e-4  
 5. **Reserved** — reserved byte for future use
 
+<a id="pgn-128259"></a>
 ### PGN 128259 — Speed, Water Referenced
 
 Reports water-referenced and ground-referenced vessel speed.
@@ -838,6 +874,7 @@ Reports water-referenced and ground-referenced vessel speed.
 4. **Speed water referenced type** — sensor/source indicator  
 5. **Speed direction** — direction relative to the water
 
+<a id="pgn-130306"></a>
 ### PGN 130306 — Wind Data
 
 Reports wind speed and wind direction with reference type.

@@ -3,7 +3,7 @@ site_description: NMEA 0183 / NMEA 2000 parsing library documentation
 site_url: https://fliuzzi02.github.io/nmealib/
 repo_url: https://github.com/fliuzzi02/nmealib
 repo_name: fliuzzi02/nmealib
-docs_dir: .
+docs_dir: .mkdocs-src
 
 theme:
   name: material
@@ -17,7 +17,7 @@ markdown_extensions:
   - fenced_code
 
 nav:
-  - Home: README.md
+  - Home: index.md
   - Installation: docs/INSTALLATION.md
   - Architecture: docs/ARCHITECTURE.md
   - Protocol Support: docs/PROTOCOL_SUPPORT.md
