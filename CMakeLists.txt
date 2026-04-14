@@ -86,6 +86,25 @@ if(ENABLE_TESTS)
     add_subdirectory(tests EXCLUDE_FROM_INSTALL)
 endif()
 
+# Documentation options
+option(ENABLE_DOXYGEN "Enable generation of Doxygen documentation" OFF)
+
+if(ENABLE_DOXYGEN)
+    find_package(Doxygen REQUIRED)
+
+    set(DOXYGEN_IN "${PROJECT_SOURCE_DIR}/docs/Doxyfile.in")
+    set(DOXYGEN_OUT "${CMAKE_BINARY_DIR}/Doxyfile")
+    configure_file("${DOXYGEN_IN}" "${DOXYGEN_OUT}" @ONLY)
+
+    add_custom_target(docs
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/docs/doxygen"
+        COMMAND ${DOXYGEN_EXECUTABLE} "${DOXYGEN_OUT}"
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM
+    )
+endif()
+
 # Static analysis options
 option(ENABLE_STATIC_ANALYSIS "Enable static analysis (clang-tidy and cppcheck)" OFF)
 
