@@ -1,19 +1,32 @@
 name: Release
 
 on:
-  push:
-    branches: [ "release/**" ]
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version (X.Y.Z). Leave empty to derive from release/vX.Y.Z branch."
-        required: false
+        description: "Release version (X.Y.Z)"
+        required: true
         type: string
-      publish:
-        description: "Publish outputs (false runs release checks/build only)"
+      publish_github:
+        description: "Publish to GitHub (tag + release)"
         required: false
         type: boolean
-        default: true
+        default: false
+      publish_platformio:
+        description: "Publish to PlatformIO"
+        required: false
+        type: boolean
+        default: false
+      publish_pypi:
+        description: "Publish to PyPI"
+        required: false
+        type: boolean
+        default: false
+      publish_testpypi:
+        description: "Publish to TestPyPI"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -21,14 +34,17 @@ permissions:
 jobs:
   prepare:
     runs-on: ubuntu-latest
-    if: ${{ github.actor != 'github-actions[bot]' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.created == true)) }}
+    if: ${{ github.actor != 'github-actions[bot]' }}
     permissions:
       contents: write
     outputs:
       version: ${{ steps.meta.outputs.version }}
       tag: ${{ steps.meta.outputs.tag }}
       branch: ${{ steps.meta.outputs.branch }}
-      publish: ${{ steps.meta.outputs.publish }}
+      publish_github: ${{ steps.meta.outputs.publish_github }}
+      publish_platformio: ${{ steps.meta.outputs.publish_platformio }}
+      publish_pypi: ${{ steps.meta.outputs.publish_pypi }}
+      publish_testpypi: ${{ steps.meta.outputs.publish_testpypi }}
       source_ref: ${{ steps.source_ref.outputs.source_ref }}
 
     steps:
@@ -42,12 +58,20 @@ jobs:
       shell: bash
       run: |
         branch="${GITHUB_REF_NAME}"
+        version="${{ github.event.inputs.version }}"
+        publish_github="${{ github.event.inputs.publish_github }}"
+        publish_platformio="${{ github.event.inputs.publish_platformio }}"
+        publish_pypi="${{ github.event.inputs.publish_pypi }}"
+        publish_testpypi="${{ github.event.inputs.publish_testpypi }}"
 
-        if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.version }}" ]]; then
-          version="${{ github.event.inputs.version }}"
-        else
-          version="${branch#release/}"
-          version="${version#v}"
+        if [[ "$branch" != "main" ]]; then
+          echo "Release workflow must be run from main. Current ref: $branch" >&2
+          exit 1
+        fi
+
+        if [[ "$publish_github" != "true" && "$publish_platformio" != "true" && "$publish_pypi" != "true" && "$publish_testpypi" != "true" ]]; then
+          echo "Select at least one publish target." >&2
+          exit 1
         fi
 
         if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
@@ -55,19 +79,16 @@ jobs:
           exit 1
         fi
 
-        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-          publish="${{ github.event.inputs.publish }}"
-        else
-          publish="true"
-        fi
-
         echo "version=$version" >> "$GITHUB_OUTPUT"
         echo "tag=v$version" >> "$GITHUB_OUTPUT"
         echo "branch=$branch" >> "$GITHUB_OUTPUT"
-        echo "publish=$publish" >> "$GITHUB_OUTPUT"
+        echo "publish_github=$publish_github" >> "$GITHUB_OUTPUT"
+        echo "publish_platformio=$publish_platformio" >> "$GITHUB_OUTPUT"
+        echo "publish_pypi=$publish_pypi" >> "$GITHUB_OUTPUT"
+        echo "publish_testpypi=$publish_testpypi" >> "$GITHUB_OUTPUT"
 
     - name: Update VERSION
-      if: ${{ steps.meta.outputs.publish == 'true' }}
+      if: ${{ steps.meta.outputs.publish_github == 'true' || steps.meta.outputs.publish_platformio == 'true' || steps.meta.outputs.publish_pypi == 'true' || steps.meta.outputs.publish_testpypi == 'true' }}
       shell: bash
       run: |
         branch="${{ steps.meta.outputs.branch }}"
@@ -90,7 +111,7 @@ jobs:
         fi
 
     - name: Create tag
-      if: ${{ steps.meta.outputs.publish == 'true' }}
+      if: ${{ steps.meta.outputs.publish_github == 'true' }}
       shell: bash
       run: |
         tag="${{ steps.meta.outputs.tag }}"
@@ -105,7 +126,7 @@ jobs:
       id: source_ref
       shell: bash
       run: |
-        if [[ "${{ steps.meta.outputs.publish }}" == "true" ]]; then
+        if [[ "${{ steps.meta.outputs.publish_github }}" == "true" ]]; then
           echo "source_ref=refs/tags/${{ steps.meta.outputs.tag }}" >> "$GITHUB_OUTPUT"
         else
           echo "source_ref=refs/heads/${{ steps.meta.outputs.branch }}" >> "$GITHUB_OUTPUT"
@@ -119,7 +140,7 @@ jobs:
 
   build:
     needs: [prepare, tests]
-    if: ${{ needs.prepare.outputs.publish == 'true' }}
+    if: ${{ needs.prepare.outputs.publish_github == 'true' || needs.prepare.outputs.publish_pypi == 'true' || needs.prepare.outputs.publish_testpypi == 'true' }}
     uses: ./.github/workflows/Build.yml
     with:
       version: ${{ needs.prepare.outputs.version }}
@@ -128,7 +149,7 @@ jobs:
 
   publish-github:
     needs: [prepare, build, tests]
-    if: ${{ needs.prepare.outputs.publish == 'true' }}
+    if: ${{ needs.prepare.outputs.publish_github == 'true' }}
     permissions:
       contents: write
     uses: ./.github/workflows/PublishGitHub.yml
@@ -138,7 +159,7 @@ jobs:
 
   publish-python:
     needs: [prepare, build, tests]
-    if: ${{ needs.prepare.outputs.publish == 'true' }}
+    if: ${{ needs.prepare.outputs.publish_pypi == 'true' }}
     uses: ./.github/workflows/PublishPython.yml
     with:
       version: ${{ needs.prepare.outputs.version }}
@@ -147,9 +168,20 @@ jobs:
     secrets:
       PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
 
-  publish-platformio:
+  publish-testpypi:
     needs: [prepare, build, tests]
-    if: ${{ needs.prepare.outputs.publish == 'true' }}
+    if: ${{ needs.prepare.outputs.publish_testpypi == 'true' }}
+    uses: ./.github/workflows/PublishTestPyPI.yml
+    with:
+      version: ${{ needs.prepare.outputs.version }}
+      tag: ${{ needs.prepare.outputs.tag }}
+      publish: true
+    secrets:
+      TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+
+  publish-platformio:
+    needs: [prepare, tests]
+    if: ${{ needs.prepare.outputs.publish_platformio == 'true' }}
     uses: ./.github/workflows/PublishPlatformIO.yml
     with:
       version: ${{ needs.prepare.outputs.version }}
@@ -159,27 +191,3 @@ jobs:
       publish: true
     secrets:
       PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
-
-  cleanup-release-branch:
-    runs-on: ubuntu-latest
-    needs: [prepare, publish-github, publish-python, publish-platformio]
-    if: ${{ always() && needs.prepare.outputs.publish == 'true' && github.event_name == 'push' && github.event.created == true && needs.publish-github.result == 'success' && needs.publish-python.result == 'success' && needs.publish-platformio.result == 'success' }}
-    permissions:
-      contents: write
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Delete release branch after successful publish
-      shell: bash
-      run: |
-        branch="${{ needs.prepare.outputs.branch }}"
-        if [[ -z "$branch" || "$branch" == "main" || "$branch" == "master" ]]; then
-          echo "Skipping branch deletion for protected or invalid branch: $branch"
-          exit 0
-        fi
-
-        git push origin --delete "$branch" \
-          && echo "Deleted release branch: $branch" \
-          || echo "Branch deletion skipped (likely protected)."
