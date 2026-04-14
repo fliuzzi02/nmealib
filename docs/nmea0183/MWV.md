@@ -2,18 +2,77 @@
 
 Class `nmea0183.MWV` (Python) / `nmealib::nmea0183::MWV` (C++).
 
+## Sentence Overview
+Wind speed and angle with reference (relative/true) and status (GPSD: MWV - Wind Speed and Angle).
+
 ## Creation
-- Python direct: `msg = nmealib.nmea0183.MWV(<fields...>)`
-- C++ direct: `nmealib::nmea0183::MWV msg(/* fields */);`
-- Python factory: `msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)`
-- C++ factory: `auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);`
+- Python direct:
+```python
+msg = nmealib.nmea0183.MWV(<fields...>)
+```
+- C++ direct:
+```cpp
+nmealib::nmea0183::MWV msg(/* fields */);
+```
+- Python factory:
+```python
+msg = nmealib.nmea0183.Nmea0183Factory.create(raw_sentence)
+```
+- C++ factory:
+```cpp
+auto msg = nmealib::nmea0183::Nmea0183Factory::create(rawSentence);
+```
 
 ## Public Methods
-- `get_reference` / `getReference`
-- `get_status` / `getStatus`
-- `get_string_content` / `getStringContent`
-- `get_wind_angle` / `getWindAngle`
-- `get_wind_speed` / `getWindSpeed`
-- `get_wind_speed_units` / `getWindSpeedUnits`
+
+### `get_reference` / `getReference`
+
+```cpp
+char getReference() const noexcept;
+```
+
+Returns the reference value parsed from this sentence.
+
+### `get_status` / `getStatus`
+
+```cpp
+char getStatus() const noexcept;
+```
+
+Returns the status value parsed from this sentence.
+
+### `get_string_content` / `getStringContent`
+
+```cpp
+std::string getStringContent(bool verbose) const noexcept override;
+```
+
+Returns a human-readable representation of the sentence content.
+
+### `get_wind_angle` / `getWindAngle`
+
+```cpp
+double getWindAngle() const noexcept;
+```
+
+Returns the wind angle value parsed from this sentence.
+
+### `get_wind_speed` / `getWindSpeed`
+
+```cpp
+double getWindSpeed() const noexcept;
+```
+
+Returns the wind speed value parsed from this sentence.
+
+### `get_wind_speed_units` / `getWindSpeedUnits`
+
+```cpp
+char getWindSpeedUnits() const noexcept;
+```
+
+Returns the wind speed units value parsed from this sentence.
+
 ## Notes
 - Inherits `Message0183` and `Message` APIs (`serialize`, `validate`, `clone`, raw/timestamp/type getters).
+- Sentence overview source: https://gpsd.gitlab.io/gpsd/NMEA.html
