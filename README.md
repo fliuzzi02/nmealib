@@ -4,7 +4,7 @@
     <img src="docs/nmealib.png" alt="nmealib logo" width="240"/>
 </p>
 
-[![License: GPL-3.0](https://img.shields.io/github/license/fliuzzi02/nmealib)](LICENSE)
+[![License: GPL-3.0](https://img.shields.io/github/license/fliuzzi02/nmealib)](https://github.com/fliuzzi02/nmealib/blob/main/LICENSE)
 [![Release](https://img.shields.io/github/v/release/fliuzzi02/nmealib)](https://github.com/fliuzzi02/nmealib/releases)
 [![PlatformIO Registry](https://badges.registry.platformio.org/packages/fliuzzi02/library/nmealib.svg)](https://registry.platformio.org/libraries/fliuzzi02/nmealib)
 [![PyPI version](https://badge.fury.io/py/nmealib.svg)](https://badge.fury.io/py/nmealib)
@@ -168,7 +168,7 @@ All messages/PGNs listed in the [Protocol Support](docs/PROTOCOL_SUPPORT.md) are
 
 ## License
 
-Licensed under **MIT**. See [LICENSE](LICENSE).
+Licensed under **MIT**. See [LICENSE](https://github.com/fliuzzi02/nmealib/blob/main/LICENSE).
 
 ---
 

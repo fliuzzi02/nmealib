@@ -3,7 +3,7 @@ site_description: NMEA 0183 / NMEA 2000 parsing library documentation
 site_url: https://fliuzzi02.github.io/nmealib/
 repo_url: https://github.com/fliuzzi02/nmealib
 repo_name: fliuzzi02/nmealib
-docs_dir: .mkdocs-src
+docs_dir: .
 
 theme:
   name: material
@@ -17,11 +17,11 @@ markdown_extensions:
   - fenced_code
 
 nav:
-  - Home: index.md
-  - Installation: INSTALLATION.md
-  - Architecture: ARCHITECTURE.md
-  - Protocol Support: PROTOCOL_SUPPORT.md
-  - Examples: EXAMPLES.md
-  - Contributing: CONTRIBUTING.md
-  - API Overview: API.md
-  - Doxygen C++ API: api/index.html
+  - Home: README.md
+  - Installation: docs/INSTALLATION.md
+  - Architecture: docs/ARCHITECTURE.md
+  - Protocol Support: docs/PROTOCOL_SUPPORT.md
+  - Examples: docs/EXAMPLES.md
+  - Contributing: docs/CONTRIBUTING.md
+  - API Overview: docs/API.md
+  - Doxygen C++ API: docs/DOXYGEN.md

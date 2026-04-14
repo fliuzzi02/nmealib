@@ -6,40 +6,40 @@ This page tracks message/PGN support and implementation details.
 
 | Message | Implemented | Tested| Notes |
 |---|---|---|---|
-| [APB](#apb--autopilot-sentence-b) | ✅ Yes | ✅ Yes | Autopilot Sentence "B" |
-| [DBT](#dbt--depth-below-transducer) | ✅ Yes | ✅ Yes | Depth Below Transducer |
-| [DPT](#dpt--depth-of-water) | ✅ Yes | ✅ Yes | Depth of Water |
-| [GGA](#gga--global-positioning-system-fix-data) | ✅ Yes | ✅ Yes | Global Positioning System Fix Data |
-| [GLL](#gll--geographic-position---latitudelongitude) | ✅ Yes | ✅ Yes | Geographic Position |
-| [GSA](#gsa--gps-dop-and-active-satellites) | ✅ Yes | ✅ Yes | GPS DOP and Active Satellites |
-| [GSV](#gsv--satellites-in-view) | ✅ Yes | ✅ Yes | GPS Satellites in View |
-| [HDG](#hdg--heading-deviation--variation) | ✅ Yes | ✅ Yes | Heading, Deviation and Variation |
-| [HDM](#hdm--heading-magnetic) | ✅ Yes | ✅ Yes | Heading, Magnetic |
-| [MTW](#mtw--mean-temperature-of-water) | ✅ Yes | ✅ Yes | Mean Temperature of Water |
-| [MWV](#mwv--wind-speed-and-angle) | ✅ Yes | ✅ Yes | Wind Speed and Angle |
-| [RMA](#rma--recommended-minimum-navigation-information) | ✅ Yes | ✅ Yes | Recommended Minimum Specific Loran-C Data |
-| [RMB](#rmb--recommended-minimum-navigation-information) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Information |
-| [RMC](#rmc--recommended-minimum-navigation-information) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Data |
-| [VHW](#vhw--water-speed-and-heading) | ✅ Yes | ✅ Yes | Water Speed and Heading |
-| [VLW](#vlw--distance-traveled-through-water) | ✅ Yes | ✅ Yes | Distance Traveled Through Water |
-| [VTG](#vtg--track-made-good-and-ground-speed) | ✅ Yes | ✅ Yes | Course Over Ground and Ground Speed |
-| [VWR](#vwr--relative-wind-speed-and-angle) | ✅ Yes | ✅ Yes | Relative Wind Speed and Angle |
-| [XDR](#xdr--transducer-measurement) | ✅ Yes | ✅ Yes | Transducer Measurements |
-| [XTE](#xte--cross-track-error-measured) | ✅ Yes | ✅ Yes | Cross-Track Error, Measured |
-| [ZDA](#zda--time--date-utc-day-month-year-local-time-zone) | ✅ Yes | ✅ Yes | Time and Date |
+| [APB](nmea0183/APB.md) | ✅ Yes | ✅ Yes | Autopilot Sentence "B" |
+| [DBT](nmea0183/DBT.md) | ✅ Yes | ✅ Yes | Depth Below Transducer |
+| [DPT](nmea0183/DPT.md) | ✅ Yes | ✅ Yes | Depth of Water |
+| [GGA](nmea0183/GGA.md) | ✅ Yes | ✅ Yes | Global Positioning System Fix Data |
+| [GLL](nmea0183/GLL.md) | ✅ Yes | ✅ Yes | Geographic Position |
+| [GSA](nmea0183/GSA.md) | ✅ Yes | ✅ Yes | GPS DOP and Active Satellites |
+| [GSV](nmea0183/GSV.md) | ✅ Yes | ✅ Yes | GPS Satellites in View |
+| [HDG](nmea0183/HDG.md) | ✅ Yes | ✅ Yes | Heading, Deviation and Variation |
+| [HDM](nmea0183/HDM.md) | ✅ Yes | ✅ Yes | Heading, Magnetic |
+| [MTW](nmea0183/MTW.md) | ✅ Yes | ✅ Yes | Mean Temperature of Water |
+| [MWV](nmea0183/MWV.md) | ✅ Yes | ✅ Yes | Wind Speed and Angle |
+| [RMA](nmea0183/RMA.md) | ✅ Yes | ✅ Yes | Recommended Minimum Specific Loran-C Data |
+| [RMB](nmea0183/RMB.md) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Information |
+| [RMC](nmea0183/RMC.md) | ✅ Yes | ✅ Yes | Recommended Minimum Navigation Data |
+| [VHW](nmea0183/VHW.md) | ✅ Yes | ✅ Yes | Water Speed and Heading |
+| [VLW](nmea0183/VLW.md) | ✅ Yes | ✅ Yes | Distance Traveled Through Water |
+| [VTG](nmea0183/VTG.md) | ✅ Yes | ✅ Yes | Course Over Ground and Ground Speed |
+| [VWR](nmea0183/VWR.md) | ✅ Yes | ✅ Yes | Relative Wind Speed and Angle |
+| [XDR](nmea0183/XDR.md) | ✅ Yes | ✅ Yes | Transducer Measurements |
+| [XTE](nmea0183/XTE.md) | ✅ Yes | ✅ Yes | Cross-Track Error, Measured |
+| [ZDA](nmea0183/ZDA.md) | ✅ Yes | ✅ Yes | Time and Date |
 
 ## NMEA 2000
 
 | Message / Transport | Implemented | Tested | Notes |
 |---|---|---|---|
-| [Single-frame messages](#nmea-2000-single-frame-messages) | ✅ Yes | ❌ No | Standard one-frame CAN payloads |
-| [Fast-packet transport](#nmea-2000-fast-packet-transport) | ❌ No | ❌ No | Multi-frame transport handling |
-| [PGN 127245](#pgn-127245--rudder) | ✅ Yes | ✅ Yes | Rudder |
-| [PGN 127250](#pgn-127250--vessel-heading) | ✅ Yes | ✅ Yes | Vessel Heading |
-| [PGN 127251](#pgn-127251--rate-of-turn) | ✅ Yes | ✅ Yes | Rate of Turn |
-| [PGN 127257](#pgn-127257--attitude) | ✅ Yes | ✅ Yes | Attitude (yaw, pitch, roll) |
-| [PGN 128259](#pgn-128259--speed-water-referenced) | ✅ Yes | ✅ Yes | Speed, Water Referenced |
-| [PGN 130306](#pgn-130306--wind-data) | ✅ Yes | ✅ Yes | Wind Data |
+| Single-frame messages | ✅ Yes | ❌ No | Standard one-frame CAN payloads |
+| Fast-packet transport | ❌ No | ❌ No | Multi-frame transport handling |
+| [PGN 127245](nmea2000/PGN127245.md) | ✅ Yes | ✅ Yes | Rudder |
+| [PGN 127250](nmea2000/PGN127250.md) | ✅ Yes | ✅ Yes | Vessel Heading |
+| [PGN 127251](nmea2000/PGN127251.md) | ✅ Yes | ✅ Yes | Rate of Turn |
+| [PGN 127257](nmea2000/PGN127257.md) | ✅ Yes | ✅ Yes | Attitude (yaw, pitch, roll) |
+| [PGN 128259](nmea2000/PGN128259.md) | ✅ Yes | ✅ Yes | Speed, Water Referenced |
+| [PGN 130306](nmea2000/PGN130306.md) | ✅ Yes | ✅ Yes | Wind Data |
 
 ---
 
