@@ -140,7 +140,7 @@ jobs:
 
   build:
     needs: [prepare, tests]
-    if: ${{ needs.prepare.outputs.publish_github == 'true' || needs.prepare.outputs.publish_pypi == 'true' || needs.prepare.outputs.publish_testpypi == 'true' }}
+    if: ${{ needs.prepare.outputs.publish_github == 'true' || needs.prepare.outputs.publish_pypi == 'true' }}
     uses: ./.github/workflows/Build.yml
     with:
       version: ${{ needs.prepare.outputs.version }}
@@ -169,12 +169,13 @@ jobs:
       PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
 
   publish-testpypi:
-    needs: [prepare, build, tests]
+    needs: [prepare, tests]
     if: ${{ needs.prepare.outputs.publish_testpypi == 'true' }}
     uses: ./.github/workflows/PublishTestPyPI.yml
     with:
       version: ${{ needs.prepare.outputs.version }}
       tag: ${{ needs.prepare.outputs.tag }}
+      source_ref: ${{ needs.prepare.outputs.source_ref }}
       publish: true
     secrets:
       TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
