@@ -112,11 +112,6 @@ cmake --build out/build/python-tests -j
 
 5) Run Python tests:
 ```bash
-PYTHONPATH="$PWD/python:$PWD/out/build/python-tests/python" pytest -q tests/python/test_bindings_all_supported.py
-```
-
-6) Optional full Python test suite:
-```bash
 PYTHONPATH="$PWD/python:$PWD/out/build/python-tests/python" pytest -q tests/python
 ```
 

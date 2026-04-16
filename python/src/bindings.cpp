@@ -3,6 +3,7 @@
 #include <pybind11/stl.h>
 
 #include <array>
+#include <cctype>
 #include <optional>
 #include <string>
 #include <vector>
@@ -102,11 +103,32 @@ void bindDataType(py::module_& m, const char* name) {
         });
 }
 
+std::string safeVersionString() {
+    std::string version;
+    version.reserve(32);
+
+    // Keep only semver-friendly ASCII chars so Python never attempts to decode
+    // invalid bytes coming from build-time definitions.
+    const unsigned char* raw = reinterpret_cast<const unsigned char*>(NMEALIB_VERSION);
+    for (std::size_t i = 0; raw[i] != '\0'; ++i) {
+        const unsigned char c = raw[i];
+        if (std::isdigit(c) != 0 || c == '.' || c == '-' || c == '+' ||
+            (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+            version.push_back(static_cast<char>(c));
+        }
+    }
+
+    if (version.empty()) {
+        return "0.0.0";
+    }
+    return version;
+}
+
 }  // namespace
 
 PYBIND11_MODULE(_core, m) {
     m.doc() = "Python bindings for nmealib";
-    m.attr("__version__") = NMEALIB_VERSION;
+    m.attr("__version__") = safeVersionString();
 
     auto nmeaException = py::register_exception<NmeaException>(m, "NmeaException");
     py::register_exception<TooLongSentenceException>(m, "TooLongSentenceException", nmeaException.ptr());

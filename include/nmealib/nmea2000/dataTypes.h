@@ -7,6 +7,7 @@
 #include <limits>
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 namespace nmealib {
 namespace nmea2000 {
@@ -137,7 +138,11 @@ public:
      */
     std::string toString() const {
         std::ostringstream oss;
-        oss << std::fixed << std::setprecision(getPrecision()) << getValue();
+        if constexpr (std::is_integral_v<TargetType>) {
+            oss << static_cast<long long>(getValue());
+        } else {
+            oss << std::fixed << std::setprecision(getPrecision()) << getValue();
+        }
         return oss.str();
     }
 
