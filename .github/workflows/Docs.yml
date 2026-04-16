@@ -36,7 +36,7 @@ jobs:
         run: cmake --preset gcc-release -DENABLE_DOXYGEN=ON
 
       - name: Build Doxygen docs
-        run: cmake --build --preset build-release --target docs
+        run: cmake --build --preset build-release --target docs --parallel "$(nproc)"
 
       - name: Prepare MkDocs content
         run: |

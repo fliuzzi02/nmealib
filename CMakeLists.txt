@@ -20,14 +20,6 @@ else()
     add_compile_options(-Wall -Wextra -Werror)
 endif()
 
-# Enable parallel builds if supported by the generator
-include(ProcessorCount)
-ProcessorCount(NPROC)
-if(NPROC GREATER 1)
-    set(CMAKE_BUILD_PARALLEL_LEVEL ${NPROC})
-    message(STATUS "Enabling parallel build with ${NPROC} jobs")
-endif()
-
 # Code coverage options
 option(ENABLE_COVERAGE "Enable code coverage instrumentation" OFF)
 

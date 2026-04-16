@@ -38,7 +38,7 @@ jobs:
         -DENABLE_COVERAGE=ON
 
     - name: Build
-      run: cmake --build build --config Release
+      run: cmake --build build --config Release --parallel "$(nproc)"
 
     - name: Run all tests
       working-directory: build

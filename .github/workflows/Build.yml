@@ -45,7 +45,7 @@ jobs:
         -S ${{ github.workspace }}
 
     - name: Build release (library only)
-      run: cmake --build ${{ steps.strings.outputs.build-lib-dir }} --config Release
+      run: cmake --build ${{ steps.strings.outputs.build-lib-dir }} --config Release --parallel "$(nproc)"
 
     - name: Configure CMake (library + cli)
       run: >
@@ -59,7 +59,7 @@ jobs:
         -S ${{ github.workspace }}
 
     - name: Build release (library + cli)
-      run: cmake --build ${{ steps.strings.outputs.build-cli-dir }} --config Release
+      run: cmake --build ${{ steps.strings.outputs.build-cli-dir }} --config Release --parallel "$(nproc)"
 
     - name: Prepare library package
       working-directory: ${{ steps.strings.outputs.build-lib-dir }}
