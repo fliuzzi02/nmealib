@@ -85,5 +85,38 @@ cmake --install out/build/gcc-release --prefix out/install/gcc-release
 - Root dirs: `.github/`, `app/`, `docs/`, `include/`, `src/`, `tests/`, `scripts/`.
 - README says: CMake 3.20+, C++20, preset-based build/test flow, CLI usage examples, install under `out/install/...`.
 
+## Python bindings tests (required when touching bindings or PGN/message constructors)
+Run from repo root.
+
+1) Configure a build with Python bindings enabled:
+```bash
+cmake -S . -B out/build/python-tests -DCMAKE_BUILD_TYPE=Release -DBUILD_PYTHON_BINDINGS=ON
+```
+
+2) Build:
+```bash
+cmake --build out/build/python-tests -j
+```
+
+3) Run Python tests with explicit module path:
+```bash
+PYTHONPATH="$PWD/python:$PWD/out/build/python-tests/python" pytest -q tests/python/test_bindings_mvp.py tests/python/test_bindings_all_supported.py
+```
+
+4) Optional full Python test suite:
+```bash
+PYTHONPATH="$PWD/python:$PWD/out/build/python-tests/python" pytest -q tests/python
+```
+
+If `ModuleNotFoundError: nmealib` appears, `PYTHONPATH` is not set correctly or `_core` was not built.
+
+## Mandatory checklist for new PGN or NMEA0183 messages
+Whenever a new PGN or NMEA0183 message is added, all of the following are required:
+
+1. Wire the new message in CMake (library sources/tests CMake files as appropriate).
+2. Add unit tests matching the style/coverage of existing implemented messages.
+3. Add/update Python bindings for the message in `python/src/bindings.cpp`.
+4. Document support details in `docs/PROTOCOL_SUPPORT.md`.
+
 ## Search policy
 Trust this file first. Only run broad repository searches if this file is incomplete, outdated, or your task touches an area not listed here.
