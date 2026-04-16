@@ -262,6 +262,15 @@ struct AngularRateTraits {
     static constexpr RawType RAW_MIN = std::numeric_limits<RawType>::min();
     static constexpr RawType RAW_MAX = std::numeric_limits<RawType>::max();
 };
+struct AccelerationTraits {
+    static constexpr double MIN = -327.64;
+    static constexpr double MAX = 327.64;
+    static constexpr double RESOLUTION = 1e-2;
+    using RawType = int16_t;
+    using TargetType = float;
+    static constexpr RawType RAW_MIN = std::numeric_limits<RawType>::min();
+    static constexpr RawType RAW_MAX = std::numeric_limits<RawType>::max();
+};
 
 /**
  * @brief Custom type representing distances in meters.
@@ -379,6 +388,19 @@ using Longitude = DataType<LongitudeTraits>;
  * - Target type: double (for use in higher-level fields that expect an angular rate value) 
  */
 using AngularRate = DataType<AngularRateTraits>;
+
+/**
+ * @brief Custom type representing accelerations in meters per second squared.
+ * 
+ * - Range: [-327.64, 327.64] m/s²
+ * 
+ * - Resolution: 0.01 m/s²
+ * 
+ * - Raw type: int16_t
+ * 
+ * - Target type: double (for use in higher-level fields that expect an acceleration value)
+ */
+using Acceleration = DataType<AccelerationTraits>;
 
 } // namespace nmea2000
 } // namespace nmealib
