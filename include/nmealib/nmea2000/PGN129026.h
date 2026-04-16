@@ -31,16 +31,10 @@ public:
     PGN129026(uint8_t sequenceId,
               HalfByte cogReference,
               Angle cog,
-              Speed sog
-            ) noexcept;
-    // TODO: Use only one constructor with default values for reserved fields, and remove the one with reserved parameters, since reserved fields should be set to 0 and not used by the user.
-    PGN129026(uint8_t sequenceId,
-              HalfByte cogReference,
-              Byte reserved,
-              Angle cog,
               Speed sog,
-              Byte reserved2,
-              Byte reserved3
+                            Byte reserved = Byte::fromValue(0U),
+              Byte reserved2 = Byte::fromValue(0U),
+              Byte reserved3 = Byte::fromValue(0U)
             ) noexcept;
 
     // Accessory constructors

@@ -26,8 +26,7 @@ TEST(PGN127250, GettersReturnCorrectValues) {
         Angle::fromValue(1.5707f),
         SignedAngle::fromValue(-0.7853f),
         SignedAngle::fromValue(0.7853f),
-        HalfByte::fromValue(1),
-        Byte::fromValue(0));
+        HalfByte::fromValue(1));
 
     EXPECT_EQ(pgn.getType(), nmealib::Message::Type::NMEA2000);
     EXPECT_EQ(pgn.getPgn(), 127250U);
@@ -109,8 +108,7 @@ TEST(PGN127250, CloneCreatesEqualObject) {
         Angle::fromValue(1.5707f),
         SignedAngle::fromValue(-0.7853f),
         SignedAngle::fromValue(0.7853f),
-        HalfByte::fromValue(1),
-        Byte::fromValue(0));
+        HalfByte::fromValue(1));
 
     auto clone = original.clone();
     auto* clonedPgn = dynamic_cast<PGN127250*>(clone.get());
@@ -124,8 +122,7 @@ TEST(PGN127250, StringContent) {
         Angle::fromValue(1.5707f),
         SignedAngle::fromValue(-0.7853f),
         SignedAngle::fromValue(0.7853f),
-        HalfByte::fromValue(1),
-        Byte::fromValue(0));
+        HalfByte::fromValue(1));
 
     std::string expectedVerbose = "--------------------------------\nProtocol:    NMEA2000\nPriority:    0\nData Page:   1\nPDU Format:  0xf1 (PDU2 - broadcast)\nDestination: 255 (global)\nSource Addr: 0\nPGN:         127250 (0x1f112)\nFrame Len:   8 bytes\nFrame Data:  02 fe 3f 00 60 fe 9f 01\nFields:\n\tSequence ID: 2\n\tHeading: 1.5706rad, 89.9904\xC2\xB0\n\tDeviation: -0.7854rad, -44.9979\xC2\xB0\n\tVariation: 0.7853rad, 44.9924\xC2\xB0\n\tHeading Reference: Magnetic\n";
     std::string expectedNonVerbose = "[OK] NMEA2000 PGN127250: SeqID=2 Heading=89.9904° Deviation=-44.9979° Variation=44.9924° HeadingRef=1";

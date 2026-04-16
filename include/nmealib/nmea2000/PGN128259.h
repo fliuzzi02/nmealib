@@ -37,9 +37,8 @@ public:
               Speed speedGroundReferenced,
               Byte speedWaterReferencedType,
               HalfByte speedDirection,
-              Byte reserved1,
-              HalfByte reserved2);
-    // TODO: Use only one constructor with default values for reserved fields, and remove the one with reserved parameters, since reserved fields should be set to 0 and not used by the user.
+              Byte reserved1 = Byte::fromValue(0U),
+              HalfByte reserved2 = HalfByte::fromValue(0U));
 
     // Accessory constructors
     PGN128259(const PGN128259&) = default;

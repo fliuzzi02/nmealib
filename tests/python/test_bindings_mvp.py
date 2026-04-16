@@ -10,8 +10,11 @@ VTG_SENTENCE = "$GPVTG,220.86,T,218.90,M,2.550,N,4.724,K*40\r\n"
 PGN127250_SENTENCE = "09F11260:342C71FF7FFF7FFD"
 PGN127245_SENTENCE = "01F10D00:0101FEBF0060FFFF"
 PGN127257_SENTENCE = "01F11900:02FE3F0060FE9F00"
+PGN127251_SENTENCE = "01F11300:0200000000000000"
 PGN128001_SENTENCE = "01F40100:050A00FBFF6400FF"
+PGN128259_SENTENCE = "01F50300:01F4012C01000000"
 PGN129026_SENTENCE = "01F80200:01010040F4010000"
+PGN130306_SENTENCE = "19FD0201:8C2C010479FAFFFF"
 
 
 def test_create_from_fields_0183():
@@ -57,8 +60,17 @@ def test_create_from_fields_2000():
     pgn128001 = nmealib.nmea2000.PGN128001(5, 0.1, -0.05, 1.0)
     assert pgn128001.get_pgn() == 128001
 
+    pgn127251 = nmealib.nmea2000.PGN127251(7, 0.25)
+    assert pgn127251.get_pgn() == 127251
+
+    pgn128259 = nmealib.nmea2000.PGN128259(1, 5.0, 3.0, 0, 0)
+    assert pgn128259.get_pgn() == 128259
+
     pgn129026 = nmealib.nmea2000.PGN129026(7, 1, 1.5707, 5.0)
     assert pgn129026.get_pgn() == 129026
+
+    pgn130306 = nmealib.nmea2000.PGN130306(1, 5.0, 1.5707, 1)
+    assert pgn130306.get_pgn() == 130306
 
 
 def test_create_from_raw_factories_and_dispatch_2000():
@@ -74,5 +86,14 @@ def test_create_from_raw_factories_and_dispatch_2000():
     pgn128001 = nmealib.nmea2000.Nmea2000Factory.create(PGN128001_SENTENCE)
     assert isinstance(pgn128001, nmealib.nmea2000.PGN128001)
 
+    pgn127251 = nmealib.nmea2000.Nmea2000Factory.create(PGN127251_SENTENCE)
+    assert isinstance(pgn127251, nmealib.nmea2000.PGN127251)
+
+    pgn128259 = nmealib.nmea2000.Nmea2000Factory.create(PGN128259_SENTENCE)
+    assert isinstance(pgn128259, nmealib.nmea2000.PGN128259)
+
     pgn129026 = nmealib.nmea2000.Nmea2000Factory.create(PGN129026_SENTENCE)
     assert isinstance(pgn129026, nmealib.nmea2000.PGN129026)
+
+    pgn130306 = nmealib.nmea2000.Nmea2000Factory.create(PGN130306_SENTENCE)
+    assert isinstance(pgn130306, nmealib.nmea2000.PGN130306)

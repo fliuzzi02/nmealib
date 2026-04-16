@@ -51,20 +51,8 @@ PGN129026::PGN129026(Message2000 baseMessage,
 PGN129026::PGN129026(uint8_t sequenceId,
                      HalfByte cogReference,
                      Angle cog,
-                     Speed sog) noexcept :
-                     PGN129026(sequenceId,
-                               cogReference,
-                               Byte::fromValue(0U),
-                               cog,
-                               sog,
-                               Byte::fromValue(0U),
-                               Byte::fromValue(0U)) {}
-
-PGN129026::PGN129026(uint8_t sequenceId,
-                     HalfByte cogReference,
-                     Byte reserved,
-                     Angle cog,
                      Speed sog,
+                     Byte reserved,
                      Byte reserved2,
                      Byte reserved3) noexcept :
                      Message2000(*Message2000::create(rawPayload(sequenceId,

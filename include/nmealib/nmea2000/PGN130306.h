@@ -29,17 +29,10 @@ public:
     PGN130306(uint8_t sequenceId,
               Speed windSpeed,
               Angle windDirection,
-              HalfByte windReference
-            ) noexcept;
-    // TODO: Use only one constructor with default values for reserved fields, and remove the one with reserved parameters, since reserved fields should be set to 0 and not used by the user.
-    // Accessory constructors that sets also reserved values
-    PGN130306(uint8_t sequenceId,
-              Speed windSpeed,
-              Angle windDirection,
               HalfByte windReference,
-              HalfByte reserved1,
-              Byte reserved2,
-              Byte reserved3
+              HalfByte reserved1 = HalfByte::fromValue(0U),
+              Byte reserved2 = Byte::fromValue(0U),
+              Byte reserved3 = Byte::fromValue(0U)
             ) noexcept;
 
     // Accessory constructors

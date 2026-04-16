@@ -550,19 +550,29 @@ PYBIND11_MODULE(_core, m) {
         .def("get_string_content", &PGN128001::getStringContent, py::arg("verbose") = false);
 
     py::class_<PGN127245, Message2000>(m2000, "PGN127245")
-        .def(py::init<uint8_t, HalfByte, SignedAngle, SignedAngle>(),
-             py::arg("rudder_id"), py::arg("direction"), py::arg("angle_order"), py::arg("position"))
+        .def(py::init<uint8_t, HalfByte, SignedAngle, SignedAngle, Byte, Byte, Byte>(),
+             py::arg("rudder_id"), py::arg("direction"), py::arg("angle_order"), py::arg("position"),
+             py::arg("reserved") = Byte::fromValue(0U),
+             py::arg("reserved2") = Byte::fromRaw(255U),
+             py::arg("reserved3") = Byte::fromRaw(255U))
         .def(py::init([](uint8_t rudderId,
                          uint8_t direction,
                          float angleOrder,
-                         float position) {
+                         float position,
+                         uint8_t reserved,
+                         uint8_t reserved2,
+                         uint8_t reserved3) {
             return PGN127245(
                 rudderId,
                 HalfByte::fromValue(direction),
                 SignedAngle::fromValue(angleOrder),
-                SignedAngle::fromValue(position));
+                SignedAngle::fromValue(position),
+                Byte::fromValue(reserved),
+                Byte::fromValue(reserved2),
+                Byte::fromValue(reserved3));
         }),
-             py::arg("rudder_id"), py::arg("direction"), py::arg("angle_order_radians"), py::arg("position_radians"))
+             py::arg("rudder_id"), py::arg("direction"), py::arg("angle_order_radians"), py::arg("position_radians"),
+             py::arg("reserved") = 0, py::arg("reserved2") = 255, py::arg("reserved3") = 255)
         .def("get_rudder_id", &PGN127245::getRudderId)
         .def("get_direction", &PGN127245::getDirection)
         .def("get_angle_order", &PGN127245::getAngleOrder)
@@ -575,7 +585,7 @@ PYBIND11_MODULE(_core, m) {
     py::class_<PGN127250, Message2000>(m2000, "PGN127250")
         .def(py::init<uint8_t, Angle, SignedAngle, SignedAngle, HalfByte, Byte>(),
              py::arg("sequence_id"), py::arg("heading"), py::arg("deviation"),
-             py::arg("variation"), py::arg("heading_reference"), py::arg("reserved"))
+             py::arg("variation"), py::arg("heading_reference"), py::arg("reserved") = Byte::fromValue(0U))
         .def(py::init([](uint8_t sequenceId,
                          float heading,
                          float deviation,
@@ -605,7 +615,9 @@ PYBIND11_MODULE(_core, m) {
     py::class_<PGN127251, Message2000>(m2000, "PGN127251")
         .def(py::init<uint8_t, AngularRate, Byte, Byte, Byte>(),
              py::arg("sequence_id"), py::arg("rate"),
-             py::arg("reserved1"), py::arg("reserved2"), py::arg("reserved3"))
+             py::arg("reserved1") = Byte::fromValue(0U),
+             py::arg("reserved2") = Byte::fromValue(0U),
+             py::arg("reserved3") = Byte::fromValue(0U))
         .def(py::init([](uint8_t sequenceId,
                          double rate,
                          uint8_t reserved1,
@@ -628,49 +640,57 @@ PYBIND11_MODULE(_core, m) {
         .def("get_string_content", &PGN127251::getStringContent, py::arg("verbose") = false);
 
     py::class_<PGN127257, Message2000>(m2000, "PGN127257")
-           .def(py::init<uint8_t, SignedAngle, SignedAngle, SignedAngle, Byte>(),
-               py::arg("sequence_id"), py::arg("yaw"), py::arg("pitch"), py::arg("roll"), py::arg("reserved"))
-           .def(py::init([](uint8_t sequenceId,
+        .def(py::init<uint8_t, SignedAngle, SignedAngle, SignedAngle, Byte>(),
+             py::arg("sequence_id"), py::arg("yaw"), py::arg("pitch"), py::arg("roll"),
+             py::arg("reserved") = Byte::fromValue(0U))
+        .def(py::init([](uint8_t sequenceId,
                         float yaw,
                         float pitch,
                         float roll,
                         uint8_t reserved) {
-              return PGN127257(
-                 sequenceId,
-                 SignedAngle::fromValue(yaw),
-                 SignedAngle::fromValue(pitch),
-                 SignedAngle::fromValue(roll),
-                 Byte::fromValue(reserved));
-           }),
-               py::arg("sequence_id"), py::arg("yaw_radians"), py::arg("pitch_radians"),
-               py::arg("roll_radians"), py::arg("reserved") = 0)
-           .def("get_sequence_id", &PGN127257::getSequenceId)
-           .def("get_yaw", &PGN127257::getYaw)
-           .def("get_pitch", &PGN127257::getPitch)
-           .def("get_roll", &PGN127257::getRoll)
-           .def("get_reserved", &PGN127257::getReserved)
-           .def("get_yaw_degrees", &PGN127257::getYawDegrees)
-           .def("get_pitch_degrees", &PGN127257::getPitchDegrees)
-           .def("get_roll_degrees", &PGN127257::getRollDegrees)
-           .def("get_string_content", &PGN127257::getStringContent, py::arg("verbose") = false);
+            return PGN127257(
+                sequenceId,
+                SignedAngle::fromValue(yaw),
+                SignedAngle::fromValue(pitch),
+                SignedAngle::fromValue(roll),
+                Byte::fromValue(reserved));
+        }),
+             py::arg("sequence_id"), py::arg("yaw_radians"), py::arg("pitch_radians"),
+             py::arg("roll_radians"), py::arg("reserved") = 0)
+        .def("get_sequence_id", &PGN127257::getSequenceId)
+        .def("get_yaw", &PGN127257::getYaw)
+        .def("get_pitch", &PGN127257::getPitch)
+        .def("get_roll", &PGN127257::getRoll)
+        .def("get_reserved", &PGN127257::getReserved)
+        .def("get_yaw_degrees", &PGN127257::getYawDegrees)
+        .def("get_pitch_degrees", &PGN127257::getPitchDegrees)
+        .def("get_roll_degrees", &PGN127257::getRollDegrees)
+        .def("get_string_content", &PGN127257::getStringContent, py::arg("verbose") = false);
 
     py::class_<PGN129026, Message2000>(m2000, "PGN129026")
-        .def(py::init<uint8_t, HalfByte, Angle, Speed>(),
-             py::arg("sequence_id"), py::arg("cog_reference"), py::arg("cog"), py::arg("sog"))
-        .def(py::init<uint8_t, HalfByte, Byte, Angle, Speed, Byte, Byte>(),
-             py::arg("sequence_id"), py::arg("cog_reference"), py::arg("reserved1"),
-             py::arg("cog"), py::arg("sog"), py::arg("reserved2"), py::arg("reserved3"))
+        .def(py::init<uint8_t, HalfByte, Angle, Speed, Byte, Byte, Byte>(),
+             py::arg("sequence_id"), py::arg("cog_reference"), py::arg("cog"), py::arg("sog"),
+             py::arg("reserved1") = Byte::fromValue(0U),
+             py::arg("reserved2") = Byte::fromValue(0U),
+             py::arg("reserved3") = Byte::fromValue(0U))
         .def(py::init([](uint8_t sequenceId,
                          uint8_t cogReference,
                          float cog,
-                         float sog) {
+                         float sog,
+                         uint8_t reserved1,
+                         uint8_t reserved2,
+                         uint8_t reserved3) {
             return PGN129026(
                 sequenceId,
                 HalfByte::fromValue(cogReference),
                 Angle::fromValue(cog),
-                Speed::fromValue(sog));
+                Speed::fromValue(sog),
+                Byte::fromValue(reserved1),
+                Byte::fromValue(reserved2),
+                Byte::fromValue(reserved3));
         }),
-             py::arg("sequence_id"), py::arg("cog_reference"), py::arg("cog_radians"), py::arg("sog_mps"))
+             py::arg("sequence_id"), py::arg("cog_reference"), py::arg("cog_radians"), py::arg("sog_mps"),
+             py::arg("reserved1") = 0, py::arg("reserved2") = 0, py::arg("reserved3") = 0)
         .def("get_sequence_id", &PGN129026::getSequenceId)
         .def("get_cog_reference", &PGN129026::getCogReference)
         .def("get_cog", &PGN129026::getCog)
@@ -686,7 +706,7 @@ PYBIND11_MODULE(_core, m) {
         .def(py::init<uint8_t, Speed, Speed, Byte, HalfByte, Byte, HalfByte>(),
              py::arg("sequence_id"), py::arg("speed_water_referenced"), py::arg("speed_ground_referenced"),
              py::arg("speed_water_referenced_type"), py::arg("speed_direction"),
-             py::arg("reserved1"), py::arg("reserved2"))
+             py::arg("reserved1") = Byte::fromValue(0U), py::arg("reserved2") = HalfByte::fromValue(0U))
         .def(py::init([](uint8_t sequenceId,
                          float speedWaterReferenced,
                          float speedGroundReferenced,
@@ -724,21 +744,27 @@ PYBIND11_MODULE(_core, m) {
         .def("get_string_content", &PGN129025::getStringContent, py::arg("verbose") = false);
 
     py::class_<PGN130306, Message2000>(m2000, "PGN130306")
-        .def(py::init<uint8_t, Speed, Angle, HalfByte>(),
-             py::arg("sequence_id"), py::arg("wind_speed"), py::arg("wind_direction"), py::arg("wind_reference"))
         .def(py::init<uint8_t, Speed, Angle, HalfByte, HalfByte, Byte, Byte>(),
              py::arg("sequence_id"), py::arg("wind_speed"), py::arg("wind_direction"), py::arg("wind_reference"),
-             py::arg("reserved1"), py::arg("reserved2"), py::arg("reserved3"))
+             py::arg("reserved1") = HalfByte::fromValue(0U), py::arg("reserved2") = Byte::fromValue(0U),
+             py::arg("reserved3") = Byte::fromValue(0U))
         .def(py::init([](uint8_t sequenceId,
                          float windSpeed,
                          float windDirection,
-                         uint8_t windReference) {
+                         uint8_t windReference,
+                         uint8_t reserved1,
+                         uint8_t reserved2,
+                         uint8_t reserved3) {
             return PGN130306(
                 sequenceId,
                 Speed::fromValue(windSpeed),
                 Angle::fromValue(windDirection),
-                HalfByte::fromValue(windReference));
-        }), py::arg("sequence_id"), py::arg("wind_speed_mps"), py::arg("wind_direction_radians"), py::arg("wind_reference"))
+                HalfByte::fromValue(windReference),
+                HalfByte::fromValue(reserved1),
+                Byte::fromValue(reserved2),
+                Byte::fromValue(reserved3));
+        }), py::arg("sequence_id"), py::arg("wind_speed_mps"), py::arg("wind_direction_radians"), py::arg("wind_reference"),
+            py::arg("reserved1") = 0, py::arg("reserved2") = 0, py::arg("reserved3") = 0)
         .def("get_sequence_id", &PGN130306::getSequenceId)
         .def("get_wind_speed", &PGN130306::getWindSpeed)
         .def("get_wind_direction", &PGN130306::getWindDirection)

@@ -31,8 +31,10 @@ public:
     PGN127245(uint8_t rudderId,
               HalfByte direction,
               SignedAngle angleOrder,
-              SignedAngle position) noexcept;
-    // TODO: Use only one constructor with default values for reserved fields, and remove the one with reserved parameters, since reserved fields should be set to 0 and not used by the user.
+              SignedAngle position,
+              Byte reserved = Byte::fromValue(0U),
+              Byte reserved2 = Byte::fromRaw(255U),
+              Byte reserved3 = Byte::fromRaw(255U)) noexcept;
 
     // Accessory constructors
     PGN127245(const PGN127245&) = default;

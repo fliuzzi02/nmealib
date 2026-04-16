@@ -17,9 +17,9 @@ static const std::string FRAME_TOO_LONG = "01F80200:01010040F401000000";
 static PGN129026 makeTypical() {
     return PGN129026(7,
                      HalfByte::fromValue(1),
-                     Byte::fromValue(0),
                      Angle::fromValue(1.5707f),
                      Speed::fromValue(5.0f),
+                     Byte::fromValue(0),
                      Byte::fromValue(0x12),
                      Byte::fromValue(0x34));
 }
@@ -49,17 +49,17 @@ TEST(PGN129026, GettersReturnCorrectValues) {
 TEST(PGN129026, DataFieldLimits) {
     auto min = PGN129026(1,
                          HalfByte::fromRaw(std::numeric_limits<uint8_t>::min()),
-                         Byte::fromValue(0),
                          Angle::fromRaw(std::numeric_limits<uint16_t>::min()),
                          Speed::fromRaw(std::numeric_limits<uint16_t>::min()),
+                         Byte::fromValue(0),
                          Byte::fromRaw(std::numeric_limits<uint8_t>::min()),
                          Byte::fromRaw(std::numeric_limits<uint8_t>::min()));
 
     auto max = PGN129026(1,
                          HalfByte::fromRaw(0x0F),
-                         Byte::fromValue(63),
                          Angle::fromRaw(std::numeric_limits<uint16_t>::max()),
                          Speed::fromRaw(std::numeric_limits<uint16_t>::max()),
+                         Byte::fromValue(63),
                          Byte::fromRaw(std::numeric_limits<uint8_t>::max()),
                          Byte::fromRaw(std::numeric_limits<uint8_t>::max()));
 
@@ -142,11 +142,8 @@ TEST(PGN129026, EqualityDependsOnPayload) {
 TEST(PGN129026, StringContent) {
     auto pgn = PGN129026(1,
                          HalfByte::fromValue(0),
-                         Byte::fromValue(0),
                          Angle::fromRaw(0),
-                         Speed::fromRaw(0),
-                         Byte::fromValue(0),
-                         Byte::fromValue(0));
+                         Speed::fromRaw(0));
 
     std::string expectedVerbose = "--------------------------------\nProtocol:    NMEA2000\nPriority:    0\nData Page:   1\nPDU Format:  0xf8 (PDU2 - broadcast)\nDestination: 255 (global)\nSource Addr: 0\nPGN:         129026 (0x1f802)\nFrame Len:   8 bytes\nFrame Data:  01 00 00 00 00 00 00 00\nFields:\n\tSequence ID: 1\n\tCourse Over Ground: 0.0000rad, 0\xC2\xB0\n\tSpeed Over Ground: 0 knots\n\tCOG Reference: True\n";
     std::string expectedNonVerbose = "[OK] NMEA2000 PGN129026: SeqID=1 COG=0° SOG=0 knots COGRef=0";
@@ -166,9 +163,9 @@ TEST(PGN129026, SerializeRoundTrip) {
 
     auto toSerialize = PGN129026(pgn->getSequenceId(),
                                  pgn->getCogReference(),
-                                 pgn->getReserved1(),
                                  pgn->getCog(),
                                  pgn->getSog(),
+                                 pgn->getReserved1(),
                                  pgn->getReserved2(),
                                  pgn->getReserved3());
     

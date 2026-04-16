@@ -68,13 +68,6 @@ PGN130306::PGN130306(uint8_t sequenceId,
                     reserved2_(reserved2),
                     reserved3_(reserved3) {}
 
-PGN130306::PGN130306(uint8_t sequenceId,
-                    Speed windSpeed,
-                    Angle windDirection,
-                    HalfByte windReference) noexcept :
-                    PGN130306(sequenceId, windSpeed, windDirection, windReference,
-                              HalfByte::fromValue(0U), Byte::fromValue(0U), Byte::fromValue(0U)) {}
-
 std::unique_ptr<Message> PGN130306::clone() const {
     return std::unique_ptr<PGN130306>(new PGN130306(*this));
 }

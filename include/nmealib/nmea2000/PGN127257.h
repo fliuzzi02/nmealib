@@ -30,8 +30,7 @@ public:
               SignedAngle yaw,
               SignedAngle pitch,
               SignedAngle roll,
-              Byte reserved) noexcept;
-    // TODO: Use only one constructor with default values for reserved fields, and remove the one with reserved parameters, since reserved fields should be set to 0 and not used by the user.
+              Byte reserved = Byte::fromValue(0U)) noexcept;
 
     // Accessory constructors
     PGN127257(const PGN127257&) = default;

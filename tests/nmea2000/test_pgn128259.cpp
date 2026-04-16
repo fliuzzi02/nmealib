@@ -46,8 +46,6 @@ static PGN128259 makeTypical() {
                      Speed::fromValue(5.0f),
                      Speed::fromValue(3.0f),
                      Byte::fromValue(0),
-                     HalfByte::fromValue(0),
-                     Byte::fromValue(0),
                      HalfByte::fromValue(0));
 }
 
