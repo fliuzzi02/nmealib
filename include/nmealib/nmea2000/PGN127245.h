@@ -32,6 +32,7 @@ public:
               HalfByte direction,
               SignedAngle angleOrder,
               SignedAngle position) noexcept;
+    // TODO: Use only one constructor with default values for reserved fields, and remove the one with reserved parameters, since reserved fields should be set to 0 and not used by the user.
 
     // Accessory constructors
     PGN127245(const PGN127245&) = default;
