@@ -64,8 +64,8 @@ jobs:
         publish_pypi="${{ github.event.inputs.publish_pypi }}"
         publish_testpypi="${{ github.event.inputs.publish_testpypi }}"
 
-        if [[ "$branch" != "main" ]]; then
-          echo "Release workflow must be run from main. Current ref: $branch" >&2
+        if [[ "$branch" != "main" && ("$publish_github" == "true" || "$publish_platformio" == "true" || "$publish_pypi" == "true") ]]; then
+          echo "GitHub/PyPI/PlatformIO publishing must be run from main. Current ref: $branch" >&2
           exit 1
         fi
 
