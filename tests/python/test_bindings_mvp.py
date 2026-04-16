@@ -10,6 +10,7 @@ VTG_SENTENCE = "$GPVTG,220.86,T,218.90,M,2.550,N,4.724,K*40\r\n"
 PGN127250_SENTENCE = "09F11260:342C71FF7FFF7FFD"
 PGN127245_SENTENCE = "01F10D00:0101FEBF0060FFFF"
 PGN127257_SENTENCE = "01F11900:02FE3F0060FE9F00"
+PGN128001_SENTENCE = "01F40100:050A00FBFF6400FF"
 PGN129026_SENTENCE = "01F80200:01010040F4010000"
 
 
@@ -53,6 +54,9 @@ def test_create_from_fields_2000():
     pgn127257 = nmealib.nmea2000.PGN127257(2, 1.5707, -0.7853, 0.7853)
     assert pgn127257.get_pgn() == 127257
 
+    pgn128001 = nmealib.nmea2000.PGN128001(5, 0.1, -0.05, 1.0)
+    assert pgn128001.get_pgn() == 128001
+
     pgn129026 = nmealib.nmea2000.PGN129026(7, 1, 1.5707, 5.0)
     assert pgn129026.get_pgn() == 129026
 
@@ -66,6 +70,9 @@ def test_create_from_raw_factories_and_dispatch_2000():
 
     pgn127257 = nmealib.nmea2000.Nmea2000Factory.create(PGN127257_SENTENCE)
     assert isinstance(pgn127257, nmealib.nmea2000.PGN127257)
+
+    pgn128001 = nmealib.nmea2000.Nmea2000Factory.create(PGN128001_SENTENCE)
+    assert isinstance(pgn128001, nmealib.nmea2000.PGN128001)
 
     pgn129026 = nmealib.nmea2000.Nmea2000Factory.create(PGN129026_SENTENCE)
     assert isinstance(pgn129026, nmealib.nmea2000.PGN129026)

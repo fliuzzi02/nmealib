@@ -64,6 +64,7 @@ using nmealib::nmea0183::VWR;
 using nmealib::nmea0183::XDR;
 using nmealib::nmea0183::XTE;
 using nmealib::nmea0183::ZDA;
+using nmealib::nmea2000::Acceleration;
 using nmealib::nmea2000::Angle;
 using nmealib::nmea2000::AngularRate;
 using nmealib::nmea2000::Byte;
@@ -75,6 +76,7 @@ using nmealib::nmea2000::Latitude;
 using nmealib::nmea2000::Longitude;
 using nmealib::nmea2000::Message2000;
 using nmealib::nmea2000::Nmea2000Factory;
+using nmealib::nmea2000::PGN128001;
 using nmealib::nmea2000::PGN127245;
 using nmealib::nmea2000::PGN127250;
 using nmealib::nmea2000::PGN127251;
@@ -487,6 +489,7 @@ PYBIND11_MODULE(_core, m) {
 
     py::module_ m2000 = m.def_submodule("nmea2000", "NMEA 2000 API");
 
+    bindDataType<Acceleration>(m2000, "Acceleration");
     bindDataType<Angle>(m2000, "Angle");
     bindDataType<SignedAngle>(m2000, "SignedAngle");
     bindDataType<Speed>(m2000, "Speed");
@@ -512,6 +515,39 @@ PYBIND11_MODULE(_core, m) {
 
     py::class_<Nmea2000Factory>(m2000, "Nmea2000Factory")
         .def_static("create", &Nmea2000Factory::create, py::arg("raw"), py::arg("timestamp") = std::chrono::system_clock::now());
+
+    py::class_<PGN128001, Message2000>(m2000, "PGN128001")
+        .def(py::init<uint8_t, Acceleration, Acceleration, Acceleration, Byte>(),
+             py::arg("sequence_id"),
+             py::arg("longitudinal_acceleration"),
+             py::arg("transverse_acceleration"),
+             py::arg("vertical_acceleration"),
+             py::arg("reserved") = Byte::fromRaw(255))
+        .def(py::init([](uint8_t sequenceId,
+                         float longitudinalAcceleration,
+                         float transverseAcceleration,
+                         float verticalAcceleration,
+                         uint8_t reserved) {
+            return PGN128001(
+                sequenceId,
+                Acceleration::fromValue(longitudinalAcceleration),
+                Acceleration::fromValue(transverseAcceleration),
+                Acceleration::fromValue(verticalAcceleration),
+                Byte::fromValue(reserved));
+        }),
+             py::arg("sequence_id"),
+             py::arg("longitudinal_acceleration_mps2"),
+             py::arg("transverse_acceleration_mps2"),
+             py::arg("vertical_acceleration_mps2"),
+             py::arg("reserved") = 255)
+        .def("get_sequence_id", &PGN128001::getSequenceId)
+        .def("get_longitudinal_acceleration", &PGN128001::getLongitudinalAcceleration)
+        .def("get_transverse_acceleration", &PGN128001::getTransverseAcceleration)
+        .def("get_vertical_acceleration", &PGN128001::getVerticalAcceleration)
+        .def("get_longitudinal_acceleration_g", &PGN128001::getLongitudinalAccelerationG)
+        .def("get_transverse_acceleration_g", &PGN128001::getTransverseAccelerationG)
+        .def("get_vertical_acceleration_g", &PGN128001::getVerticalAccelerationG)
+        .def("get_string_content", &PGN128001::getStringContent, py::arg("verbose") = false);
 
     py::class_<PGN127245, Message2000>(m2000, "PGN127245")
         .def(py::init<uint8_t, HalfByte, SignedAngle, SignedAngle>(),
