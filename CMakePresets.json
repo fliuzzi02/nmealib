@@ -1,16 +1,16 @@
 {
     "version": 8,
     "configurePresets": [
-        {
+    {
       "name": "gcc-base",
       "displayName": "GCC Base",
       "description": "GCC toolchain and default paths",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "cacheVariables": {
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-                "CMAKE_C_COMPILER": "/usr/bin/gcc",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CMAKE_C_COMPILER": "/usr/bin/gcc",
         "CMAKE_CXX_COMPILER": "/usr/bin/g++"
-            }
+      }
     },
     {
       "name": "gcc-debug",
@@ -73,32 +73,38 @@
     {
       "name": "build-debug",
       "displayName": "Build Debug",
-      "configurePreset": "gcc-debug"
+      "configurePreset": "gcc-debug",
+      "jobs": 20
     },
     {
       "name": "build-debug-tests",
       "displayName": "Build Debug + Tests",
-      "configurePreset": "gcc-debug-tests"
+      "configurePreset": "gcc-debug-tests",
+      "jobs": 20
     },
     {
       "name": "build-release",
       "displayName": "Build Release",
-      "configurePreset": "gcc-release"
+      "configurePreset": "gcc-release",
+      "jobs": 20
     },
     {
       "name": "build-release-tests",
       "displayName": "Build Release + Tests",
-      "configurePreset": "gcc-release-tests"
+      "configurePreset": "gcc-release-tests",
+      "jobs": 20
     },
     {
       "name": "build-release-static",
       "displayName": "Build Release + Static Analysis",
-      "configurePreset": "gcc-release-static"
+      "configurePreset": "gcc-release-static",
+      "jobs": 20
     },
     {
       "name": "build-release-lib-only",
       "displayName": "Build Release (Library Only)",
-      "configurePreset": "gcc-release-lib-only"
+      "configurePreset": "gcc-release-lib-only",
+      "jobs": 20
     }
   ],
     "testPresets": [
