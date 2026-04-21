@@ -29,16 +29,10 @@ public:
     PGN130306(uint8_t sequenceId,
               Speed windSpeed,
               Angle windDirection,
-              HalfByte windReference
-            ) noexcept;
-    // Accessory constructors that sets also reserved values
-    PGN130306(uint8_t sequenceId,
-              Speed windSpeed,
-              Angle windDirection,
               HalfByte windReference,
-              HalfByte reserved1,
-              Byte reserved2,
-              Byte reserved3
+              HalfByte reserved1 = HalfByte::fromValue(0U),
+              Byte reserved2 = Byte::fromValue(0U),
+              Byte reserved3 = Byte::fromValue(0U)
             ) noexcept;
 
     // Accessory constructors

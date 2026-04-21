@@ -31,15 +31,10 @@ public:
     PGN129026(uint8_t sequenceId,
               HalfByte cogReference,
               Angle cog,
-              Speed sog
-            ) noexcept;
-    PGN129026(uint8_t sequenceId,
-              HalfByte cogReference,
-              Byte reserved,
-              Angle cog,
               Speed sog,
-              Byte reserved2,
-              Byte reserved3
+                            Byte reserved = Byte::fromValue(0U),
+              Byte reserved2 = Byte::fromValue(0U),
+              Byte reserved3 = Byte::fromValue(0U)
             ) noexcept;
 
     // Accessory constructors

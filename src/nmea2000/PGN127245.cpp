@@ -51,21 +51,24 @@ PGN127245::PGN127245(Message2000 baseMessage,
 PGN127245::PGN127245(uint8_t rudderId,
                      HalfByte direction,
                      SignedAngle angleOrder,
-                     SignedAngle position) noexcept :
+                     SignedAngle position,
+                     Byte reserved,
+                     Byte reserved2,
+                     Byte reserved3) noexcept :
                      Message2000(*Message2000::create(rawPayload(rudderId,
                                                                 direction,
-                                                                Byte::fromValue(0U),
+                                                                reserved,
                                                                 angleOrder,
                                                                 position,
-                                                                Byte::fromValue(255U),
-                                                                Byte::fromValue(255U)))),
+                                                                reserved2,
+                                                                reserved3))),
                      rudderId_(rudderId),
                      direction_(direction),
-                     reserved_(Byte::fromValue(0U)),
+                     reserved_(reserved),
                      angleOrder_(angleOrder),
                      position_(position),
-                     reserved2(Byte::fromValue(255U)),
-                     reserved3(Byte::fromValue(255U)) {}
+                     reserved2(reserved2),
+                     reserved3(reserved3) {}
 
 std::unique_ptr<Message> PGN127245::clone() const {
     return std::unique_ptr<PGN127245>(new PGN127245(*this));

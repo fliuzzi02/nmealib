@@ -50,6 +50,7 @@
 #include "nmealib/nmea0183/zda.h"
 #include "nmealib/nmea2000/nmea2000Factory.h"
 #include "nmealib/nmea2000/dataTypes.h"
+#include "nmealib/nmea2000/PGN128001.h"
 #include "nmealib/nmea2000/PGN127245.h"
 #include "nmealib/nmea2000/PGN128259.h"
 #include "nmealib/nmea2000/PGN127250.h"

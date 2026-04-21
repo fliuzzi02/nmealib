@@ -31,7 +31,10 @@ public:
     PGN127245(uint8_t rudderId,
               HalfByte direction,
               SignedAngle angleOrder,
-              SignedAngle position) noexcept;
+              SignedAngle position,
+              Byte reserved = Byte::fromValue(0U),
+              Byte reserved2 = Byte::fromRaw(255U),
+              Byte reserved3 = Byte::fromRaw(255U)) noexcept;
 
     // Accessory constructors
     PGN127245(const PGN127245&) = default;

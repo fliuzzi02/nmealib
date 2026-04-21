@@ -33,7 +33,7 @@ public:
               SignedAngle deviation,
               SignedAngle variation,
               HalfByte headingReference,
-              Byte reserved) noexcept;
+              Byte reserved = Byte::fromValue(0U)) noexcept;
 
     // Accessory constructors
     PGN127250(const PGN127250&) = default;

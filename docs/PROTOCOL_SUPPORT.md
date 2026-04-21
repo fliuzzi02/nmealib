@@ -34,6 +34,7 @@ This page tracks message/PGN support and implementation details.
 |---|---|---|---|
 | [Single-frame messages](#single-frame-messages) | ✅ Yes | ❌ No | Standard one-frame CAN payloads |
 | [Fast-packet transport](#fast-packet-transport) | ❌ No | ❌ No | Multi-frame transport handling |
+| [PGN 128001](#pgn-128001) | ✅ Yes | ✅ Yes | Vessel Acceleration |
 | [PGN 127245](#pgn-127245) | ✅ Yes | ✅ Yes | Rudder |
 | [PGN 127250](#pgn-127250) | ✅ Yes | ✅ Yes | Vessel Heading |
 | [PGN 127251](#pgn-127251) | ✅ Yes | ✅ Yes | Rate of Turn |
@@ -821,6 +822,19 @@ Reports rudder command/feedback values for a specific rudder channel.
 3. **Angle order** — signed radians, resolution 1e-4
 4. **Position** — signed radians, resolution 1e-4
 5. **Reserved** — protocol-reserved bits/bytes for future use
+
+<a id="pgn-128001"></a>
+### PGN 128001 — Vessel Acceleration
+
+Reports vessel acceleration in vessel axes.
+
+#### Field definitions
+
+1. **Sequence ID** — message sequence counter
+2. **Longitudinal acceleration** — m/s^2, signed, resolution 1e-2
+3. **Transverse acceleration** — m/s^2, signed, resolution 1e-2
+4. **Vertical acceleration** — m/s^2, signed, resolution 1e-2
+5. **Reserved** — reserved byte for future use
 
 <a id="pgn-127250"></a>
 ### PGN 127250 — Vessel Heading

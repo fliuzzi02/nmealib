@@ -101,10 +101,7 @@ TEST(PGN127251, CloneCreatesEqualObject) {
 
 TEST(PGN127251, StringContent) {
     auto pgn = PGN127251(1,
-                         AngularRate::fromRaw(0),
-                         Byte::fromValue(0),
-                         Byte::fromValue(0),
-                         Byte::fromValue(0));
+                         AngularRate::fromRaw(0));
 
     const std::string verbose = pgn.getStringContent(true);
     const std::string nonVerbose = pgn.getStringContent(false);

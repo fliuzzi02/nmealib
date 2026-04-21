@@ -30,7 +30,7 @@ public:
               SignedAngle yaw,
               SignedAngle pitch,
               SignedAngle roll,
-              Byte reserved) noexcept;
+              Byte reserved = Byte::fromValue(0U)) noexcept;
 
     // Accessory constructors
     PGN127257(const PGN127257&) = default;

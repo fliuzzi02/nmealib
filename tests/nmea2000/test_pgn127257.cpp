@@ -12,8 +12,7 @@ TEST(PGN127257, GettersReturnCorrectValues) {
     auto pgn = PGN127257(2,
         SignedAngle::fromValue(1.5707f),
         SignedAngle::fromValue(-0.7853f),
-        SignedAngle::fromValue(0.7853f),
-        Byte::fromValue(0));
+        SignedAngle::fromValue(0.7853f));
 
     EXPECT_EQ(pgn.getType(), nmealib::Message::Type::NMEA2000);
     EXPECT_EQ(pgn.getPgn(), 127257U);
@@ -83,8 +82,7 @@ TEST(PGN127257, CloneCreatesEqualObject) {
     auto original = PGN127257(2,
         SignedAngle::fromValue(1.5707f),
         SignedAngle::fromValue(-0.7853f),
-        SignedAngle::fromValue(0.7853f),
-        Byte::fromValue(0));
+        SignedAngle::fromValue(0.7853f));
 
     auto clone = original.clone();
     auto* clonedPgn = dynamic_cast<PGN127257*>(clone.get());
@@ -96,8 +94,7 @@ TEST(PGN127257, StringContent) {
     auto pgn = PGN127257(2,
         SignedAngle::fromValue(1.5707f),
         SignedAngle::fromValue(-0.7853f),
-        SignedAngle::fromValue(0.7853f),
-        Byte::fromValue(0));
+        SignedAngle::fromValue(0.7853f));
 
     std::string expectedVerbose = "--------------------------------\nProtocol:    NMEA2000\nPriority:    0\nData Page:   1\nPDU Format:  0xf1 (PDU2 - broadcast)\nDestination: 255 (global)\nSource Addr: 0\nPGN:         127257 (0x1f119)\nFrame Len:   8 bytes\nFrame Data:  02 fe bf 00 60 fe 9f 00\nFields:\n\tSequence ID: 2\n\tYaw: 1.5707rad, 89.9931\xC2\xB0\n\tPitch: -0.7854rad, -44.9979\xC2\xB0\n\tRoll: 0.7853rad, 44.9924\xC2\xB0\n";
     std::string expectedNonVerbose = "[OK] NMEA2000 PGN127257: SeqID=2 Yaw=89.9931° Pitch=-44.9979° Roll=44.9924°";

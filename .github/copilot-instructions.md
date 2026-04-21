@@ -85,5 +85,49 @@ cmake --install out/build/gcc-release --prefix out/install/gcc-release
 - Root dirs: `.github/`, `app/`, `docs/`, `include/`, `src/`, `tests/`, `scripts/`.
 - README says: CMake 3.20+, C++20, preset-based build/test flow, CLI usage examples, install under `out/install/...`.
 
+## Python bindings tests (required when touching bindings or PGN/message constructors)
+Run from repo root.
+
+1) Create and activate a virtual environment (required in this container due PEP 668):
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+2) Install Python test/build prerequisites:
+```bash
+python -m pip install --upgrade pip
+python -m pip install pybind11 pytest
+```
+
+3) Configure a build with Python bindings enabled (explicit `pybind11_DIR` is required for CMake discovery):
+```bash
+cmake -S . -B out/build/python-tests -DCMAKE_BUILD_TYPE=Release -DBUILD_PYTHON_BINDINGS=ON -Dpybind11_DIR="$(python -m pybind11 --cmakedir)"
+```
+
+4) Build:
+```bash
+cmake --build out/build/python-tests -j
+```
+
+5) Run Python tests:
+```bash
+PYTHONPATH="$PWD/python:$PWD/out/build/python-tests/python" pytest -q tests/python
+```
+
+If `ModuleNotFoundError: nmealib` appears, `PYTHONPATH` is not set correctly or `_core` was not built.
+
+If `find_package(pybind11)` fails during configure, ensure the venv is active and pass `-Dpybind11_DIR="$(python -m pybind11 --cmakedir)"`.
+
+Current known issue (as of 2026-04-16): Python tests may fail at import with `ImportError: initialization failed` / `UnicodeDecodeError` even after successful configure/build. Treat this as a bindings runtime issue, not a setup-command issue.
+
+## Mandatory checklist for new PGN or NMEA0183 messages
+Whenever a new PGN or NMEA0183 message is added, all of the following are required:
+
+1. Wire the new message in CMake (library sources/tests CMake files as appropriate).
+2. Add unit tests matching the style/coverage of existing implemented messages.
+3. Add/update Python bindings for the message in `python/src/bindings.cpp`.
+4. Document support details in `docs/PROTOCOL_SUPPORT.md`.
+
 ## Search policy
 Trust this file first. Only run broad repository searches if this file is incomplete, outdated, or your task touches an area not listed here.

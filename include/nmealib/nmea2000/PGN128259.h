@@ -37,8 +37,8 @@ public:
               Speed speedGroundReferenced,
               Byte speedWaterReferencedType,
               HalfByte speedDirection,
-              Byte reserved1,
-              HalfByte reserved2);
+              Byte reserved1 = Byte::fromValue(0U),
+              HalfByte reserved2 = HalfByte::fromValue(0U));
 
     // Accessory constructors
     PGN128259(const PGN128259&) = default;

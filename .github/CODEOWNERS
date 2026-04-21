@@ -1,1 +1,9 @@
+# You own everything by default
 * @fliuzzi02
+
+# These paths have no owner (anyone can change without your review)
+src/
+include/
+python/
+tests/
+app/

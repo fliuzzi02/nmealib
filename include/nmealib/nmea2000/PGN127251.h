@@ -24,9 +24,9 @@ public:
     // Public constructor from parameters, of the reserved field, only the 6 LSBits are considered
     PGN127251(uint8_t sequenceId,
               AngularRate rate,
-              Byte reserved1,
-              Byte reserved2,
-              Byte reserved3) noexcept;
+              Byte reserved1 = Byte::fromValue(0U),
+              Byte reserved2 = Byte::fromValue(0U),
+              Byte reserved3 = Byte::fromValue(0U)) noexcept;
 
     // Accessory constructors
     PGN127251(const PGN127251&) = default;
